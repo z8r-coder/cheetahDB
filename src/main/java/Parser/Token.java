@@ -1,59 +1,29 @@
 package Parser;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Created by roy on 2017/7/9.
+ * Created by roy on 2017/7/17.
  */
-public enum Token {
-    SELECT("SELECT"),
-    FROM("FROM"),
-    WHERE("WHERE"),
-    AND("AND"),
-    OR("OR"),
-    INSERT("INSERT"),
-    VALUES("VALUES"),
-    INTO("INTO"),
-    BETWEEN("BETWEEN"),
-    LIKE("LIKE"),
-    UPDATE("UPDATE"),
-    SET("SET"),
-    DELETE("DELETE"),
-    CREATE("CREATE"),
-    DATABASE("DATABASE"),
-    TABLE("TABLE"),
-    NOT("NOT"),
-    NULL("NULL"),
-    INT("INT"),
-    VARCHAR("VARCHAR"),
-    PRIMARY("PRIMARY"),
-    KEY("KEY"),
-    NUMBER("NUMBER"),
-    ALERT("ALERT"),
-    IDENTIFIED("IDENTIFIED"),
-    COMMA(","),
-    LPARENT("("),
-    RPARENT(")"),
-    COLON(";"),
-    LT("<"),
-    GT(">"),
-    EQ("="),
-    NEQ("!="),
-    GTET(">="),
-    LTET("<="),
-    ;
-    static Map<String, Token> tokenMap = new HashMap<String, Token>();
-    static {
-        tokenMap.put("SELECT",Token.SELECT);
-        
+public class Token {
+    private SortCode sortCode;//种别码
+    private String value;
+
+    public Token(SortCode sortCode, String value) {
+        this.value = value;
+        this.sortCode = sortCode;
+    }
+    public SortCode getSortCode() {
+        return sortCode;
     }
 
-    public final String name;
-    Token(){
-        this(null);
+    public void setSortCode(SortCode sortCode) {
+        this.sortCode = sortCode;
     }
-    Token(String name) {
-        this.name = name;
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }
