@@ -6,10 +6,12 @@ package Parser;
 public class Token {
     private SortCode sortCode;//种别码
     private String value;
+    private int line;//所在行
 
-    public Token(SortCode sortCode, String value) {
+    public Token(SortCode sortCode, String value, int line) {
         this.value = value;
         this.sortCode = sortCode;
+        this.line = line;
     }
     public SortCode getSortCode() {
         return sortCode;
@@ -25,5 +27,13 @@ public class Token {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public void setLine(int line) {
+        this.line = line;
+    }
+
+    public int getLine() {
+        return line;
     }
 }

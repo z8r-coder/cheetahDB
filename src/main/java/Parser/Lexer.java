@@ -1,5 +1,6 @@
 package Parser;
 
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import javafx.css.StyleOrigin;
 import org.omg.PortableServer.POA;
 
@@ -34,6 +35,7 @@ public class Lexer {
         return pos >= sql.length();
     }
 
+    
     /**
      * 接受关键字
      */
@@ -45,14 +47,14 @@ public class Lexer {
             case 's':
                 if (icNextCharIs('E') & icNextCharIs('T') & isNextBlank()) {
                     pos++;
-                    return new Token(SortCode.SET, "SET");
+                    return new Token(SortCode.SET, "SET", line);
                 }
                 pos = savePoint;
                 if (icNextCharIs('E') & icNextCharIs('L')
                         & icNextCharIs('E') & icNextCharIs('C')
-                        & icNextCharIs('T') & (isNextBlank() || isNextLP())) {
+                        & icNextCharIs('T') & isNextBlank()) {
                     pos++;
-                    return new Token(SortCode.SELECT, "SELECT");
+                    return new Token(SortCode.SELECT, "SELECT", line);
                 }
                 pos = savePoint;
                 return null;
@@ -61,20 +63,20 @@ public class Lexer {
                 if (icNextCharIs('N') & icNextCharIs('T')
                         & isNextLP()) {
                     pos++;
-                    return new Token(SortCode.INT, "INT");
+                    return new Token(SortCode.INT, "INT", line);
                 }
                 pos = savePoint;
                 if (icNextCharIs('N') & icNextCharIs('T')
                         & icNextCharIs('O') & isNextBlank()) {
                     pos++;
-                    return new Token(SortCode.INTO, "INTO")
+                    return new Token(SortCode.INTO, "INTO", line);
                 }
                 pos = savePoint;
                 if (icNextCharIs('N') & icNextCharIs('S')
                         & icNextCharIs('E') & icNextCharIs('R')
                         & icNextCharIs('T') & isNextBlank()) {
                     pos++;
-                    return new Token(SortCode.INSERT, "INSERT");
+                    return new Token(SortCode.INSERT, "INSERT", line);
                 }
                  pos = savePoint;
                 return null;
@@ -84,7 +86,7 @@ public class Lexer {
                         & icNextCharIs('E') & icNextCharIs('T')
                         & isNextBlank()) {
                     pos++;
-                    return new Token(SortCode.DELETE, "DELETE");
+                    return new Token(SortCode.DELETE, "DELETE", line);
                 }
                 pos = savePoint;
                 return null;
@@ -95,7 +97,7 @@ public class Lexer {
                         & icNextCharIs('T') & icNextCharIs('E')
                         & isNextBlank()) {
                     pos++;
-                    return new Token(SortCode.UPDATE, "UPDATE");
+                    return new Token(SortCode.UPDATE, "UPDATE", line);
                 }
                 pos = savePoint;
                 return null;
@@ -105,7 +107,7 @@ public class Lexer {
                         & icNextCharIs('A') & icNextCharIs('T')
                         & icNextCharIs('E') & isNextBlank()) {
                     pos++;
-                    return new Token(SortCode.CREATE, "CREATE");
+                    return new Token(SortCode.CREATE, "CREATE", line);
                 }
                 pos = savePoint;
                 return null;
@@ -114,7 +116,7 @@ public class Lexer {
                 if (icNextCharIs('R') & icNextCharIs('O')
                         & icNextCharIs('M') & (isNextBlank() || isNextLP())) {
                     pos++;
-                    return new Token(SortCode.FROM, "FROM");
+                    return new Token(SortCode.FROM, "FROM", line);
                 }
                 pos = savePoint;
                 return null;
@@ -124,7 +126,7 @@ public class Lexer {
                         & icNextCharIs('R') & icNextCharIs('E')
                         & isNextBlank()) {
                     pos++;
-                    return new Token(SortCode.WHERE, "WHERE");
+                    return new Token(SortCode.WHERE, "WHERE", line);
                 }
                 pos = savePoint;
                 return null;
@@ -132,15 +134,20 @@ public class Lexer {
             case 'a':
                 if (icNextCharIs('N') & icNextCharIs('D') & isNextBlank()) {
                     pos++;
-                    return new Token(SortCode.AND, "AND");
+                    return new Token(SortCode.AND, "AND", line);
                 }
                 pos = savePoint;
+                if (icNextCharIs('L') & icNextCharIs('E')
+                        & icNextCharIs('R') & icNextCharIs('T')) {
+                    pos++;
+                    return new Token(SortCode.ALERT, "ALERT", line);
+                }
                 return null;
             case 'O':
             case 'o':
                 if (icNextCharIs('R') & isNextBlank()) {
                     pos++;
-                    return new Token(SortCode.OR, "OR");
+                    return new Token(SortCode.OR, "OR", line);
                 }
                 pos = savePoint;
                 return null;
@@ -151,18 +158,82 @@ public class Lexer {
                         & icNextCharIs('A') & icNextCharIs('R')
                         & (isNextLP() || isNextBlank())) {
                     pos++;
-                    return new Token(SortCode.VARCHAR, "VARCHAR");
+                    return new Token(SortCode.VARCHAR, "VARCHAR", line);
                 }
                 pos = savePoint;
                 if (icNextCharIs('A') & icNextCharIs('L')
                         & icNextCharIs('U') & icNextCharIs('E')
                         & icNextCharIs('S') & isNextBlank()) {
                     pos++;
-                    return new Token(SortCode.VALUES, "VALUES");
+                    return new Token(SortCode.VALUES, "VALUES", line);
                 }
                 pos = savePoint;
                 return null;
-
+            case 'B':
+            case 'b':
+                if (icNextCharIs('E') & icNextCharIs('T')
+                        & icNextCharIs('W') & icNextCharIs('E')
+                        & icNextCharIs('E') & icNextCharIs('N')
+                        & isNextBlank()) {
+                    pos++;
+                    return new Token(SortCode.BETWEEN, "BETWEEN", line);
+                }
+                pos = savePoint;
+                return null;
+            case 'L':
+            case 'l':
+                if (icNextCharIs('I') & icNextCharIs('K')
+                        & icNextCharIs('E') & isNextBlank()) {
+                    pos++;
+                    return new Token(SortCode.LIKE, "LIKE", line);
+                }
+                pos = savePoint;
+                return null;
+            case 'N':
+            case 'n':
+                if (icNextCharIs('O') & icNextCharIs('T')
+                        & isNextBlank()) {
+                    pos++;
+                    return new Token(SortCode.NOT, "NOT", line);
+                }
+                pos = savePoint;
+                if (icNextCharIs('U') & icNextCharIs('L')
+                        & icNextCharIs('L') & isNextBlank()) {
+                    pos++;
+                    return new Token(SortCode.NULL, "NULL", line);
+                }
+                pos = savePoint;
+                return null;
+            case 'T':
+            case 't':
+                if (icNextCharIs('A') & icNextCharIs('B')
+                        & icNextCharIs('L') & icNextCharIs('E')
+                        & isNextBlank()) {
+                    pos++;
+                    return new Token(SortCode.TABLE, "TABLE" ,line);
+                }
+                pos = savePoint;
+                return null;
+            case 'P':
+            case 'p':
+                if (icNextCharIs('R') & icNextCharIs('I')
+                        & icNextCharIs('M') & icNextCharIs('A')
+                        & icNextCharIs('R') & icNextCharIs('Y')
+                        & isNextBlank()) {
+                    pos++;
+                    return new Token(SortCode.PRIMARY, "PRIMARY", line);
+                }
+                pos = savePoint;
+                return null;
+            case 'K':
+            case 'k':
+                if (icNextCharIs('E') & icNextCharIs('Y')
+                        & (isNextBlank() || isNextLP())) {
+                    pos++;
+                    return new Token(SortCode.KEY, "KEY", line);
+                }
+                pos = savePoint;
+                return null;
             default:
                 return null;
         }
