@@ -27,7 +27,7 @@ public class IOSystem {
             String lineText = null;
 
             while((lineText = br.readLine()) != null) {
-                sb.append(lineText);
+                sb.append(lineText + '\n');
             }
             br.close();
             e.close();

@@ -20,7 +20,7 @@ public class test {
         try {
             List<Token> tokens = lexer.generateTokenStream();
             for (Token token : tokens) {
-                System.out.println(token.getValue());
+                System.out.println(token.getValue() + ":" + token.getLine());
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -2,7 +2,6 @@ package Parser;
 import Exception.*;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +13,7 @@ public class Lexer {
     private String sql;// 输入sql语句
     private char ch;//当前字符
     private  String str;//当前串
-    private int line;//行
+    private int line = 0;//行
     private List<Token> tokenStream = new ArrayList<Token>();
     private final byte ICMask = (byte) 0xDF;
     public Lexer() {
@@ -22,7 +21,6 @@ public class Lexer {
         File file = new File(url);
         IOSystem io = new IOSystem();
         sql = io.readFromFile(file);
-        System.out.println(sql);
     }
     public final char charAt(int pos) {
         if (pos >= sql.length()) {
@@ -103,8 +101,10 @@ public class Lexer {
             if (tmp == ' ' || charAt(pos) == '\t') {
                 continue;
             }
-            if (charAt(pos) == '\n') {
+            char tmp1 = charAt(pos);
+            if (tmp1 == '\n') {
                 plusLine();
+                continue;
             }
             Token token = scan();
             tokenStream.add(token);
@@ -191,6 +191,10 @@ public class Lexer {
                 }
             case '*':
                 return new Token(SortCode.STAR, "*", line);
+            case '{':
+                return new Token(SortCode.BLP, "{", line);
+            case '}':
+                return new Token(SortCode.BRP, "}", line);
             default:
                 return null;
         }

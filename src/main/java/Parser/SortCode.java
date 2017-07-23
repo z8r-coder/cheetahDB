@@ -44,6 +44,8 @@ public enum SortCode {
     GTET(">="),
     LTET("<="),
     STAR("*"),
+    BLP("{"),
+    BRP("}"),
     ;
     static Map<String, SortCode> tokenMap = new HashMap<String, SortCode>();
     static {
