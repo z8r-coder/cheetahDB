@@ -1,8 +1,10 @@
 package Parser;
+import Exception.*;
 
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
-import javafx.css.StyleOrigin;
-import org.omg.PortableServer.POA;
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by roy on 2017/7/9.
@@ -13,7 +15,15 @@ public class Lexer {
     private char ch;//当前字符
     private  String str;//当前串
     private int line;//行
+    private List<Token> tokenStream = new ArrayList<Token>();
     private final byte ICMask = (byte) 0xDF;
+    public Lexer() {
+        String url = Lexer.class.getClassLoader().getResource("testSql.txt").getFile();
+        File file = new File(url);
+        IOSystem io = new IOSystem();
+        sql = io.readFromFile(file);
+        System.out.println(sql);
+    }
     public final char charAt(int pos) {
         if (pos >= sql.length()) {
             return LayoutCharacters.EOI;
@@ -31,213 +41,6 @@ public class Lexer {
         return ch;
     }
 
-    public boolean isEOF() {
-        return pos >= sql.length();
-    }
-
-    
-    /**
-     * 接受关键字
-     */
-    public Token acceptKeyWords() {
-        char currentChar = charAt(pos);
-        int savePoint = pos;
-        switch (currentChar) {
-            case 'S':
-            case 's':
-                if (icNextCharIs('E') & icNextCharIs('T') & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.SET, "SET", line);
-                }
-                pos = savePoint;
-                if (icNextCharIs('E') & icNextCharIs('L')
-                        & icNextCharIs('E') & icNextCharIs('C')
-                        & icNextCharIs('T') & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.SELECT, "SELECT", line);
-                }
-                pos = savePoint;
-                return null;
-            case 'I':
-            case 'i':
-                if (icNextCharIs('N') & icNextCharIs('T')
-                        & isNextLP()) {
-                    pos++;
-                    return new Token(SortCode.INT, "INT", line);
-                }
-                pos = savePoint;
-                if (icNextCharIs('N') & icNextCharIs('T')
-                        & icNextCharIs('O') & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.INTO, "INTO", line);
-                }
-                pos = savePoint;
-                if (icNextCharIs('N') & icNextCharIs('S')
-                        & icNextCharIs('E') & icNextCharIs('R')
-                        & icNextCharIs('T') & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.INSERT, "INSERT", line);
-                }
-                 pos = savePoint;
-                return null;
-            case 'D':
-            case 'd':
-                if (icNextCharIs('E') & icNextCharIs('L')
-                        & icNextCharIs('E') & icNextCharIs('T')
-                        & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.DELETE, "DELETE", line);
-                }
-                pos = savePoint;
-                return null;
-            case 'U':
-            case 'u':
-                if (icNextCharIs('U') & icNextCharIs('P')
-                        & icNextCharIs('D') & icNextCharIs('A')
-                        & icNextCharIs('T') & icNextCharIs('E')
-                        & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.UPDATE, "UPDATE", line);
-                }
-                pos = savePoint;
-                return null;
-            case 'C':
-            case 'c':
-                if (icNextCharIs('R') & icNextCharIs('E')
-                        & icNextCharIs('A') & icNextCharIs('T')
-                        & icNextCharIs('E') & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.CREATE, "CREATE", line);
-                }
-                pos = savePoint;
-                return null;
-            case 'F':
-            case 'f':
-                if (icNextCharIs('R') & icNextCharIs('O')
-                        & icNextCharIs('M') & (isNextBlank() || isNextLP())) {
-                    pos++;
-                    return new Token(SortCode.FROM, "FROM", line);
-                }
-                pos = savePoint;
-                return null;
-            case 'W':
-            case 'w':
-                if (icNextCharIs('H') & icNextCharIs('E')
-                        & icNextCharIs('R') & icNextCharIs('E')
-                        & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.WHERE, "WHERE", line);
-                }
-                pos = savePoint;
-                return null;
-            case 'A':
-            case 'a':
-                if (icNextCharIs('N') & icNextCharIs('D') & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.AND, "AND", line);
-                }
-                pos = savePoint;
-                if (icNextCharIs('L') & icNextCharIs('E')
-                        & icNextCharIs('R') & icNextCharIs('T')) {
-                    pos++;
-                    return new Token(SortCode.ALERT, "ALERT", line);
-                }
-                return null;
-            case 'O':
-            case 'o':
-                if (icNextCharIs('R') & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.OR, "OR", line);
-                }
-                pos = savePoint;
-                return null;
-            case 'V':
-            case 'v':
-                if (icNextCharIs('A') & icNextCharIs('R')
-                        & icNextCharIs('C') & icNextCharIs('H')
-                        & icNextCharIs('A') & icNextCharIs('R')
-                        & (isNextLP() || isNextBlank())) {
-                    pos++;
-                    return new Token(SortCode.VARCHAR, "VARCHAR", line);
-                }
-                pos = savePoint;
-                if (icNextCharIs('A') & icNextCharIs('L')
-                        & icNextCharIs('U') & icNextCharIs('E')
-                        & icNextCharIs('S') & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.VALUES, "VALUES", line);
-                }
-                pos = savePoint;
-                return null;
-            case 'B':
-            case 'b':
-                if (icNextCharIs('E') & icNextCharIs('T')
-                        & icNextCharIs('W') & icNextCharIs('E')
-                        & icNextCharIs('E') & icNextCharIs('N')
-                        & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.BETWEEN, "BETWEEN", line);
-                }
-                pos = savePoint;
-                return null;
-            case 'L':
-            case 'l':
-                if (icNextCharIs('I') & icNextCharIs('K')
-                        & icNextCharIs('E') & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.LIKE, "LIKE", line);
-                }
-                pos = savePoint;
-                return null;
-            case 'N':
-            case 'n':
-                if (icNextCharIs('O') & icNextCharIs('T')
-                        & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.NOT, "NOT", line);
-                }
-                pos = savePoint;
-                if (icNextCharIs('U') & icNextCharIs('L')
-                        & icNextCharIs('L') & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.NULL, "NULL", line);
-                }
-                pos = savePoint;
-                return null;
-            case 'T':
-            case 't':
-                if (icNextCharIs('A') & icNextCharIs('B')
-                        & icNextCharIs('L') & icNextCharIs('E')
-                        & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.TABLE, "TABLE" ,line);
-                }
-                pos = savePoint;
-                return null;
-            case 'P':
-            case 'p':
-                if (icNextCharIs('R') & icNextCharIs('I')
-                        & icNextCharIs('M') & icNextCharIs('A')
-                        & icNextCharIs('R') & icNextCharIs('Y')
-                        & isNextBlank()) {
-                    pos++;
-                    return new Token(SortCode.PRIMARY, "PRIMARY", line);
-                }
-                pos = savePoint;
-                return null;
-            case 'K':
-            case 'k':
-                if (icNextCharIs('E') & icNextCharIs('Y')
-                        & (isNextBlank() || isNextLP())) {
-                    pos++;
-                    return new Token(SortCode.KEY, "KEY", line);
-                }
-                pos = savePoint;
-                return null;
-            default:
-                return null;
-        }
-    }
     private void plusLine() {
         line++;
     }
@@ -259,25 +62,140 @@ public class Lexer {
         int tmp = pos;
         return charAt(++tmp) == ' ';
     }
+    private boolean readNum() {
+        if (charAt(pos) >= '0' && charAt(pos) <='9') {
+            return true;
+        }
+        return false;
+    }
+    private boolean readch() {
+        if (isChar() || isUnderline()) {
+            return true;
+        }
+        return false;
+    }
+    private final boolean isChar() {
+        if ((charAt(pos) >= 'a' && charAt(pos) <= 'z')
+                || (charAt(pos) >= 'A' && charAt(pos) <= 'Z')) {
+            return true;
+        }
+        return false;
+    }
+    private final boolean isUnderline() {
+        if (charAt(pos) == '_') {
+            return true;
+        }
+        return false;
+    }
+    private final boolean isEOF() {
+        if (pos < sql.length()) {
+            return true;
+        }
+        return false;
+    }
 
     /**
+     * 生成token流
+     */
+    public List<Token> generateTokenStream() throws Exception {
+        for (; pos < sql.length();pos++) {
+            char tmp = charAt(pos);
+            if (tmp == ' ' || charAt(pos) == '\t') {
+                continue;
+            }
+            if (charAt(pos) == '\n') {
+                plusLine();
+            }
+            Token token = scan();
+            tokenStream.add(token);
+        }
+        return tokenStream;
+    }
+    public Token scan() throws Exception {
+        //接受关键词，id或数字
+        StringBuilder sb = new StringBuilder();
+        //第一个字符
+        if (Op(charAt(pos)) != null) {
+            return Op(charAt(pos));
+        }
+        //数字
+        while(isEOF() && readNum()) {
+            sb.append(charAt(pos));
+            pos++;
+        }
+        if (sb.length() != 0) {
+            pos--;
+            return new Token(SortCode.NUMBER, sb.toString(), line);
+        }
+        //id和关键字
+        while (isEOF() && readch()) {
+            sb.append(charAt(pos));
+            pos++;
+        }
+        if (sb.length() != 0) {
+            if (Keywords.getValue(sb.toString()) != null) {
+                pos--;
+                return new Token(Keywords.getValue(sb.toString()), sb.toString(), line);
+            }
+            pos--;
+            return new Token(SortCode.IDENTIFIED, sb.toString(), line);
+        }
+        throw new SytaxErrorsException("There is sytax errors in " + line + " !");
+    }
+    /**
      *  是否是运算符
-     * @param ch
      * @return
      */
-    private boolean isOp(char ch) {
+    private Token Op(char ch) throws Exception {
+        int tmp = pos;
         switch (ch) {
             case ',':
+                return new Token(SortCode.COMMA, ",", line);
             case '(':
+                return new Token(SortCode.LPARENT, "(", line);
             case ')':
+                return new Token(SortCode.RPARENT, ")", line);
             case ';':
+                return new Token(SortCode.COLON, ";", line);
             case '<':
+                tmp = pos;
+                if (charAt(++tmp) == '=') {
+                    pos++;
+                    return new Token(SortCode.LTET,"<=", line);
+                }else {
+                    return new Token(SortCode.LT, "<", line);
+                }
             case '>':
+                tmp = pos;
+                if (charAt(++tmp) == '=') {
+                    pos++;
+                    return new Token(SortCode.GTET, ">=", line);
+                }else {
+                    return new Token(SortCode.GT, ">", line);
+                }
             case '=':
+                tmp = pos;
+                if (charAt(++tmp) == '=') {
+                    pos++;
+                    return new Token(SortCode.EQ, "==", line);
+                }else {
+                    return new Token(SortCode.ASS,"=", line);
+                }
             case '!':
-                return true;
+                tmp = pos;
+                if (charAt(++tmp) == '=') {
+                    pos++;
+                    return new Token(SortCode.NEQ, "!=", line);
+                }else {
+                    throw new SytaxErrorsException("There is sytax error in " + line + " !");
+                }
+            case '*':
+                return new Token(SortCode.STAR, "*", line);
             default:
-                return false;
+                return null;
         }
+    }
+    public List<Token> getTokenStream() {
+        return tokenStream;
     }
 }

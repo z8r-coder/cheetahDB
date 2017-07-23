@@ -38,10 +38,12 @@ public enum SortCode {
     COLON(";"),
     LT("<"),
     GT(">"),
-    EQ("="),
+    EQ("=="),
+    ASS("="),
     NEQ("!="),
     GTET(">="),
     LTET("<="),
+    STAR("*"),
     ;
     static Map<String, SortCode> tokenMap = new HashMap<String, SortCode>();
     static {
