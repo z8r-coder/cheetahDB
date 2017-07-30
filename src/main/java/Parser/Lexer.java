@@ -174,13 +174,7 @@ public class Lexer {
                     return new Token(SortCode.GT, ">", line);
                 }
             case '=':
-                tmp = pos;
-                if (charAt(++tmp) == '=') {
-                    pos++;
-                    return new Token(SortCode.EQ, "==", line);
-                }else {
-                    return new Token(SortCode.ASS,"=", line);
-                }
+                return new Token(SortCode.EQ, "=", line);
             case '!':
                 tmp = pos;
                 if (charAt(++tmp) == '=') {

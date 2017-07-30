@@ -32,20 +32,28 @@ public enum SortCode {
     NUMBER("NUMBER"),
     ALERT("ALERT"),
     IDENTIFIED("IDENTIFIED"),
+    UNIQUE("UNIQUE"),
+    INTEGER("INTEGER"),
+    SMALLINT("SMALLINT"),
+    TINYINT("TINYINT"),
+    CHAR("CHAR"),
+    FOREIGN("FOREIGN"),
+    REFERENCES("REFERENCES"),
+    CHECK("CHECK"),
     COMMA(","),
     LPARENT("("),
     RPARENT(")"),
     COLON(";"),
     LT("<"),
     GT(">"),
-    EQ("=="),
-    ASS("="),
+    EQ("="),
     NEQ("!="),
     GTET(">="),
     LTET("<="),
     STAR("*"),
     BLP("{"),
     BRP("}"),
+    RS("<|>|==|=|!=|>=|<="),
     ;
     static Map<String, SortCode> tokenMap = new HashMap<String, SortCode>();
     static {
@@ -55,9 +63,7 @@ public enum SortCode {
     }
 
     public final String name;
-    SortCode(){
-        this(null);
-    }
+
     SortCode(String name) {
         this.name = name;
     }

@@ -32,7 +32,14 @@ public class Keywords {
         keywords.put("PRIMARY", SortCode.PRIMARY);
         keywords.put("KEY", SortCode.KEY);
         keywords.put("ALERT", SortCode.ALERT);
-
+        keywords.put("UNIQUE", SortCode.UNIQUE);
+        keywords.put("INTEGER", SortCode.INTEGER);
+        keywords.put("SMALLINT", SortCode.SMALLINT);
+        keywords.put("TINYINT", SortCode.TINYINT);
+        keywords.put("CHAR", SortCode.CHAR);
+        keywords.put("REFERENCES", SortCode.REFERENCES);
+        keywords.put("PRIMARY", SortCode.PRIMARY);
+        keywords.put("CHECK", SortCode.CHECK);
     }
 
     public static SortCode getValue(String key) {
