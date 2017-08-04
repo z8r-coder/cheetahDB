@@ -43,7 +43,7 @@ public enum SortCode {
     COMMA(","),
     LPARENT("("),
     RPARENT(")"),
-    COLON(";"),
+    SEMICOLON(";"),
     LT("<"),
     GT(">"),
     EQ("="),

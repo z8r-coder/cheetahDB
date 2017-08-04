@@ -79,10 +79,26 @@ public class SQLParser {
 
             return CreateTable(++pos, astNode);
         }else if (value.equals("DATABASE")) {
-            //return CreateDatabase(++pos, ddl);
+            ASTNode database_node = new ASTNode(false, true, token.getValue());
+            astNode.addChildNode(database_node);
+
+            token = getToken(++pos);
+            if (token.getSortCode() == SortCode.IDENTIFIED) {
+                ASTNode id_node = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(id_node);
+
+                token = getToken(++pos);
+                if (token.getSortCode() == SortCode.SEMICOLON) {
+                    ASTNode se_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(se_node);
+
+                    return new SavePoint(pos,true);
+                }
+            }
         }
         return new SavePoint(pos, false);
     }
+
     public SavePoint CreateTable(int pos, ASTNode astNode) throws Exception {
         Token token = getToken(pos);
         if (token.getSortCode() == SortCode.IDENTIFIED) {
@@ -99,7 +115,16 @@ public class SQLParser {
                 ASTNode col_node = new ASTNode(false, false, "column");
                 astNode.addChildNode(col_node);
                 SavePoint sp = column(++pos, col_node);
+                if (sp.correct) {
+                    pos = sp.pos;
+                    token = getToken(pos);
+                    if (token.getSortCode() == SortCode.SEMICOLON){
+                        ASTNode semi_node = new ASTNode(false, true, token.getValue());
+                        astNode.addChildNode(semi_node);
 
+                        return new SavePoint(pos, true);
+                    }
+                }
             }
         }
         return new SavePoint(pos, false);
@@ -198,9 +223,11 @@ public class SQLParser {
             }
         }
         ASTNode rp = new ASTNode(false, true, token.getValue());
+        //table层面的)
+        parent_match--;
         astNode.addChildNode(rp);
 
-        return new SavePoint(pos, true);
+        return new SavePoint(++pos, true);//分号交给上层执行
     }
 
     private List<SortCode> getPattern(String name) {
@@ -306,8 +333,45 @@ public class SQLParser {
             }
         }else if (name.equals("CHECK")) {
             SavePoint sp = CheckList(pos, para_list);
+            if (sp.correct) {
+                pos = sp.pos;
+                token = getToken(pos++);
+                //接受para层面上的)
+                ASTNode rp = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(rp);
+
+                token = getToken(pos++);
+                //table层面的)，交给上层处理
+                if (token.getSortCode() == SortCode.RPARENT) {
+                    return new SavePoint(--pos, true);
+                }else if (token.getSortCode() == SortCode.COMMA) {
+                    ASTNode ast_comma = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(ast_comma);
+
+                    token = getToken(pos);
+                    //出现,)情况，错误
+                    if (token.getSortCode() == SortCode.RPARENT) {
+                        return new SavePoint(pos, false);
+                    }
+                    return new SavePoint(pos, true);
+                }
+            }
         }else if (name.equals("FOREIGN")){
-            return new SavePoint(pos, true);
+            token = getToken(pos++);
+            //交给table层处理
+            if (token.getSortCode() == SortCode.RPARENT) {
+                return new SavePoint(--pos, true);
+            }else if (token.getSortCode() == SortCode.COMMA) {
+                ASTNode ast_comma = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(ast_comma);
+
+                token = getToken(pos);
+                //出现,)情况，错误
+                if (token.getSortCode() == SortCode.RPARENT) {
+                    return new SavePoint(pos, false);
+                }
+                return new SavePoint(pos, true);
+            }
         }
         return new SavePoint(pos, false);
     }
@@ -343,7 +407,38 @@ public class SQLParser {
         Token token = getToken(pos++);
 
         while (token.getSortCode() != SortCode.RPARENT) {
+            if (token.getSortCode() == SortCode.IDENTIFIED ||
+                    token.getSortCode() == SortCode.NUMBER) {
+                ASTNode id_num_node = new ASTNode(false,true, token.getValue());
+                astNode.addChildNode(id_num_node);
 
+                token = getToken(pos++);
+                if (RelationOps.containValue(token.getValue())) {
+                    ASTNode ro = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(ro);
+
+                    token = getToken(pos++);
+                    // TODO: 2017/8/4 还有个字符串类型需要添加
+                    if (token.getSortCode() == SortCode.NUMBER ||
+                            token.getSortCode() == SortCode.IDENTIFIED) {
+                        ASTNode second_node = new ASTNode(false, true, token.getValue());
+                        astNode.addChildNode(second_node);
+
+                        token = getToken(pos++);
+                        if (token.getSortCode() == SortCode.RPARENT) {
+                            return new SavePoint(--pos, true);
+                        } else if (token.getSortCode() == SortCode.OR ||
+                                token.getSortCode() == SortCode.AND) {
+                            ASTNode and_or = new ASTNode(false, true, token.getValue());
+                            astNode.addChildNode(and_or);
+
+                            token = getToken(pos++);
+                            continue;
+                        }
+                    }
+                }
+            }
+            return new SavePoint(pos, false);
         }
         return new SavePoint(pos, false);
     }

@@ -156,7 +156,7 @@ public class Lexer {
             case ')':
                 return new Token(SortCode.RPARENT, ")", line);
             case ';':
-                return new Token(SortCode.COLON, ";", line);
+                return new Token(SortCode.SEMICOLON, ";", line);
             case '<':
                 tmp = pos;
                 if (charAt(++tmp) == '=') {

@@ -24,4 +24,11 @@ public class RelationOps {
         return map;
     }
 
+    public static boolean containValue(String key) {
+        if (map == null) {
+            return false;
+        }else {
+            return map.containsKey(key);
+        }
+    }
 }
