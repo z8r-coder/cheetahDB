@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import Exception.SytaxErrorsException;
+import com.sun.org.apache.bcel.internal.generic.FADD;
 import org.omg.PortableServer.POA;
 
 /**
@@ -60,8 +61,19 @@ public class SQLParser {
 
             return DDL(pos,ddl);
         }else if (value.equals("SELECT")){
+            ASTNode dql = new ASTNode(false, false, "dql");
+            root.addChildNode(dql);
+
 
         }
+        return null;
+    }
+    public SavePoint DQL(int pos, ASTNode astNode) throws Exception {
+        Token token = getToken(pos++);
+        ASTNode select_node = new ASTNode(false, true, token.getValue());
+        astNode.addChildNode(select_node);
+
+        //token
         return null;
     }
     public SavePoint DDL(int pos, ASTNode astNode) throws Exception {

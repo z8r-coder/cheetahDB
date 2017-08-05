@@ -17,18 +17,15 @@ import java.util.Vector;
  */
 public class test {
     public static void main(String args[]) {
-        for (SQLDDLPattern sqlddlPattern : SQLDDLPattern.values()) {
-            System.out.println(sqlddlPattern.getName());
+        Lexer lexer = new Lexer();
+        try {
+            List<Token> tokens = lexer.generateTokenStream();
+            for (Token token : tokens) {
+                System.out.println(token.getValue() + ":" + token.getLine());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-//        Lexer lexer = new Lexer();
-//        try {
-//            List<Token> tokens = lexer.generateTokenStream();
-//            for (Token token : tokens) {
-//                System.out.println(token.getValue() + ":" + token.getLine());
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
 //        String[] key = {"a","b","c","d","e","f","g","h"};
 //        String[] value = {"1","2","3","4","5","6","7","8"};
 //        Entry<String,String> entry = new Entry<String, String>("hash","here");

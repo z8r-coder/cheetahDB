@@ -32,6 +32,7 @@ public enum SortCode {
     NUMBER("NUMBER"),
     ALERT("ALERT"),
     IDENTIFIED("IDENTIFIED"),
+    STRING("STRING"),
     UNIQUE("UNIQUE"),
     INTEGER("INTEGER"),
     SMALLINT("SMALLINT"),

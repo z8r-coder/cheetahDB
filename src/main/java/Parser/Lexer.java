@@ -60,13 +60,21 @@ public class Lexer {
         int tmp = pos;
         return charAt(++tmp) == ' ';
     }
-    private boolean readNum() {
+    private final boolean readNum() {
         if (charAt(pos) >= '0' && charAt(pos) <='9') {
             return true;
         }
         return false;
     }
-    private boolean readch() {
+
+    private final boolean readStr() {
+        if (charAt(pos) != '\'') {
+            return true;
+        }
+        return false;
+    }
+
+    private final boolean readch() {
         if (isChar() || isUnderline()) {
             return true;
         }
@@ -112,8 +120,23 @@ public class Lexer {
         return tokenStream;
     }
     public Token scan() throws Exception {
-        //接受关键词，id或数字
+        //接受关键词，id或数字,字符串
         StringBuilder sb = new StringBuilder();
+        //接受字符串
+        if (charAt(pos) == '\'') {
+            pos++;
+            while (isEOF() && readStr()) {
+                sb.append(charAt(pos));
+                pos++;
+            }
+        }
+        if (!isEOF()) {
+            throw new SytaxErrorsException("There is sytax errors in " + line + " !");
+        }
+        if (sb.length() != 0) {
+            return new Token(SortCode.STRING, sb.toString(), line);
+        }
+
         //第一个字符
         if (Op(charAt(pos)) != null) {
             return Op(charAt(pos));
