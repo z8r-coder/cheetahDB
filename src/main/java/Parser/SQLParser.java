@@ -3,6 +3,7 @@ package Parser;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import Exception.SytaxErrorsException;
 import com.sun.org.apache.bcel.internal.generic.FADD;
@@ -213,10 +214,130 @@ public class SQLParser {
     }
 
     public SavePoint having_condition(int pos, ASTNode astNode) throws Exception {
+        Token token = getToken(pos++);
+        if (token.getSortCode() == SortCode.HAVING) {
+            ASTNode having_node = new ASTNode(false,  true, token.getValue());
+            astNode.addChildNode(having_node);
 
+            ASTNode condition_node = new ASTNode(false, false, "having_search_condition");
+            astNode.addChildNode(condition_node);
+
+            SavePoint sp = having_search_condition(pos, condition_node);
+
+            pos = sp.pos;
+            if (sp.correct) {
+                token = getToken(pos);
+                if (token.getSortCode() == SortCode.SEMICOLON) {
+                    // having 以;分号结束
+                    ASTNode sem_node = new ASTNode(false ,true, token.getValue());
+                    astNode.addChildNode(sem_node);
+
+                    return new SavePoint(pos, true);
+                }else if (token.getSortCode() == SortCode.ORDER) {
+                    SavePoint o_node = order_condition(pos, astNode);
+                    return o_node;
+                }
+            }
+        }
         return new SavePoint(pos, false);
     }
 
+    public SavePoint having_search_condition(int pos, ASTNode astNode) throws Exception {
+        for (;;) {
+            //op 左边
+            SavePoint left_sp = having_left_op_right(pos, astNode);
+
+            if (left_sp.correct) {
+                pos = left_sp.pos;
+            }else {
+                return new SavePoint(pos, false);
+            }
+            Token token = getToken(pos++);
+            //r op
+            if (RelationOps.containValue(token.getValue())) {
+                ASTNode op_node = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(op_node);
+
+                //op右边
+                SavePoint right_sp = having_left_op_right(pos, astNode);
+                if (right_sp.correct) {
+                    pos = right_sp.pos;
+                    token = getToken(pos++);
+
+                    if (token.getSortCode() == SortCode.OR ||
+                            token.getSortCode() == SortCode.AND) {
+                        ASTNode oa_node = new ASTNode(false, true, token.getValue());
+                        astNode.addChildNode(oa_node);
+
+                        continue;
+                    }else if (token.getSortCode() == SortCode.ORDER) {
+                        //having ->order
+                        return new SavePoint(--pos, true);
+                    }else if (token.getSortCode() == SortCode.SEMICOLON) {
+                        //;分号结束
+                        return new SavePoint(--pos, true);
+                    }
+                }
+            }
+            return new SavePoint(pos, false);
+        }
+    }
+    //having 的 op 的左边和右边表达式
+    public SavePoint having_left_op_right(int pos, ASTNode astNode) throws Exception {
+        Token token = getToken(pos++);
+        switch (token.getSortCode()) {
+            case COUNT:
+            case MIN:
+            case MAX:
+            case AVG:
+            case SUM:
+                boolean flag = false;
+                ASTNode count_node = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(count_node);
+
+                token = getToken(pos++);
+                if (token.getSortCode() == SortCode.LPARENT) {
+                    ASTNode lp = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(lp);
+
+                    token = getToken(pos++);
+                    if (token.getSortCode() == SortCode.IDENTIFIED) {
+                        ASTNode id_node = new ASTNode(false, true, token.getValue());
+                        astNode.addChildNode(id_node);
+
+                        token = getToken(pos++);
+                        if (token.getSortCode() == SortCode.RPARENT) {
+                            ASTNode rp = new ASTNode(false, true, token.getValue());
+                            astNode.addChildNode(rp);
+                            flag = true;
+                        }
+                    }
+                }
+                //解析聚合函数错误
+                if (!flag) {
+                    return new SavePoint(pos, false);
+                }
+                //解析聚合函数正确
+                break;
+            default:
+                //非聚合函数,column
+                if (token.getSortCode() == SortCode.IDENTIFIED) {
+                    ASTNode id_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(id_node);
+                } else if (token.getSortCode() == SortCode.NUMBER) {
+                    ASTNode num_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(num_node);
+                } else if (token.getSortCode() == SortCode.STRING) {
+                    ASTNode str_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(str_node);
+                } else {
+                    return new SavePoint(pos, false);
+                }
+                break;
+        }
+        return new SavePoint(pos, true);
+    }
+    //// TODO: 2017/8/5  select 可跟聚合函数
     public SavePoint select_list(int pos, ASTNode astNode) throws Exception {
         Token token = tokens.get(pos++);
         if (token.getSortCode() == SortCode.STAR) {

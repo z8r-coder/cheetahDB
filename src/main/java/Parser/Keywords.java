@@ -46,6 +46,11 @@ public class Keywords {
         keywords.put("ORDER", SortCode.ORDER);
         keywords.put("ASC", SortCode.ASC);
         keywords.put("DESC", SortCode.DESC);
+        keywords.put("AVG", SortCode.AVG);
+        keywords.put("COUNT", SortCode.COUNT);
+        keywords.put("MAX", SortCode.MAX);
+        keywords.put("MIN", SortCode.MIN);
+        keywords.put("SUM", SortCode.SUM);
     }
 
     public static SortCode getValue(String key) {
