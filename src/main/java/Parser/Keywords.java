@@ -40,6 +40,12 @@ public class Keywords {
         keywords.put("REFERENCES", SortCode.REFERENCES);
         keywords.put("PRIMARY", SortCode.PRIMARY);
         keywords.put("CHECK", SortCode.CHECK);
+        keywords.put("GROUP", SortCode.GROUP);
+        keywords.put("BY",SortCode.BY);
+        keywords.put("HAVING", SortCode.HAVING);
+        keywords.put("ORDER", SortCode.ORDER);
+        keywords.put("ASC", SortCode.ASC);
+        keywords.put("DESC", SortCode.DESC);
     }
 
     public static SortCode getValue(String key) {

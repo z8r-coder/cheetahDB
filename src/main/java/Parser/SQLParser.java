@@ -73,8 +73,176 @@ public class SQLParser {
         ASTNode select_node = new ASTNode(false, true, token.getValue());
         astNode.addChildNode(select_node);
 
+        ASTNode select_list = new ASTNode(false, true, "select_list");
+        astNode.addChildNode(select_list);
+
+        SavePoint sp_slist = select_list(pos, select_list);
+        if (sp_slist.correct) {
+            pos = sp_slist.pos;
+            token = getToken(pos++);
+            if (token.getSortCode() == SortCode.FROM) {
+                ASTNode from_node = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(from_node);
+
+                token = getToken(pos++);
+                //table name
+                if (token.getSortCode() == SortCode.IDENTIFIED) {
+                    ASTNode table_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(table_node);
+
+                    where_condition(pos,astNode);
+                    //可选 where
+                }
+            }
+        }
         //token
-        return null;
+        return new SavePoint(pos, false);
+    }
+    //可选表达式 where
+    public SavePoint where_condition(int pos, ASTNode astNode) throws Exception {
+        Token token = getToken(pos++);
+        if (token.getSortCode() == SortCode.WHERE) {
+            ASTNode where_node = new ASTNode(false, true, token.getValue());
+            astNode.addChildNode(where_node);
+
+            //where后的限制条件
+            ASTNode search_node = new ASTNode(false, false, "search_condition");
+            astNode.addChildNode(search_node);
+
+            SavePoint sp = CheckList(pos, search_node);
+
+            pos = sp.pos;
+            if (sp.correct) {
+                token = getToken(pos);
+
+                if (token.getSortCode() == SortCode.GROUP) {
+                    //where -> group
+                    SavePoint g_sp = group_condition(pos, astNode);
+                    return g_sp;
+                } else if (token.getSortCode() == SortCode.ORDER) {
+                    //where -> order
+                    SavePoint o_sp = order_condition(pos, astNode);
+                    return o_sp;
+                }else if (token.getSortCode() == SortCode.SEMICOLON) {
+                    ASTNode sem_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(sem_node);
+
+                    return new SavePoint(pos, true);
+                }
+            }
+        }
+        return new SavePoint(pos, false);
+    }
+
+    //可选表达式 group by
+    public SavePoint group_condition(int pos, ASTNode astNode) throws Exception {
+        Token token = getToken(pos++);
+        if (token.getSortCode() == SortCode.GROUP) {
+            ASTNode g_node = new ASTNode(false, true, token.getValue());
+            astNode.addChildNode(g_node);
+
+            token = getToken(pos++);
+            if (token.getSortCode() == SortCode.BY) {
+                ASTNode b_node = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(b_node);
+
+                ASTNode group = new ASTNode(false, true, "group_by list");
+                astNode.addChildNode(group);
+
+                SavePoint sp = ParamsList(pos, group);
+
+                pos = sp.pos;
+                if (sp.correct) {
+                    token = getToken(pos);
+
+                    if (token.getSortCode() == SortCode.HAVING) {
+                        // group by -> having
+                        SavePoint h_sp = having_condition(pos, astNode);
+                        return h_sp;
+                    }else if (token.getSortCode() == SortCode.ORDER) {
+                        //group by -> order
+                        SavePoint o_sp = order_condition(pos, astNode);
+                        return o_sp;
+                    }else if (token.getSortCode() == SortCode.SEMICOLON) {
+                        //group by....;结束
+                        ASTNode sem_node = new ASTNode(false, true, token.getValue());
+                        astNode.addChildNode(sem_node);
+
+                        return new SavePoint(pos, true);
+                    }
+                }
+            }
+        }
+        return new SavePoint(pos, false);
+    }
+
+    public SavePoint order_condition(int pos, ASTNode astNode) throws Exception {
+        Token token = getToken(pos++);
+        if (token.getSortCode() == SortCode.ORDER) {
+            ASTNode or_node = new ASTNode(false, true, token.getValue());
+            astNode.addChildNode(or_node);
+
+            token = getToken(pos++);
+            if (token.getSortCode() == SortCode.BY) {
+                ASTNode by_node = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(by_node);
+
+                token = getToken(pos++);
+                if (token.getSortCode() == SortCode.ASC) {
+                    //升序
+                    ASTNode asc_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(asc_node);
+                }else if (token.getSortCode() == SortCode.DESC){
+                    //降序
+                    ASTNode desc_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(desc_node);
+                }else {
+                    return new SavePoint(pos, false);
+                }
+                token = getToken(pos);
+                if (token.getSortCode() == SortCode.SEMICOLON) {
+                    //order by 以;结束
+                    ASTNode sem_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(sem_node);
+
+                    return new SavePoint(pos, true);
+                }
+            }
+        }
+        return new SavePoint(pos, false);
+    }
+
+    public SavePoint having_condition(int pos, ASTNode astNode) throws Exception {
+
+        return new SavePoint(pos, false);
+    }
+
+    public SavePoint select_list(int pos, ASTNode astNode) throws Exception {
+        Token token = tokens.get(pos++);
+        if (token.getSortCode() == SortCode.STAR) {
+            ASTNode star_node = new ASTNode(false, true, token.getValue());
+            astNode.addChildNode(star_node);
+
+            return new SavePoint(pos, true);
+        }else if (token.getSortCode() == SortCode.IDENTIFIED) {
+            while (token.getSortCode() == SortCode.IDENTIFIED) {
+                ASTNode id_node = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(id_node);
+
+                token = tokens.get(pos++);
+                if (token.getSortCode() == SortCode.COMMA) {
+                    ASTNode comma_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(comma_node);
+
+                    token = tokens.get(pos++);
+                }else if (token.getSortCode() == SortCode.FROM) {
+                    return new SavePoint(--pos, true);
+                } else {
+                    return new SavePoint(pos, false);
+                }
+            }
+        }
+        return new SavePoint(pos, false);
     }
     public SavePoint DDL(int pos, ASTNode astNode) throws Exception {
 
@@ -130,11 +298,18 @@ public class SQLParser {
                 if (sp.correct) {
                     pos = sp.pos;
                     token = getToken(pos);
-                    if (token.getSortCode() == SortCode.SEMICOLON){
-                        ASTNode semi_node = new ASTNode(false, true, token.getValue());
-                        astNode.addChildNode(semi_node);
+                    if (token.getSortCode() == SortCode.RPARENT) {
+                        parent_match--;
+                        ASTNode rp = new ASTNode(false, true, token.getValue());
+                        astNode.addChildNode(rp);
 
-                        return new SavePoint(pos, true);
+                        token = getToken(++pos);
+                        if (token.getSortCode() == SortCode.SEMICOLON){
+                            ASTNode semi_node = new ASTNode(false, true, token.getValue());
+                            astNode.addChildNode(semi_node);
+
+                            return new SavePoint(pos, true);
+                        }
                     }
                 }
             }
@@ -234,12 +409,7 @@ public class SQLParser {
                     return new SavePoint(pos, false);
             }
         }
-        ASTNode rp = new ASTNode(false, true, token.getValue());
-        //table层面的)
-        parent_match--;
-        astNode.addChildNode(rp);
-
-        return new SavePoint(++pos, true);//分号交给上层执行
+        return new SavePoint(pos, true);//分号交给上层执行
     }
 
     private List<SortCode> getPattern(String name) {
@@ -324,8 +494,12 @@ public class SQLParser {
                 pos = sp.pos;
                 token = getToken(pos++);
                 //接受"Para层次的)"
-                ASTNode rp = new ASTNode(false, true, token.getValue());
-                astNode.addChildNode(rp);
+                if (token.getSortCode() == SortCode.RPARENT) {
+                    ASTNode rp = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(rp);
+                }else {
+                    return new SavePoint(pos, false);
+                }
 
                 token = getToken(pos++);
                 //table层次的 ")",交给上级处理
@@ -391,53 +565,65 @@ public class SQLParser {
     private SavePoint ParamsList(int pos, ASTNode astNode) throws Exception {
         Token token = getToken(pos++);
 
-        while (token.getSortCode() != SortCode.RPARENT) {
-            if (token.getSortCode() == SortCode.IDENTIFIED) {
-                ASTNode id_node = new ASTNode(false, true, token.getValue());
-                astNode.addChildNode(id_node);
+        while (token.getSortCode() == SortCode.IDENTIFIED) {
+            ASTNode id_node = new ASTNode(false, true, token.getValue());
+            astNode.addChildNode(id_node);
+
+            token = getToken(pos++);
+            if (token.getSortCode() == SortCode.COMMA) {
+                ASTNode comma_node = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(comma_node);
 
                 token = getToken(pos++);
-                //右括号交给上层处理
-                if (token.getSortCode() == SortCode.RPARENT) {
-                    return new SavePoint(--pos, true);
-                }else if (token.getSortCode() == SortCode.COMMA) {
-                    ASTNode ast_comma = new ASTNode(false, true, token.getValue());
-                    astNode.addChildNode(ast_comma);
-
-                    token = getToken(pos++);
-                }else {
-                    return new SavePoint(pos, false);
-                }
-            }else {
+                continue;
+            } else if (token.getSortCode() == SortCode.RPARENT) {
+                //unique和primary->)
+                return new SavePoint(--pos, true);
+            } else if (token.getSortCode() == SortCode.SEMICOLON) {
+                //;group by
+                return new SavePoint(--pos, true);
+            } else if (token.getSortCode() == SortCode.HAVING) {
+                //group_by -> having
+                return new SavePoint(--pos, true);
+            } else if (token.getSortCode() == SortCode.ORDER) {
+                //group_by -> order
+                return new SavePoint(--pos, true);
+            } else {
                 return new SavePoint(pos, false);
             }
         }
-        return new SavePoint(pos, false);
+        return new SavePoint(--pos, false);
     }
     //解析check语句的参数列表
     private SavePoint CheckList(int pos, ASTNode astNode) throws Exception {
         Token token = getToken(pos++);
 
         while (token.getSortCode() != SortCode.RPARENT) {
+
             if (token.getSortCode() == SortCode.IDENTIFIED ||
-                    token.getSortCode() == SortCode.NUMBER) {
+                    token.getSortCode() == SortCode.NUMBER ||
+                    token.getSortCode() == SortCode.STRING) {
                 ASTNode id_num_node = new ASTNode(false,true, token.getValue());
                 astNode.addChildNode(id_num_node);
 
                 token = getToken(pos++);
+                //接受比较关系符
                 if (RelationOps.containValue(token.getValue())) {
                     ASTNode ro = new ASTNode(false, true, token.getValue());
                     astNode.addChildNode(ro);
 
                     token = getToken(pos++);
-                    // TODO: 2017/8/4 还有个字符串类型需要添加
+
                     if (token.getSortCode() == SortCode.NUMBER ||
-                            token.getSortCode() == SortCode.IDENTIFIED) {
+                            token.getSortCode() == SortCode.IDENTIFIED ||
+                            token.getSortCode() == SortCode.STRING) {
                         ASTNode second_node = new ASTNode(false, true, token.getValue());
                         astNode.addChildNode(second_node);
 
                         token = getToken(pos++);
+                        //真正退出循环的出口
                         if (token.getSortCode() == SortCode.RPARENT) {
+                            //右括号结尾，check
                             return new SavePoint(--pos, true);
                         } else if (token.getSortCode() == SortCode.OR ||
                                 token.getSortCode() == SortCode.AND) {
@@ -446,6 +632,15 @@ public class SQLParser {
 
                             token = getToken(pos++);
                             continue;
+                        } else if (token.getSortCode() == SortCode.SEMICOLON) {
+                            //分号结尾，where,having
+                            return new SavePoint(--pos, true);
+                        } else if (token.getSortCode() == SortCode.GROUP) {
+                            //where后面增加的group by语句
+                            return new SavePoint(--pos, true);
+                        }else if (token.getSortCode() == SortCode.ORDER) {
+                            //where后面增加的order语句
+                            return new SavePoint(--pos, true);
                         }
                     }
                 }
@@ -454,10 +649,6 @@ public class SQLParser {
         }
         return new SavePoint(pos, false);
     }
-//
-//    public SavePoint CreateDatabase(int pos, ASTNode astNode) throws Exception {
-//
-//    }
 
     public Token getToken(int pos) throws Exception{
         if (pos >= tokens.size()) {
