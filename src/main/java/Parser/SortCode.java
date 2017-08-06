@@ -52,6 +52,7 @@ public enum SortCode {
     MAX("MAX"),
     MIN("MIN"),
     SUM("SUM"),
+    IN("IN"),
     COMMA(","),
     LPARENT("("),
     RPARENT(")"),

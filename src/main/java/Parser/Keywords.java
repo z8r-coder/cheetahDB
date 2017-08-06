@@ -51,6 +51,7 @@ public class Keywords {
         keywords.put("MAX", SortCode.MAX);
         keywords.put("MIN", SortCode.MIN);
         keywords.put("SUM", SortCode.SUM);
+        keywords.put("IN", SortCode.IN);
     }
 
     public static SortCode getValue(String key) {
