@@ -61,16 +61,148 @@ public class SQLParser {
             root.addChildNode(ddl);
 
             return DDL(pos,ddl);
-        }else if (value.equals("SELECT")){
+        } else if (value.equals("SELECT")){
             ASTNode dql = new ASTNode(false, false, "dql");
             root.addChildNode(dql);
 
+            return DQL(pos, dql);
+        } else if (value.equals("INSERT") || value.equals("UPDATE") || value.equals("DELETE")) {
+            ASTNode dml = new ASTNode(false, false, "dml");
+            root.addChildNode(dml);
 
+            return DML(pos, dml);
         }
         return null;
     }
+    public SavePoint DML(int pos, ASTNode astNode) throws Exception {
+        Token token = getToken(pos++);
+        switch (token.getSortCode()) {
+            case INSERT:
+                //add insert to ast
+                ASTNode insert_node = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(insert_node);
+
+                token = getToken(pos++);
+                if (token.getSortCode() == SortCode.INTO) {
+                    ASTNode into_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(into_node);
+
+                    token = getToken(pos++);
+                    if (token.getSortCode() == SortCode.IDENTIFIED) {
+                        ASTNode id_node = new ASTNode(false, true, token.getValue());
+                        astNode.addChildNode(id_node);
+
+                        /** default implement
+                         * Single row insert
+                         INSERT INTO table VALUES (value1, [value2, ... ])
+
+                         Multirow insert
+                         INSERT INTO tablename VALUES ('value-1a', ['value-1b', ...]),
+                         ('value-2a', ['value-2b', ...]),
+                         ...
+                         **/
+                        return values_single_mutl(pos, astNode);
+                    }
+                         /**none default implement
+                         * Single row insert
+                         INSERT INTO table (column1 [, column2, column3 ... ]) VALUES (value1 [, value2, value3 ... ])
+                         Multirow insert
+                         INSERT INTO tablename (column-a, [column-b, ...])
+                         VALUES ('value-1a', ['value-1b', ...]),
+                         ('value-2a', ['value-2b', ...]),
+                         ...
+                         */
+                        else if (token.getSortCode() == SortCode.LPARENT) {
+                            //column,非缺省
+                            ASTNode lp = new ASTNode(false, true, token.getValue());
+                            astNode.addChildNode(lp);
+
+                            ASTNode column_list = new ASTNode(false ,false, "insert_colum_list");
+                            astNode.addChildNode(column_list);
+
+                            SavePoint sp = ParamsList(pos, column_list);
+
+                            pos = sp.pos;
+                            if (sp.correct) {
+                                token = getToken(pos++);
+                                if (token.getSortCode() == SortCode.RPARENT) {
+                                    ASTNode rp = new ASTNode(false, true, token.getValue());
+                                    astNode.addChildNode(rp);
+
+                                    return values_single_mutl(pos, astNode);
+                                }
+                            }
+                        }
+                    }
+                break;
+            case UPDATE:
+                break;
+            case DELETE:
+                break;
+            default:
+                break;
+        }
+        return new SavePoint(pos, false);
+    }
+
+    /**
+     * 解析insert中values单项插入和多项插入
+     * @param pos
+     * @param astNode
+     * @return
+     * @throws Exception
+     */
+    private SavePoint values_single_mutl(int pos, ASTNode astNode) throws Exception {
+        Token token = getToken(pos++);
+        if (token.getSortCode() == SortCode.VALUES) {
+            ASTNode value_node = new ASTNode(false, true, token.getValue());
+            astNode.addChildNode(value_node);
+
+            token = getToken(pos++);
+            for (;;) {
+                if (token.getSortCode() == SortCode.LPARENT) {
+                    ASTNode lp = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(lp);
+
+                    ASTNode valuelist_node = new ASTNode(false, true, "values_list");
+                    astNode.addChildNode(valuelist_node);
+
+                    SavePoint sp = ParamsList(pos, valuelist_node);
+
+                    pos = sp.pos;
+                    if (sp.correct) {
+                        token = getToken(pos++);
+                        if (token.getSortCode() == SortCode.RPARENT) {
+                            ASTNode rp = new ASTNode(false, true, token.getValue());
+                            astNode.addChildNode(rp);
+
+                            token = getToken(pos);
+                            if (token.getSortCode() == SortCode.SEMICOLON) {
+                                //以分号;结束insert语句
+                                ASTNode sem = new ASTNode(false, true, token.getValue());
+                                astNode.addChildNode(sem);
+
+                                return new SavePoint(pos, false);
+                            }else if (token.getSortCode() == SortCode.COMMA) {
+                                //,缺省多行插入
+                                ASTNode comma_node = new ASTNode(false, true, token.getValue());
+                                astNode.addChildNode(comma_node);
+
+                                token = getToken(++pos);
+                                continue;
+                            }
+                        }
+                    }
+                }
+                return new SavePoint(pos, false);
+            }
+        }
+        return new SavePoint(pos,false);
+    }
     public SavePoint DQL(int pos, ASTNode astNode) throws Exception {
         Token token = getToken(pos++);
+
+        //add select to ast
         ASTNode select_node = new ASTNode(false, true, token.getValue());
         astNode.addChildNode(select_node);
 
@@ -699,11 +831,13 @@ public class SQLParser {
         }
         return new SavePoint(pos, false);
     }
-    //解析参数列表
+    //解析参数列表         value1,value2,value3,..... value == number, identifier, string
     private SavePoint ParamsList(int pos, ASTNode astNode) throws Exception {
         Token token = getToken(pos++);
 
-        while (token.getSortCode() == SortCode.IDENTIFIED) {
+        while (token.getSortCode() == SortCode.IDENTIFIED ||
+                token.getSortCode() == SortCode.NUMBER ||
+                token.getSortCode() == SortCode.STRING) {
             ASTNode id_node = new ASTNode(false, true, token.getValue());
             astNode.addChildNode(id_node);
 
@@ -715,7 +849,7 @@ public class SQLParser {
                 token = getToken(pos++);
                 continue;
             } else if (token.getSortCode() == SortCode.RPARENT) {
-                //unique和primary->)
+                //unique,primary,insert values->)
                 return new SavePoint(--pos, true);
             } else if (token.getSortCode() == SortCode.SEMICOLON) {
                 //;group by
