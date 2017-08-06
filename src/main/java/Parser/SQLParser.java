@@ -136,8 +136,74 @@ public class SQLParser {
                     }
                 break;
             case UPDATE:
+                /**
+                 * UPDATE table_name SET column_name = value [, column_name = value ...] [WHERE condition]
+                 */
+                //add update to ast
+                ASTNode update_node = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(update_node);
+
+                token = getToken(pos++);
+                if (token.getSortCode() == SortCode.IDENTIFIED) {
+                    ASTNode id_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(id_node);
+
+                    token = getToken(pos++);
+                    if (token.getSortCode() == SortCode.SET) {
+                        ASTNode set_node = new ASTNode(false, true, token.getValue());
+                        astNode.addChildNode(set_node);
+
+                        ASTNode set_list = new ASTNode(false, false, "set_list");
+                        astNode.addChildNode(set_list);
+
+                        SavePoint sp = set_list(pos, set_list);
+                        pos = sp.pos;
+                        if (sp.correct) {
+                            token = getToken(pos);
+                            if (token.getSortCode() == SortCode.SEMICOLON) {
+                                ASTNode sem_node = new ASTNode(false, true, token.getValue());
+                                astNode.addChildNode(sem_node);
+                                //;结束
+                                return new SavePoint(pos, true);
+                            }else if (token.getSortCode() == SortCode.WHERE) {
+                                return where_condition(pos, astNode);
+                            }
+                        }
+                    }
+                }
                 break;
             case DELETE:
+                /**
+                 * DELETE FROM table_name [WHERE condition];
+                 */
+                //add delete to ast
+                ASTNode del_node = new ASTNode(false,true, token.getValue());
+                astNode.addChildNode(del_node);
+
+                token = getToken(pos++);
+                if (token.getSortCode() == SortCode.FROM) {
+                    ASTNode from_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(from_node);
+
+                    token = getToken(pos++);
+                    if (token.getSortCode() == SortCode.IDENTIFIED){
+                        //table_name
+                        ASTNode id_node = new ASTNode(false, true, token.getValue());
+                        astNode.addChildNode(id_node);
+
+                        token = getToken(pos++);
+                        if (token.getSortCode() == SortCode.SEMICOLON) {
+                            //delete语句以;结束
+                            ASTNode sem_node = new ASTNode(false, true, token.getValue());
+                            astNode.addChildNode(sem_node);
+
+                            return new SavePoint(--pos, true);
+                        } else if (token.getSortCode() == SortCode.WHERE) {
+                            //where语句
+                            return where_condition(--pos, astNode);
+                        }
+                    }
+                }
                 break;
             default:
                 break;
@@ -145,6 +211,54 @@ public class SQLParser {
         return new SavePoint(pos, false);
     }
 
+    /**
+     * 解析update函数，set后面多项更新和，赋值含有表达式的语句
+     * @param pos
+     * @param astNode
+     * @return
+     * @throws Exception
+     */
+    private SavePoint set_list(int pos, ASTNode astNode) throws Exception {
+        Token token = getToken(pos++);
+        for (;;) {
+            if (token.getSortCode() == SortCode.IDENTIFIED) {
+                ASTNode id_node = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(id_node);
+
+                token = getToken(pos++);
+                if (token.getSortCode() == SortCode.EQ) {
+                    ASTNode eq_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(eq_node);
+                    
+                    // TODO: 2017/8/6 column = (?) not support expression but can be string or number
+                    token = getToken(pos++);
+                    if (token.getSortCode() == SortCode.NUMBER ||
+                            token.getSortCode() == SortCode.STRING) {
+                        ASTNode ass_node = new ASTNode(false, true, token.getValue());
+                        astNode.addChildNode(ass_node);
+
+                        token = getToken(pos++);
+                        //,后面还有赋值表达式
+                        if (token.getSortCode() == SortCode.COMMA) {
+                            ASTNode comma_node = new ASTNode(false, true, token.getValue());
+                            astNode.addChildNode(comma_node);
+
+                            token = getToken(pos++);
+                            continue;
+                        }else if (token.getSortCode() == SortCode.SEMICOLON) {
+                            //func parse expression list semicolon need commit
+                            return new SavePoint(--pos, true);
+                        }else if (token.getSortCode() == SortCode.WHERE) {
+                            //where子句交给上层处理
+                            return new SavePoint(--pos, true);
+                        }
+                    }
+                }
+            }
+            return new SavePoint(pos, false);
+        }
+    }
+    
     /**
      * 解析insert中values单项插入和多项插入
      * @param pos
@@ -252,6 +366,7 @@ public class SQLParser {
     public SavePoint where_condition(int pos, ASTNode astNode) throws Exception {
         Token token = getToken(pos++);
         if (token.getSortCode() == SortCode.WHERE) {
+            //add where to ast
             ASTNode where_node = new ASTNode(false, true, token.getValue());
             astNode.addChildNode(where_node);
 
