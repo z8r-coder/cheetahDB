@@ -91,8 +91,25 @@ public class SQLParser {
                     ASTNode table_node = new ASTNode(false, true, token.getValue());
                     astNode.addChildNode(table_node);
 
-                    where_condition(pos,astNode);
-                    //可选 where
+                    token = getToken(pos);
+                    switch (token.getSortCode()) {
+                        case WHERE:
+                            return where_condition(pos,astNode);
+                        case GROUP:
+                            return group_condition(pos, astNode);
+                        case HAVING:
+                            return having_condition(pos, astNode);
+                        case ORDER:
+                            return group_condition(pos, astNode);
+                        case SEMICOLON:
+                            //直接分号结束
+                            ASTNode sem_node = new ASTNode(false, true, token.getValue());
+                            astNode.addChildNode(sem_node);
+
+                            return new SavePoint(pos, true);
+                        default:
+                            return new SavePoint(pos, false);
+                    }
                 }
             }
         }
