@@ -31,7 +31,7 @@ public class Keywords {
         keywords.put("VARCHAR", SortCode.VARCHAR);
         keywords.put("PRIMARY", SortCode.PRIMARY);
         keywords.put("KEY", SortCode.KEY);
-        keywords.put("ALERT", SortCode.ALERT);
+        keywords.put("ALERT", SortCode.ALTER);
         keywords.put("UNIQUE", SortCode.UNIQUE);
         keywords.put("INTEGER", SortCode.INTEGER);
         keywords.put("SMALLINT", SortCode.SMALLINT);
@@ -52,6 +52,7 @@ public class Keywords {
         keywords.put("MIN", SortCode.MIN);
         keywords.put("SUM", SortCode.SUM);
         keywords.put("IN", SortCode.IN);
+        keywords.put("DROP", SortCode.DROP);
     }
 
     public static SortCode getValue(String key) {

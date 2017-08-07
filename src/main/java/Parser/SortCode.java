@@ -30,7 +30,7 @@ public enum SortCode {
     PRIMARY("PRIMARY"),
     KEY("KEY"),
     NUMBER("NUMBER"),
-    ALERT("ALERT"),
+    ALTER("ALTER"),
     IDENTIFIED("IDENTIFIED"),
     STRING("STRING"),
     UNIQUE("UNIQUE"),
@@ -53,6 +53,9 @@ public enum SortCode {
     MIN("MIN"),
     SUM("SUM"),
     IN("IN"),
+    DROP("DROP"),
+    ADD("ADD"),
+    COLUMN("COLUMN"),
     COMMA(","),
     LPARENT("("),
     RPARENT(")"),
@@ -67,6 +70,11 @@ public enum SortCode {
     BLP("{"),
     BRP("}"),
     RS("<|>|==|=|!=|>=|<="),
+
+
+
+
+    OPTION("OPTION"),//该非关键字，表示pattern中的可选项
     ;
     static Map<String, SortCode> tokenMap = new HashMap<String, SortCode>();
     static {
