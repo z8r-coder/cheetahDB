@@ -1,7 +1,8 @@
 package Parser.Visitor;
 
 /**
- * Created by Administrator on 2017/8/8.
+ * Created by ruanxin on 2017/8/8.
  */
-public class PrintableASTVisitor {
+public interface PrintableASTVisitor extends SQLASTVisitor {
+    String toString();
 }

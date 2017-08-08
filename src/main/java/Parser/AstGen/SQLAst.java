@@ -1,7 +1,7 @@
-package Parser;
+package Parser.AstGen;
 
 /**
- * Created by Administrator on 2017/8/9.
+ * Created by ruanixn on 2017/8/9.
  */
-public class SQLAst {
+public interface SQLAst {
 }

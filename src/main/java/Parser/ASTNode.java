@@ -54,4 +54,8 @@ public class ASTNode {
     public void addChildNode(ASTNode childNode) {
         childSet.add(childNode);
     }
+
+    public List<ASTNode> getChildSet() {
+        return childSet;
+    }
 }
