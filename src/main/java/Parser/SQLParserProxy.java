@@ -19,7 +19,7 @@ public class SQLParserProxy {
     public static List<Token> getToken() {
         Lexer lexer = new Lexer();
         try {
-            List<Token> tokens = lexer.generateTokenStream();
+            List<Token> tokens = getToken();
             CheetahASTLog.Info("Lexer", tokens);
             return lexer.generateTokenStream();
         } catch (Exception e) {
@@ -29,7 +29,7 @@ public class SQLParserProxy {
     }
 
     /**
-     * 获取所有的AST
+     * 从文件获取sql并生成获取所有的AST
      * @return
      */
     public static AST ASTgen() {
@@ -43,5 +43,19 @@ public class SQLParserProxy {
             e.printStackTrace();
         }
         return sqlParser.getAst();
+    }
+
+    public static AST AssSQlASTgen(String sql) {
+        try {
+            Lexer lexer = new Lexer(sql);
+            List<Token> tokens = lexer.getTokenStream();
+            AST ast = new AST();
+            SQLParser sqlParser = new SQLParser(tokens, ast);
+            sqlParser.managerSQL();
+            return sqlParser.getAst();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -16,11 +16,16 @@ public class Lexer {
     private int line = 0;//行
     private List<Token> tokenStream = new ArrayList<Token>();
     private final byte ICMask = (byte) 0xDF;
+    //从文件读入sql语句
     public Lexer() {
         String url = Lexer.class.getClassLoader().getResource("testSql.txt").getFile();
         File file = new File(url);
         IOSystem io = new IOSystem();
         sql = io.readFromFile(file);
+    }
+    //赋值sql语句
+    public Lexer(String sql) {
+        this.sql = sql;
     }
     public final char charAt(int pos) {
         if (pos >= sql.length()) {
@@ -216,7 +221,7 @@ public class Lexer {
                 return null;
         }
     }
-    public List<Token> getTokenStream() {
-        return tokenStream;
+    public List<Token> getTokenStream() throws Exception {
+        return generateTokenStream();
     }
 }

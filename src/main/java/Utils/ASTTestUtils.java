@@ -25,7 +25,8 @@ public class ASTTestUtils {
     }
 
     public static void main(String args[]) {
-        AST ast = SQLParserProxy.ASTgen();
+        //单行缺省值插入通过测试
+        AST ast = SQLParserProxy.AssSQlASTgen("INSERT INTO Persons VALUES ('Gates', 'Bill', 'Xuanwumen 10', 'Beijing');");
         ASTTestPrint(ast.getRoot_set().get(0));
     }
 }
