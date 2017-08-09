@@ -1,8 +1,10 @@
 package Parser;
 
+import Log.CheetahASTLog;
 import Parser.AstGen.BaseAST;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by roy on 2017/8/6.
@@ -17,6 +19,8 @@ public class SQLParserProxy {
     public static List<Token> getToken() {
         Lexer lexer = new Lexer();
         try {
+            List<Token> tokens = lexer.generateTokenStream();
+            CheetahASTLog.Info("Lexer", tokens);
             return lexer.generateTokenStream();
         } catch (Exception e) {
             e.printStackTrace();
@@ -33,17 +37,11 @@ public class SQLParserProxy {
         List<Token> tokens = getToken();
         AST ast = new AST();
         SQLParser sqlParser = new SQLParser(tokens, ast);
-        sqlParser.managerSQL();
+        try {
+            sqlParser.managerSQL();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return sqlParser.getAst();
     }
-
-    /**
-     * 向ast中注入结点集合
-     * @param baseAST
-     * @param astNode
-     */
-    public static void InjectCollection2Ast(BaseAST baseAST,ASTNode astNode) {
-        baseAST.setCollection(astNode.getChildSet());
-    }
-
 }

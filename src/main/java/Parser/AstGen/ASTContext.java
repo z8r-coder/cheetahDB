@@ -13,6 +13,10 @@ public class ASTContext {
      */
     private BaseAST ast;
 
+    public ASTContext(String name, BaseAST ast) {
+        this.name = name;
+        this.ast = ast;
+    }
     public String getName() {
         return name;
     }

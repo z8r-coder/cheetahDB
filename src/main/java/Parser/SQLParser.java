@@ -48,9 +48,18 @@ public class SQLParser {
             this.pos = pos;
         }
     }
-    //控制多条sql语句
-    public void managerSQL() {
-
+    //单条输出
+    public AST managerSQL() throws Exception {
+        for (int i = 0; i < tokens.size();) {
+            SavePoint sp = sql(i);
+            i = sp.pos + 1;
+            if (!sp.correct) {
+                throw new SytaxErrorsException(getClass().toString()
+                        + "some wrong around " + getToken(sp.pos).getValue()
+                        + "in " + getToken(sp.pos).getLine());
+            }
+        }
+        return ast;
     }
     public SavePoint sql(int pos) throws Exception {
         ASTNode root = new ASTNode(true, false, "sql");
@@ -280,7 +289,7 @@ public class SQLParser {
                     ASTNode lp = new ASTNode(false, true, token.getValue());
                     astNode.addChildNode(lp);
 
-                    ASTNode valuelist_node = new ASTNode(false, true, "values_list");
+                    ASTNode valuelist_node = new ASTNode(false, false, "values_list");
                     astNode.addChildNode(valuelist_node);
 
                     SavePoint sp = ParamsList(pos, valuelist_node);
@@ -298,7 +307,7 @@ public class SQLParser {
                                 ASTNode sem = new ASTNode(false, true, token.getValue());
                                 astNode.addChildNode(sem);
 
-                                return new SavePoint(pos, false);
+                                return new SavePoint(pos, true);
                             }else if (token.getSortCode() == SortCode.COMMA) {
                                 //,缺省多行插入
                                 ASTNode comma_node = new ASTNode(false, true, token.getValue());
@@ -1292,4 +1301,44 @@ public class SQLParser {
         }
         return tokens.get(pos);
     }
+
+    /**
+     * 预加载语句数据
+     * @return
+     */
+    public String PreLoad() throws Exception {
+        Token token0 = getToken(0);
+        Token token1;
+        switch (token0.getSortCode()) {
+            case SELECT:
+                return "SELECT";
+            case INSERT:
+                return "INSERT";
+            case DELETE:
+                return "DELETE";
+            case UPDATE:
+                return "UPDATE";
+            case CREATE:
+                token1 = getToken(1);
+                if (token1.getSortCode() == SortCode.DATABASE) {
+                    return "CREATE_DATABASE";
+                } else if (token1.getSortCode() == SortCode.TABLE) {
+                    return "CREATE_TABLE";
+                }
+                break;
+            case ALTER:
+                return "ALERT_TABLE";
+            case DROP:
+                token1 = getToken(1);
+                if (token1.getSortCode() == SortCode.TABLE) {
+                    return "DROP_TABLE";
+                } else if (token1.getSortCode() == SortCode.DATABASE) {
+                    return "DROP_DATABASE";
+                }
+            default:
+                break;
+        }
+        throw new SytaxErrorsException("PreLoad error");
+    }
+
 }

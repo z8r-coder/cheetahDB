@@ -12,19 +12,6 @@ import java.util.List;
 public class BaseASTVisitor implements SQLASTVisitor {
 
     public String toString(ASTContext astContext) {
-        StringBuilder sb = new StringBuilder();
-        
-        BaseAST ast = astContext.getAst();
-        List<ASTNode> nodes = ast.getCollection();
-        if (nodes == null) {
-            // TODO: 2017/8/9 打日志 + name
-            return null;
-        }
-        for (ASTNode node : nodes) {
-            if (node.get_isLeaf()) {
-                System.out.print(node.getValue());
-            }
-        }
         return null;
     }
 

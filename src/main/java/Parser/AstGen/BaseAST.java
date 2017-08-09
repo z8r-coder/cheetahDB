@@ -10,12 +10,12 @@ import java.util.List;
  */
 public interface BaseAST extends SQLAst {
     /**
-     * 注入结点集合
-     * @param set
+     * 注入根结点
+     * @param astNode
      */
-    public void setCollection(List<ASTNode> set);
+    public void setRoot(ASTNode astNode);
     /**
-     * 返回结点集合
+     * 返回根结点
      */
-    public List<ASTNode> getCollection();
+    public ASTNode getRoot();
 }

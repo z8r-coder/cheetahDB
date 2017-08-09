@@ -9,6 +9,15 @@ import Exception.NotRootException;
  */
 public class AST {
     private List<ASTNode> root_set = new ArrayList<ASTNode>();
+    private String name;
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
 
     public void setRoot_set(List<ASTNode> root_set) {
         this.root_set = root_set;
@@ -21,6 +30,7 @@ public class AST {
     public void addRootNode(ASTNode astNode) throws Exception {
         if (astNode.get_isRoot()) {
             this.root_set.add(astNode);
+            return;
         }
         throw new NotRootException(getClass().toString());
     }
