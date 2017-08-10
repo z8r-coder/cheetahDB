@@ -30,7 +30,17 @@ public class ASTTestUtils {
          * create语句测试
          */
         //create table语句测试
-
+//        AST ast = SQLParserUntil.AssSQlASTgen("CREATE TABLE Persons" +
+//                "         (" +
+//                "         Id_P int," +
+//                "         LastName varchar(255)," +
+//                "         FirstName varchar(255)," +
+//                "         Address varchar(255)," +
+//                "         City varchar(255)" +
+//                "         );");
+//        ASTTestPrint(ast.getRoot_set().get(0));
+        //create database语句测试
+        AST ast = SQLParserUntil.AssSQlASTgen("CREATE DATABASE my_db");
         /**
          * Insert语句测试
          */

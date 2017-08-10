@@ -967,6 +967,51 @@ public class SQLParser {
                     }
                 }
             }
+        } else if (token.getSortCode() == SortCode.SHOW) {
+            ASTNode show_node = new ASTNode(false, true, token.getValue());
+            astNode.addChildNode(show_node);
+
+            token = getToken(pos++);
+            if (token.getSortCode() == SortCode.DATABASES) {
+                ASTNode db_node = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(db_node);
+
+                token = getToken(pos++);
+                if (token.getSortCode() == SortCode.SEMICOLON) {
+                    ASTNode sem_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(sem_node);
+
+                    return new SavePoint(--pos, true);
+                }
+            } else if (token.getSortCode() == SortCode.TABLES) {
+                ASTNode tab_node = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(tab_node);
+
+                token = getToken(pos);
+                if(token.getSortCode() == SortCode.SEMICOLON) {
+                    ASTNode sem_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(sem_node);
+
+                    return new SavePoint(pos, true);
+                }
+            }
+        } else if (token.getSortCode() == SortCode.USE) {
+            ASTNode use_node = new ASTNode(false, true, token.getValue());
+            astNode.addChildNode(use_node);
+
+            token = getToken(pos++);
+            if (token.getSortCode() == SortCode.IDENTIFIED) {
+                ASTNode db_name = new ASTNode(false, true, token.getValue());
+                astNode.addChildNode(db_name);
+
+                token = getToken(pos);
+                if (token.getSortCode() == SortCode.SEMICOLON) {
+                    ASTNode sem_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(sem_node);
+
+                    return new SavePoint(pos, true);
+                }
+            }
         }
 
         return new SavePoint(pos, false);

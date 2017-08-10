@@ -53,6 +53,7 @@ public class Keywords {
         keywords.put("SUM", SortCode.SUM);
         keywords.put("IN", SortCode.IN);
         keywords.put("DROP", SortCode.DROP);
+        keywords.put("DATABASES", SortCode.DATABASES);
     }
 
     public static SortCode getValue(String key) {
