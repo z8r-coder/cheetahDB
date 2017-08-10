@@ -17,6 +17,7 @@ public class ASTTestUtils {
         if (root.get_isLeaf()) {
             System.out.println(root.getValue());
         } else {
+            System.out.println(root.getValue());
             List<ASTNode> list = root.getChildSet();
             for (ASTNode astNode : list) {
                 ASTTestPrint(astNode);
@@ -30,16 +31,16 @@ public class ASTTestUtils {
 //        ASTTestPrint(ast.getRoot_set().get(0));
 
         //单行非缺省值通过测试
-//        AST ast = SQLParserUntil.AssSQlASTgen("INSERT INTO Persons (LastName, Address) VALUES ('Wilson', 'Champs-Elysees');");
-//        ASTTestPrint(ast.getRoot_set().get(0));
+        AST ast = SQLParserUntil.AssSQlASTgen("INSERT INTO Persons (LastName, Address) VALUES ('Wilson', 'Champs-Elysees');");
+        ASTTestPrint(ast.getRoot_set().get(0));
 
         //多行插入缺省值
-        AST ast = SQLParserUntil.AssSQlASTgen("insert into persons" +
-                "(id_p, lastname , firstName, city )" +
-                "values" +
-                "(200,'haha' , 'deng' , 'shenzhen')," +
-                "(201,'haha2' , 'deng' , 'GD')," +
-                "(202,'haha3' , 'deng' , 'Beijing');");
-        ASTTestPrint((ast.getRoot_set().get(0)));
+//        AST ast = SQLParserUntil.AssSQlASTgen("insert into persons" +
+//                "(id_p, lastname , firstName, city )" +
+//                "values" +
+//                "(200,'haha' , 'deng' , 'shenzhen')," +
+//                "(201,'haha2' , 'deng' , 'GD')," +
+//                "(202,'haha3' , 'deng' , 'Beijing');");
+//        ASTTestPrint((ast.getRoot_set().get(0)));
     }
 }

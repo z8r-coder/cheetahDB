@@ -67,7 +67,7 @@ public class SQLParser {
         return ast;
     }
     public SavePoint sql(int pos) throws Exception {
-        ASTNode root = new ASTNode(true, false, "sql");
+        ASTNode root = new ASTNode(true, false, "sql_node");
         ast.addRootNode(root);
 
         Token token = getToken(pos);
@@ -75,12 +75,12 @@ public class SQLParser {
         if (value.equals("CREATE")) {
             token = getToken(pos + 1);
             if (token.getSortCode() == SortCode.TABLE) {
-                ASTNode crt_tab = new ASTNode(false, false, "CREATE_TABLE");
+                ASTNode crt_tab = new ASTNode(false, false, "CREATE_TABLE_NODE");
                 root.addChildNode(crt_tab);
 
                 return DDL(pos,crt_tab);
             } else if (token.getSortCode() == SortCode.DATABASE) {
-                ASTNode crt_db = new ASTNode(false, false, "CREATE_DATABASE");
+                ASTNode crt_db = new ASTNode(false, false, "CREATE_DATABASE_NODE");
                 root.addChildNode(crt_db);
 
                 return DDL(pos, crt_db);
@@ -88,19 +88,19 @@ public class SQLParser {
 
             return new SavePoint(pos, false);
         } else if(value.equals("ALTER")) {
-            ASTNode aler_node = new ASTNode(false, false, "ALTER");
+            ASTNode aler_node = new ASTNode(false, false, "ALTER_NODE");
             root.addChildNode(aler_node);
 
             return DDL(pos, aler_node);
         } else if (value.equals("DROP")) {
             token = getToken(pos + 1);
             if (token.getSortCode() == SortCode.TABLE) {
-                ASTNode dp_tab_node = new ASTNode(false, false, "DROP_TABLE");
+                ASTNode dp_tab_node = new ASTNode(false, false, "DROP_TABLE_NODE");
                 root.addChildNode(dp_tab_node);
 
                 return DDL(pos, dp_tab_node);
             } else if (token.getSortCode() == SortCode.DATABASE) {
-                ASTNode dp_db_node = new ASTNode(false, false, "DROP_DATABASE");
+                ASTNode dp_db_node = new ASTNode(false, false, "DROP_DATABASE_NODE");
                 root.addChildNode(dp_db_node);
 
                 return DDL(pos, dp_db_node);
@@ -108,23 +108,23 @@ public class SQLParser {
 
             return new SavePoint(pos, false);
         } else if (value.equals("SELECT")){
-            ASTNode slt = new ASTNode(false, false, "SELECT");
+            ASTNode slt = new ASTNode(false, false, "SELECT_NODE");
             root.addChildNode(slt);
 
             return DQL(pos, slt);
         } else if (value.equals("INSERT") || value.equals("UPDATE") || value.equals("DELETE")) {
             if (value.equals("INSERT")) {
-                ASTNode insert_node = new ASTNode(false, false, "INSERT");
+                ASTNode insert_node = new ASTNode(false, false, "INSERT_NODE");
                 root.addChildNode(insert_node);
 
                 return DML(pos, insert_node);
             } else if (value.equals("UPDATE")) {
-                ASTNode update_node = new ASTNode(false, false, "UPDATE");
+                ASTNode update_node = new ASTNode(false, false, "UPDATE_NODE");
                 root.addChildNode(update_node);
 
                 return DML(pos, update_node);
             } else if (value.equals("DELETE")) {
-                ASTNode delete_node = new ASTNode(false, false, "DELETE");
+                ASTNode delete_node = new ASTNode(false, false, "DELETE_NODE");
                 root.addChildNode(delete_node);
 
                 return DML(pos, delete_node);
