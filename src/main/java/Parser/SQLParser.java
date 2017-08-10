@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import Exception.SytaxErrorsException;
+import Log.CheetahASTLog;
 import com.sun.org.apache.bcel.internal.generic.FADD;
 import org.omg.PortableServer.POA;
 
@@ -52,6 +53,10 @@ public class SQLParser {
     public AST managerSQL() throws Exception {
         for (int i = 0; i < tokens.size();) {
             SavePoint sp = sql(i);
+            if (sp == null) {
+                CheetahASTLog.Info("the first token is wrong");
+                return null;
+            }
             i = sp.pos + 1;
             if (!sp.correct) {
                 throw new SytaxErrorsException(getClass().toString()
@@ -68,20 +73,62 @@ public class SQLParser {
         Token token = getToken(pos);
         String value = token.getValue().toUpperCase();
         if (value.equals("CREATE")) {
-            ASTNode ddl = new ASTNode(false,false,"DDL");
-            root.addChildNode(ddl);
+            token = getToken(pos + 1);
+            if (token.getSortCode() == SortCode.TABLE) {
+                ASTNode crt_tab = new ASTNode(false, false, "CREATE_TABLE");
+                root.addChildNode(crt_tab);
 
-            return DDL(pos,ddl);
+                return DDL(pos,crt_tab);
+            } else if (token.getSortCode() == SortCode.DATABASE) {
+                ASTNode crt_db = new ASTNode(false, false, "CREATE_DATABASE");
+                root.addChildNode(crt_db);
+
+                return DDL(pos, crt_db);
+            }
+
+            return new SavePoint(pos, false);
+        } else if(value.equals("ALTER")) {
+            ASTNode aler_node = new ASTNode(false, false, "ALTER");
+            root.addChildNode(aler_node);
+
+            return DDL(pos, aler_node);
+        } else if (value.equals("DROP")) {
+            token = getToken(pos + 1);
+            if (token.getSortCode() == SortCode.TABLE) {
+                ASTNode dp_tab_node = new ASTNode(false, false, "DROP_TABLE");
+                root.addChildNode(dp_tab_node);
+
+                return DDL(pos, dp_tab_node);
+            } else if (token.getSortCode() == SortCode.DATABASE) {
+                ASTNode dp_db_node = new ASTNode(false, false, "DROP_DATABASE");
+                root.addChildNode(dp_db_node);
+
+                return DDL(pos, dp_db_node);
+            }
+
+            return new SavePoint(pos, false);
         } else if (value.equals("SELECT")){
-            ASTNode dql = new ASTNode(false, false, "dql");
-            root.addChildNode(dql);
+            ASTNode slt = new ASTNode(false, false, "SELECT");
+            root.addChildNode(slt);
 
-            return DQL(pos, dql);
+            return DQL(pos, slt);
         } else if (value.equals("INSERT") || value.equals("UPDATE") || value.equals("DELETE")) {
-            ASTNode dml = new ASTNode(false, false, "dml");
-            root.addChildNode(dml);
+            if (value.equals("INSERT")) {
+                ASTNode insert_node = new ASTNode(false, false, "INSERT");
+                root.addChildNode(insert_node);
 
-            return DML(pos, dml);
+                return DML(pos, insert_node);
+            } else if (value.equals("UPDATE")) {
+                ASTNode update_node = new ASTNode(false, false, "UPDATE");
+                root.addChildNode(update_node);
+
+                return DML(pos, update_node);
+            } else if (value.equals("DELETE")) {
+                ASTNode delete_node = new ASTNode(false, false, "DELETE");
+                root.addChildNode(delete_node);
+
+                return DML(pos, delete_node);
+            }
         }
         return null;
     }

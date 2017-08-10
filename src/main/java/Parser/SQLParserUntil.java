@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by roy on 2017/8/6.
  */
-public class SQLParserProxy {
+public class SQLParserUntil {
     String io_file;//file文件暂时内置
 
     /**

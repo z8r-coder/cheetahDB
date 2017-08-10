@@ -2,8 +2,7 @@ package Utils;
 
 import Parser.AST;
 import Parser.ASTNode;
-import Parser.SQLParser;
-import Parser.SQLParserProxy;
+import Parser.SQLParserUntil;
 
 import java.util.List;
 
@@ -27,15 +26,15 @@ public class ASTTestUtils {
 
     public static void main(String args[]) {
 //        单行缺省值插入通过测试
-//        AST ast = SQLParserProxy.AssSQlASTgen("INSERT INTO Persons VALUES ('Gates', 'Bill', 'Xuanwumen 10', 'Beijing');");
+//        AST ast = SQLParserUntil.AssSQlASTgen("INSERT INTO Persons VALUES ('Gates', 'Bill', 'Xuanwumen 10', 'Beijing');");
 //        ASTTestPrint(ast.getRoot_set().get(0));
 
         //单行非缺省值通过测试
-//        AST ast = SQLParserProxy.AssSQlASTgen("INSERT INTO Persons (LastName, Address) VALUES ('Wilson', 'Champs-Elysees');");
+//        AST ast = SQLParserUntil.AssSQlASTgen("INSERT INTO Persons (LastName, Address) VALUES ('Wilson', 'Champs-Elysees');");
 //        ASTTestPrint(ast.getRoot_set().get(0));
 
         //多行插入缺省值
-        AST ast = SQLParserProxy.AssSQlASTgen("insert into persons" +
+        AST ast = SQLParserUntil.AssSQlASTgen("insert into persons" +
                 "(id_p, lastname , firstName, city )" +
                 "values" +
                 "(200,'haha' , 'deng' , 'shenzhen')," +

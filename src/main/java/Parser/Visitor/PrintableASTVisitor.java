@@ -1,16 +1,10 @@
 package Parser.Visitor;
 
 import Log.CheetahASTLog;
-import Parser.AST;
 import Parser.ASTNode;
 import Parser.AstGen.ASTContext;;
 import Parser.AstGen.BaseAST;
-import Parser.AstGen.InsertAst;
-import Parser.SQLParser;
-import Parser.SQLParserProxy;
 import Utils.ASTUtils;
-
-import java.util.List;
 
 /**
  * Created by ruanxin on 2017/8/8.
