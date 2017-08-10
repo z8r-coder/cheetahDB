@@ -27,6 +27,11 @@ public class ASTTestUtils {
 
     public static void main(String args[]) {
         /**
+         * create语句测试
+         */
+        //create table语句测试
+
+        /**
          * Insert语句测试
          */
 //        单行缺省值插入通过测试
@@ -67,6 +72,12 @@ public class ASTTestUtils {
         /**
          * delete语句测试
          */
+        //不带where delete测试成功
+//        AST ast = SQLParserUntil.AssSQlASTgen("DELETE FROM Person;");
+//        ASTTestPrint((ast.getRoot_set().get(0)));
 
+        //带where delete测试成功
+//        AST ast = SQLParserUntil.AssSQlASTgen("DELETE FROM Person WHERE LastName = 'Wilson' AND LastName = 'Wilson' OR LastName = 'Wilson';");
+//        ASTTestPrint((ast.getRoot_set().get(0)));
     }
 }
