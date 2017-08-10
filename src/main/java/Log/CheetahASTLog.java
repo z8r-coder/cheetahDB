@@ -14,21 +14,29 @@ public class CheetahASTLog implements CheetahLog{
         this.className = className;
     }
 
-    public static void Info(String desc) {
+    public final static void Info(String desc) {
         System.out.println(desc);
     }
-    public static void Info(String desc,String str) {
+    public final static void Info(String desc,String str) {
         System.out.println(desc + ":[" + str + "]");
     }
 
-    public static void Info(String desc, Object object) {
+    public final static void Info(String desc, Object object) {
         System.out.println(desc + ":[" + object.toString() + "]" );
     }
-    public static void  Info(String desc, List<Token> tokens) {
+    public final static void  Info(String desc, List<Token> tokens) {
         System.out.print(desc + ":[");
         for (Token token : tokens) {
             System.out.print(token.getValue() + ",");
         }
         System.out.println("]");
     }
+    public static void Info(String desc, List<Token> tokens, char splitSymbol) {
+        System.out.print(desc + ":[");
+        for (Token token : tokens) {
+            System.out.print(token.getValue() + splitSymbol);
+        }
+        System.out.println("]");
+    }
+
 }

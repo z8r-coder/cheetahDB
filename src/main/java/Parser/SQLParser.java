@@ -56,7 +56,7 @@ public class SQLParser {
             if (!sp.correct) {
                 throw new SytaxErrorsException(getClass().toString()
                         + "some wrong around " + getToken(sp.pos).getValue()
-                        + "in " + getToken(sp.pos).getLine());
+                        + " in " + getToken(sp.pos).getLine());
             }
         }
         return ast;
@@ -103,6 +103,11 @@ public class SQLParser {
                         ASTNode id_node = new ASTNode(false, true, token.getValue());
                         astNode.addChildNode(id_node);
 
+                        // TODO: 2017/8/10 由于修复bug兼容，此处没设计好
+                        token = getToken(pos);
+                        if (token.getSortCode() == SortCode.VALUES) {
+                            return values_single_mutl(pos, astNode);
+                        }
                         /** default implement
                          * Single row insert
                          INSERT INTO table VALUES (value1, [value2, ... ])
@@ -112,9 +117,7 @@ public class SQLParser {
                          ('value-2a', ['value-2b', ...]),
                          ...
                          **/
-                        return values_single_mutl(pos, astNode);
-                    }
-                         /**none default implement
+                        /**none default implement
                          * Single row insert
                          INSERT INTO table (column1 [, column2, column3 ... ]) VALUES (value1 [, value2, value3 ... ])
                          Multirow insert
@@ -128,10 +131,10 @@ public class SQLParser {
                             ASTNode lp = new ASTNode(false, true, token.getValue());
                             astNode.addChildNode(lp);
 
-                            ASTNode column_list = new ASTNode(false ,false, "insert_colum_list");
+                            ASTNode column_list = new ASTNode(false, false, "insert_colum_list");
                             astNode.addChildNode(column_list);
 
-                            SavePoint sp = ParamsList(pos, column_list);
+                            SavePoint sp = ParamsList(++pos, column_list);
 
                             pos = sp.pos;
                             if (sp.correct) {
@@ -145,6 +148,7 @@ public class SQLParser {
                             }
                         }
                     }
+                }
                 break;
             case UPDATE:
                 /**
