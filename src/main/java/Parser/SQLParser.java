@@ -61,7 +61,7 @@ public class SQLParser {
             if (!sp.correct) {
                 throw new SytaxErrorsException(getClass().toString()
                         + "some wrong around " + getToken(sp.pos).getValue()
-                        + " in " + getToken(sp.pos).getLine());
+                        + " in " + sp.pos + " " + getToken(sp.pos).getLine());
             }
         }
         return ast;
@@ -149,12 +149,6 @@ public class SQLParser {
                     if (token.getSortCode() == SortCode.IDENTIFIED) {
                         ASTNode id_node = new ASTNode(false, true, token.getValue());
                         astNode.addChildNode(id_node);
-
-                        // TODO: 2017/8/10 由于修复bug兼容，此处没设计好
-                        token = getToken(pos);
-                        if (token.getSortCode() == SortCode.VALUES) {
-                            return values_single_mutl(pos, astNode);
-                        }
                         /** default implement
                          * Single row insert
                          INSERT INTO table VALUES (value1, [value2, ... ])
@@ -164,6 +158,12 @@ public class SQLParser {
                          ('value-2a', ['value-2b', ...]),
                          ...
                          **/
+                        // TODO: 2017/8/10 由于修复bug兼容，此处没设计好
+                        token = getToken(pos);
+                        if (token.getSortCode() == SortCode.VALUES) {
+                            return values_single_mutl(pos, astNode);
+                        }
+
                         /**none default implement
                          * Single row insert
                          INSERT INTO table (column1 [, column2, column3 ... ]) VALUES (value1 [, value2, value3 ... ])
@@ -334,7 +334,7 @@ public class SQLParser {
             ASTNode value_node = new ASTNode(false, true, token.getValue());
             astNode.addChildNode(value_node);
 
-            token = getToken(pos++);
+            token = getToken(pos);
             for (;;) {
                 if (token.getSortCode() == SortCode.LPARENT) {
                     ASTNode lp = new ASTNode(false, true, token.getValue());
@@ -343,7 +343,7 @@ public class SQLParser {
                     ASTNode valuelist_node = new ASTNode(false, false, "values_list");
                     astNode.addChildNode(valuelist_node);
 
-                    SavePoint sp = ParamsList(pos, valuelist_node);
+                    SavePoint sp = ParamsList(++pos, valuelist_node);
 
                     pos = sp.pos;
                     if (sp.correct) {
@@ -360,7 +360,7 @@ public class SQLParser {
 
                                 return new SavePoint(pos, true);
                             }else if (token.getSortCode() == SortCode.COMMA) {
-                                //,缺省多行插入
+                                //多行插入
                                 ASTNode comma_node = new ASTNode(false, true, token.getValue());
                                 astNode.addChildNode(comma_node);
 
