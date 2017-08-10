@@ -14,7 +14,6 @@ import org.omg.PortableServer.POA;
  * Created by Roy on 2017/7/23.
  */
 public class SQLParser {
-
     private AST ast;
     private List<Token> tokens;
     private int parent_match = 0;
