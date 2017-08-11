@@ -2,6 +2,7 @@ package Utils;
 
 import Parser.AST;
 import Parser.ASTNode;
+import Parser.SQLParser;
 import Parser.SQLParserUntil;
 
 import java.util.List;
@@ -39,10 +40,35 @@ public class ASTTestUtils {
 //                "         City varchar(255)" +
 //                "         );");
 //        ASTTestPrint(ast.getRoot_set().get(0));
+
         //create database语句测试通过
 //        AST ast = SQLParserUntil.AssSQlASTgen("CREATE DATABASE my_db;");
 //        ASTTestPrint(ast.getRoot_set().get(0));
-        //use database
+
+        //use database 语句测试通过
+//        AST ast = SQLParserUntil.AssSQlASTgen("USE db_name;");
+//        ASTTestPrint(ast.getRoot_set().get(0));
+
+        //show databases 语句测试通过
+//        AST ast = SQLParserUntil.AssSQlASTgen("SHOW DATABASES;");
+//        ASTTestPrint(ast.getRoot_set().get(0));
+
+        //show tables;通过
+//        AST ast = SQLParserUntil.AssSQlASTgen("SHOW TABLES;");
+//        ASTTestPrint(ast.getRoot_set().get(0));
+
+        /**
+         * drop语句
+         */
+        // drop database语句通过
+//        AST ast = SQLParserUntil.AssSQlASTgen("Drop database database_name;");
+//        ASTTestPrint(ast.getRoot_set().get(0));
+
+        // drop table语句通过
+//        AST ast = SQLParserUntil.AssSQlASTgen("DROP TABLE Customer;");
+//        ASTTestPrint(ast.getRoot_set().get(0));
+
+
 
         /**
          * Insert语句测试

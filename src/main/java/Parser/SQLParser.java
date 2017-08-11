@@ -109,12 +109,12 @@ public class SQLParser {
         } else if (value.equals("SHOW")) {
             token = getToken(pos + 1);
             if (token.getSortCode() == SortCode.TABLES) {
-                ASTNode show_tab = new ASTNode(false, false, "SHOW_TABLES");
+                ASTNode show_tab = new ASTNode(false, false, "SHOW_TABLES_NODE");
                 root.addChildNode(show_tab);
 
                 return DDL(pos, show_tab);
             } else if (token.getSortCode() == SortCode.DATABASES){
-                ASTNode show_db = new ASTNode(false, false, "SHOW_DBS");
+                ASTNode show_db = new ASTNode(false, false, "SHOW_DBS_NODE");
                 root.addChildNode(show_db);
 
                 return DDL(pos, show_db);
@@ -122,7 +122,7 @@ public class SQLParser {
 
             return new SavePoint(pos, false);
         } else if (value.equals("USE")) {
-            ASTNode use_node = new ASTNode(false, false, "USE_DB");
+            ASTNode use_node = new ASTNode(false, false, "USE_DB_NODE");
             root.addChildNode(use_node);
 
             return DDL(pos, use_node);
@@ -935,19 +935,25 @@ public class SQLParser {
         } else if (token.getSortCode() == SortCode.ALTER) {
             //暂时 alert只支持对表的修改
             List<SortCode> alert_list = SQLAlterPattern.getAlterPattern();
-
+            SortCode contextSortCode = null;
             boolean fail = false;
             for (SortCode sortCode : alert_list) {
                 if (sortCode == SortCode.OPTION) {
                     if (token.getSortCode() == SortCode.ADD) {
                         ASTNode add_node  = new ASTNode(false, true, token.getValue());
                         astNode.addChildNode(add_node);
+
+                        contextSortCode = SortCode.ADD;
                     } else if (token.getSortCode() == SortCode.DROP) {
                         ASTNode drop_node = new ASTNode(false, true, token.getValue());
                         astNode.addChildNode(drop_node);
+
+                        contextSortCode = SortCode.DROP;
                     } else if (token.getSortCode() == SortCode.ALTER) {
                         ASTNode alter_node = new ASTNode(false, true, token.getValue());
                         astNode.addChildNode(alter_node);
+
+                        contextSortCode = SortCode.ALTER;
                     } else {
                         break;
                     }
@@ -961,31 +967,51 @@ public class SQLParser {
                     token = getToken(pos++);
                     continue;
                 }
+
+                //ruo contetSortCode = null, 则fail = true，则下面一定不会使用到contextSortCode
                 fail = true;
                 break;
             }
             //解析缺省 datatype
             if (!fail) {
-                if (token.getSortCode() == SortCode.SEMICOLON) {
-                    //缺省
-                    ASTNode sem_node = new ASTNode(false ,true, token.getValue());
-                    astNode.addChildNode(sem_node);
+                switch (contextSortCode) {
+                    case ADD:
+                    case ALTER:
+                        List<SortCode> dataTypePattern = SQLDataTypePattern.getDataTypePattern();
+                        for (SortCode sortCode : dataTypePattern) {
+                            if (sortCode == SortCode.OPTION) {
+                                if (token.getSortCode() == SortCode.VARCHAR) {
+                                    ASTNode vc = new ASTNode(false, true, token.getValue());
+                                    astNode.addChildNode(vc);
+                                } else if (token.getSortCode() == SortCode.NUMBER) {
+                                    ASTNode num = new ASTNode(false, true, token.getValue());
+                                    astNode.addChildNode(num);
+                                } else {
+                                    return new SavePoint(pos, false);
+                                }
+                                token = getToken(pos++);
+                                continue;
+                            }
 
-                    return new SavePoint(--pos, true);
-                } else if (token.getSortCode() == SortCode.NUMBER ||
-                        token.getSortCode() == SortCode.STRING) {
-                    //非缺省
-                    ASTNode num_str_node = new ASTNode(false, true, token.getValue());
-                    astNode.addChildNode(num_str_node);
+                            if (token.getSortCode() == sortCode) {
+                                ASTNode tmp_token = new ASTNode(false, true, token.getValue());
+                                astNode.addChildNode(tmp_token);
 
-                    token = getToken(pos);
-                    if (token.getSortCode() == SortCode.SEMICOLON) {
-                        ASTNode sem_node = new ASTNode(false, true, token.getValue());
-                        astNode.addChildNode(sem_node);
-
-                        return new SavePoint(--pos, true);
-                    }
+                                token = getToken(pos++);
+                                continue;
+                            }
+                            return new SavePoint(pos, false);
+                        }
+                        break;
+                    case DROP:
+                        if (token.getSortCode() == SortCode.SEMICOLON) {
+                            ASTNode sem_node = new ASTNode(false, true, token.getValue());
+                            astNode.addChildNode(sem_node);
+                            break;
+                        }
+                        return new SavePoint(pos, false);
                 }
+                return new SavePoint(--pos, true);
             }
         } else if (token.getSortCode() == SortCode.SHOW) {
             ASTNode show_node = new ASTNode(false, true, token.getValue());

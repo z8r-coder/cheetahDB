@@ -8,6 +8,7 @@ import Exception.NotRootException;
  * Created by roy on 2017/7/29.
  */
 public class AST {
+    private String astType;
     private List<ASTNode> root_set = new ArrayList<ASTNode>();
     private String name;
 
@@ -33,5 +34,13 @@ public class AST {
             return;
         }
         throw new NotRootException(getClass().toString());
+    }
+
+    public void setAstType(String astType) {
+        this.astType = astType;
+    }
+
+    public String getAstType() {
+        return astType;
     }
 }

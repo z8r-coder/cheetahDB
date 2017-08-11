@@ -54,6 +54,9 @@ public class Keywords {
         keywords.put("IN", SortCode.IN);
         keywords.put("DROP", SortCode.DROP);
         keywords.put("DATABASES", SortCode.DATABASES);
+        keywords.put("TABLES", SortCode.TABLES);
+        keywords.put("USE", SortCode.USE);
+        keywords.put("SHOW", SortCode.SHOW);
     }
 
     public static SortCode getValue(String key) {
