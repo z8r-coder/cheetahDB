@@ -112,11 +112,13 @@ public class SQLParser {
                 ASTNode show_tab = new ASTNode(false, false, "SHOW_TABLES_NODE");
                 root.addChildNode(show_tab);
 
+                ast.setAstType(SQLASTType.CREATE_TABLE);
                 return DDL(pos, show_tab);
             } else if (token.getSortCode() == SortCode.DATABASES){
                 ASTNode show_db = new ASTNode(false, false, "SHOW_DBS_NODE");
                 root.addChildNode(show_db);
 
+                ast.setAstType(SQLASTType.CREATE_DATABASE);
                 return DDL(pos, show_db);
             }
 
@@ -125,6 +127,7 @@ public class SQLParser {
             ASTNode use_node = new ASTNode(false, false, "USE_DB_NODE");
             root.addChildNode(use_node);
 
+            ast.setAstType(SQLASTType.USE_DATABASE);
             return DDL(pos, use_node);
         } else if (value.equals("SELECT")){
             ASTNode slt = new ASTNode(false, false, "SELECT_NODE");
@@ -245,8 +248,10 @@ public class SQLParser {
                                 ASTNode sem_node = new ASTNode(false, true, token.getValue());
                                 astNode.addChildNode(sem_node);
                                 //;结束
+                                ast.setAstType(SQLASTType.UPDATE_WITHOUT_WHERE);
                                 return new SavePoint(pos, true);
                             }else if (token.getSortCode() == SortCode.WHERE) {
+                                ast.setAstType(SQLASTType.UPDATE_WITH_WHERE);
                                 return where_condition(pos, astNode);
                             }
                         }
@@ -1022,6 +1027,7 @@ public class SQLParser {
                 ASTNode db_node = new ASTNode(false, true, token.getValue());
                 astNode.addChildNode(db_node);
 
+                ast.setAstType(SQLASTType.SHOW_DATABASES);
                 token = getToken(pos++);
                 if (token.getSortCode() == SortCode.SEMICOLON) {
                     ASTNode sem_node = new ASTNode(false, true, token.getValue());
@@ -1033,6 +1039,7 @@ public class SQLParser {
                 ASTNode tab_node = new ASTNode(false, true, token.getValue());
                 astNode.addChildNode(tab_node);
 
+                ast.setAstType(SQLASTType.SHOW_TABLES);
                 token = getToken(pos);
                 if(token.getSortCode() == SortCode.SEMICOLON) {
                     ASTNode sem_node = new ASTNode(false, true, token.getValue());
@@ -1045,7 +1052,9 @@ public class SQLParser {
             ASTNode use_node = new ASTNode(false, true, token.getValue());
             astNode.addChildNode(use_node);
 
+            ast.setAstType(SQLASTType.USE_DATABASE);
             token = getToken(pos++);
+            
             if (token.getSortCode() == SortCode.IDENTIFIED) {
                 ASTNode db_name = new ASTNode(false, true, token.getValue());
                 astNode.addChildNode(db_name);

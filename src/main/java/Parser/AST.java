@@ -8,7 +8,7 @@ import Exception.NotRootException;
  * Created by roy on 2017/7/29.
  */
 public class AST {
-    private String astType;
+    private SQLASTType astType;
     private List<ASTNode> root_set = new ArrayList<ASTNode>();
     private String name;
 
@@ -36,11 +36,11 @@ public class AST {
         throw new NotRootException(getClass().toString());
     }
 
-    public void setAstType(String astType) {
+    public void setAstType(SQLASTType astType) {
         this.astType = astType;
     }
 
-    public String getAstType() {
+    public SQLASTType getAstType() {
         return astType;
     }
 }
