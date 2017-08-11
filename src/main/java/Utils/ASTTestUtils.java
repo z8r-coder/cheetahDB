@@ -39,8 +39,11 @@ public class ASTTestUtils {
 //                "         City varchar(255)" +
 //                "         );");
 //        ASTTestPrint(ast.getRoot_set().get(0));
-        //create database语句测试
-        AST ast = SQLParserUntil.AssSQlASTgen("CREATE DATABASE my_db");
+        //create database语句测试通过
+//        AST ast = SQLParserUntil.AssSQlASTgen("CREATE DATABASE my_db;");
+//        ASTTestPrint(ast.getRoot_set().get(0));
+        //use database
+
         /**
          * Insert语句测试
          */

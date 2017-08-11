@@ -106,6 +106,26 @@ public class SQLParser {
             }
 
             return new SavePoint(pos, false);
+        } else if (value.equals("SHOW")) {
+            token = getToken(pos + 1);
+            if (token.getSortCode() == SortCode.TABLES) {
+                ASTNode show_tab = new ASTNode(false, false, "SHOW_TABLES");
+                root.addChildNode(show_tab);
+
+                return DDL(pos, show_tab);
+            } else if (token.getSortCode() == SortCode.DATABASES){
+                ASTNode show_db = new ASTNode(false, false, "SHOW_DBS");
+                root.addChildNode(show_db);
+
+                return DDL(pos, show_db);
+            }
+
+            return new SavePoint(pos, false);
+        } else if (value.equals("USE")) {
+            ASTNode use_node = new ASTNode(false, false, "USE_DB");
+            root.addChildNode(use_node);
+
+            return DDL(pos, use_node);
         } else if (value.equals("SELECT")){
             ASTNode slt = new ASTNode(false, false, "SELECT_NODE");
             root.addChildNode(slt);
