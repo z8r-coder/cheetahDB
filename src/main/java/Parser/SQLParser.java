@@ -1133,6 +1133,7 @@ public class SQLParser {
 
                 ASTNode col_node = new ASTNode(false, false, "column");
                 astNode.addChildNode(col_node);
+
                 SavePoint sp = column(++pos, col_node);
                 if (sp.correct) {
                     pos = sp.pos;
@@ -1207,57 +1208,17 @@ public class SQLParser {
             Token lookahead = getToken(pos + 1);//观察数据类型
             SortCode sortCode = lookahead.getSortCode();
 
-            switch (sortCode) {
-                case VARCHAR:
-                    sp = columnPattern(pos, "VARCHAR", astNode);
-                    if (sp.correct) {
-                        pos = sp.pos;
-                        token = getToken(pos);
-                    } else {
-                        return sp;
-                    }
-                    break;
-                case INTEGER:
-                    sp = columnPattern(pos, "INTEGER", astNode);
-                    if (sp.correct) {
-                        pos = sp.pos;
-                        token = getToken(pos);
-                    }else {
-                        return sp;
-                    }
-                    break;
-                case INT:
-                    sp = columnPattern(pos, "INT", astNode);
-                    if (sp.correct) {
-                        pos = sp.pos;
-                        token = getToken(pos);
-                    }else {
-                        return sp;
-                    }
-                    break;
-                case CHAR:
-                    sp = columnPattern(pos, "CHAR", astNode);
-                    if (sp.correct) {
-                        pos = sp.pos;
-                        token = getToken(pos);
-                    }else {
-                        return sp;
-                    }
-                    break;
-                default:
-                    return new SavePoint(pos, false);
-            }
+
         }
         return new SavePoint(pos, true);//分号交给上层执行
     }
 
-    private List<SortCode> getPattern(String name) {
-        return SQLDDLPattern.pattern.get(name);
-    }
-
-    private SavePoint columnPattern(int pos, String name, ASTNode astNode) throws Exception {
-        List<SortCode> patternlist = getPattern(name);
+    private SavePoint columnPattern(int pos, ASTNode astNode) throws Exception {
+        List<SortCode> patternlist = SQLCreateTablePattern.getCrtTabPat();
         for (SortCode sc : patternlist) {
+            if (sc == SortCode.OPTION) {
+
+            }
             Token token = getToken(pos++);
             if (token.getSortCode() == sc) {
                 ASTNode node = new ASTNode(false, true, token.getValue());
