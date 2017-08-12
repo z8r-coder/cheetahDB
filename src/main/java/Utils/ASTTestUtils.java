@@ -2,9 +2,9 @@ package Utils;
 
 import Parser.AST;
 import Parser.ASTNode;
-import Parser.SQLParser;
 import Parser.SQLParserUntil;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+import Support.Logging.Log;
+import Support.Logging.LogFactory;
 
 import java.util.List;
 
@@ -12,6 +12,7 @@ import java.util.List;
  * Created by ruanxin on 2017/8/10.
  */
 public class ASTTestUtils {
+    private final static Log LOG = LogFactory.getLog(ASTTestUtils.class);
     public static void ASTTestPrint(ASTNode root) {
         if (root == null) {
             return;
@@ -187,6 +188,7 @@ public class ASTTestUtils {
 //        ASTTestPrint((ast.getRoot_set().get(0)));
 //        System.out.println();
 //        System.out.println(ast.getAstType());
+//        LOG.info("成功");
 
         //带where delete测试成功
 //        AST ast = SQLParserUntil.AssSQlASTgen("DELETE FROM Person WHERE LastName = 'Wilson' AND LastName = 'Wilson' OR LastName = 'Wilson';");
