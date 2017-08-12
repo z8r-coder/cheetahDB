@@ -58,22 +58,36 @@ public class ASTTestUtils {
 //        System.out.println(ast.getAstType());
 
         //create table语句测试,含not null约束语句,含unique,check,primary,foreign约束通过测试
-        AST ast = SQLParserUntil.AssSQlASTgen("CREATE TABLE Persons" +
-                "         (" +
-                "         Id_P integer(10) NOT NULL," +
-                "         LastName varchar(255) not null," +
-                "         FirstName varchar(255)," +
-                "         Address varchar(255)," +
-                "         UNIQUE (Id_P)," +
-                "         PRIMARY KEY (Id_P)," +
-                "         FOREIGN KEY (Id_P) REFERENCES Persons(Id_P)," +
-                "         City varchar(255)," +
-                "         CHECK (Id_P>0 AND ID_P < 1)" +
-                "         );");
-        ASTTestPrint(ast.getRoot_set().get(0));
-        System.out.println();
-        System.out.println(ast.getAstType());
+//        AST ast = SQLParserUntil.AssSQlASTgen("CREATE TABLE Persons" +
+//                "         (" +
+//                "         Id_P integer(10) NOT NULL," +
+//                "         LastName varchar(255) not null," +
+//                "         FirstName varchar(255)," +
+//                "         Address varchar(255)," +
+//                "         UNIQUE (Id_P)," +
+//                "         PRIMARY KEY (Id_P)," +
+//                "         FOREIGN KEY (Id_P) REFERENCES Persons(Id_P)," +
+//                "         City varchar(255)," +
+//                "         CHECK (Id_P>0 AND ID_P < 1)" +
+//                "         );");
+//        ASTTestPrint(ast.getRoot_set().get(0));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
+        /**
+         * select暂时只支持简单select和带where的简单select
+         */
+        //简单select语句测试，不带where,通过测试
+//        AST ast = SQLParserUntil.AssSQlASTgen("select * from table_a;");
+//        ASTTestPrint(ast.getRoot_set().get(0));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
+
+        //简单select语句测试，带where,不带in,通过测试
+//        AST ast = SQLParserUntil.AssSQlASTgen("SELECT a,b from table_a where A = '123' AND B = '321';");
+//        ASTTestPrint(ast.getRoot_set().get(0));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
         //create database语句测试通过
 //        AST ast = SQLParserUntil.AssSQlASTgen("CREATE DATABASE my_db;");
 //        ASTTestPrint(ast.getRoot_set().get(0));

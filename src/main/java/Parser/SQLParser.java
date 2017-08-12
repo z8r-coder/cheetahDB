@@ -440,7 +440,7 @@ public class SQLParser {
         ASTNode select_node = new ASTNode(false, true, token.getValue());
         astNode.addChildNode(select_node);
 
-        ASTNode select_list = new ASTNode(false, true, "select_list");
+        ASTNode select_list = new ASTNode(false, false, "select_list");
         astNode.addChildNode(select_list);
 
         SavePoint sp_slist = select_list(pos, select_list);
