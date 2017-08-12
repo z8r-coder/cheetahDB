@@ -4,13 +4,16 @@ package Parser;
  * Created by royruan on 2017/8/11.
  */
 public enum SQLASTType {
-    //DQL
-    SELECT_WITHOUT_WHERE("SELECT_WITHOUT_WHERE", "不带where简单select语句"),
+    //DQL，带group等的先不考虑
+    SELECT_ONLY("SELECT_ONLY", "不带任何语句的SELECT"),
     SELECT_WITH_WHERE("SELECT_WITH_WHERE","带where简单基于关系的select语句"),
     SELECT_WITH_WHERE_IN("SELECT_WITH_WHERE_IN","带where简单基于in的select语句"),
     SELECT_WITH_SUB("SELECT_WITH_SUB", "带子查询的select语句"),
 
     //DDL
+    //缺省和非缺省的预分类,中间态
+    INSERT_DEFAULT("INSERT_DEFAULT", "缺省"),
+    INSERT_NONE_DEFAULT("INSERT_NONE_DEFAULT", "非缺省"),
     INSERT_SINGLE_DEFAULT("INSERT_SINGLE_DEFAULT","单行缺省插入"),
     INSERT_SINGLE("INSERT_SINGLE", "单行非缺省插入"),
     INSERT_MULT_DEFAULT("INSERT_MULT_DEFAULT","多行缺省插入"),
@@ -35,6 +38,9 @@ public enum SQLASTType {
     USE_DATABASE("USE_DATABASE", "使用某个数据库"),
     DROP_TABLE("DROP_TABLE", "删除某个表"),
     DROP_DATABASE("DROP_DATABASE","删除某个数据库"),
+    ALTER_TABLE_ADD("ALTER_TABLE_ADD", "给表增加行"),
+    ALTER_TABLE_DROP("ALTER_TABLE_DROP", "给表删除某行"),
+    ALTER_TABLE_ALTER("ALTER_TABLE_ALTER", "给表修改行"),
     ;
     /**
      * 该语句的类型
@@ -48,5 +54,21 @@ public enum SQLASTType {
     SQLASTType(String type, String desc) {
         this.type = type;
         this.desc = desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
     }
 }

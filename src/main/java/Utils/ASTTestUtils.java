@@ -4,6 +4,7 @@ import Parser.AST;
 import Parser.ASTNode;
 import Parser.SQLParser;
 import Parser.SQLParserUntil;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.util.List;
 
@@ -44,18 +45,26 @@ public class ASTTestUtils {
         //create database语句测试通过
 //        AST ast = SQLParserUntil.AssSQlASTgen("CREATE DATABASE my_db;");
 //        ASTTestPrint(ast.getRoot_set().get(0));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         //use database 语句测试通过
 //        AST ast = SQLParserUntil.AssSQlASTgen("USE db_name;");
 //        ASTTestPrint(ast.getRoot_set().get(0));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         //show databases 语句测试通过
 //        AST ast = SQLParserUntil.AssSQlASTgen("SHOW DATABASES;");
 //        ASTTestPrint(ast.getRoot_set().get(0));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         //show tables;通过
 //        AST ast = SQLParserUntil.AssSQlASTgen("SHOW TABLES;");
 //        ASTTestPrint(ast.getRoot_set().get(0));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         /**
          * drop语句
@@ -63,12 +72,14 @@ public class ASTTestUtils {
         // drop database语句通过
 //        AST ast = SQLParserUntil.AssSQlASTgen("Drop database database_name;");
 //        ASTTestPrint(ast.getRoot_set().get(0));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         // drop table语句通过
 //        AST ast = SQLParserUntil.AssSQlASTgen("DROP TABLE Customer;");
 //        ASTTestPrint(ast.getRoot_set().get(0));
-
-
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         /**
          * Insert语句测试
@@ -76,10 +87,14 @@ public class ASTTestUtils {
 //        单行缺省值插入通过测试
 //        AST ast = SQLParserUntil.AssSQlASTgen("INSERT INTO Persons VALUES ('Gates', 'Bill', 'Xuanwumen 10', 'Beijing');");
 //        ASTTestPrint(ast.getRoot_set().get(0));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         //单行非缺省值通过测试
 //        AST ast = SQLParserUntil.AssSQlASTgen("INSERT INTO Persons (LastName) VALUES ('Wilson');");
 //        ASTTestPrint(ast.getRoot_set().get(0));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         //多行插入非缺省值测试通过
 //        AST ast = SQLParserUntil.AssSQlASTgen("insert into persons" +
@@ -89,6 +104,8 @@ public class ASTTestUtils {
 //                "(201,'haha2' , 'deng' , 'GD')," +
 //                "(202,'haha3' , 'deng' , 'Beijing');");
 //        ASTTestPrint((ast.getRoot_set().get(0)));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         //多行插入缺省值测试通过
 //        AST ast = SQLParserUntil.AssSQlASTgen("insert into persons " +
@@ -97,16 +114,23 @@ public class ASTTestUtils {
 //                "(201,'haha2' , 'deng' , 'GD')," +
 //                "(202,'haha3' , 'deng' , 'Beijing');");
 //        ASTTestPrint((ast.getRoot_set().get(0)));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         /**
          * update语句测试
          */
-        //不要where语句通过
+//        不要where语句通过
 //        AST ast = SQLParserUntil.AssSQlASTgen("UPDATE Person SET Address = 'Zhongshan 23', City = 'Nanjing';");
 //        ASTTestPrint((ast.getRoot_set().get(0)));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
+
         //带where的语句通过
 //        AST ast = SQLParserUntil.AssSQlASTgen("UPDATE Person SET Address = 'Zhongshan 23', City = 'Nanjing' WHERE LastName = 'Wilson' AND FirstName = 'Roy';");
 //        ASTTestPrint((ast.getRoot_set().get(0)));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         /**
          * delete语句测试
@@ -114,9 +138,13 @@ public class ASTTestUtils {
         //不带where delete测试成功
 //        AST ast = SQLParserUntil.AssSQlASTgen("DELETE FROM Person;");
 //        ASTTestPrint((ast.getRoot_set().get(0)));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         //带where delete测试成功
 //        AST ast = SQLParserUntil.AssSQlASTgen("DELETE FROM Person WHERE LastName = 'Wilson' AND LastName = 'Wilson' OR LastName = 'Wilson';");
 //        ASTTestPrint((ast.getRoot_set().get(0)));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
     }
 }

@@ -77,11 +77,13 @@ public class SQLParser {
                 ASTNode crt_tab = new ASTNode(false, false, "CREATE_TABLE_NODE");
                 root.addChildNode(crt_tab);
 
+                ast.setAstType(SQLASTType.CREATE_TABLE);
                 return DDL(pos,crt_tab);
             } else if (token.getSortCode() == SortCode.DATABASE) {
                 ASTNode crt_db = new ASTNode(false, false, "CREATE_DATABASE_NODE");
                 root.addChildNode(crt_db);
 
+                ast.setAstType(SQLASTType.CREATE_DATABASE);
                 return DDL(pos, crt_db);
             }
 
@@ -97,11 +99,13 @@ public class SQLParser {
                 ASTNode dp_tab_node = new ASTNode(false, false, "DROP_TABLE_NODE");
                 root.addChildNode(dp_tab_node);
 
+                ast.setAstType(SQLASTType.DROP_TABLE);
                 return DDL(pos, dp_tab_node);
             } else if (token.getSortCode() == SortCode.DATABASE) {
                 ASTNode dp_db_node = new ASTNode(false, false, "DROP_DATABASE_NODE");
                 root.addChildNode(dp_db_node);
 
+                ast.setAstType(SQLASTType.DROP_DATABASE);
                 return DDL(pos, dp_db_node);
             }
 
@@ -112,13 +116,13 @@ public class SQLParser {
                 ASTNode show_tab = new ASTNode(false, false, "SHOW_TABLES_NODE");
                 root.addChildNode(show_tab);
 
-                ast.setAstType(SQLASTType.CREATE_TABLE);
+                ast.setAstType(SQLASTType.SHOW_TABLES);
                 return DDL(pos, show_tab);
             } else if (token.getSortCode() == SortCode.DATABASES){
                 ASTNode show_db = new ASTNode(false, false, "SHOW_DBS_NODE");
                 root.addChildNode(show_db);
 
-                ast.setAstType(SQLASTType.CREATE_DATABASE);
+                ast.setAstType(SQLASTType.SHOW_DATABASES);
                 return DDL(pos, show_db);
             }
 
@@ -183,6 +187,7 @@ public class SQLParser {
                         // TODO: 2017/8/10 由于修复bug兼容，此处没设计好
                         token = getToken(pos);
                         if (token.getSortCode() == SortCode.VALUES) {
+                            ast.setAstType(SQLASTType.INSERT_DEFAULT);
                             return values_single_mutl(pos, astNode);
                         }
 
@@ -212,6 +217,7 @@ public class SQLParser {
                                     ASTNode rp = new ASTNode(false, true, token.getValue());
                                     astNode.addChildNode(rp);
 
+                                    ast.setAstType(SQLASTType.INSERT_NONE_DEFAULT);
                                     return values_single_mutl(pos, astNode);
                                 }
                             }
@@ -283,8 +289,10 @@ public class SQLParser {
                             ASTNode sem_node = new ASTNode(false, true, token.getValue());
                             astNode.addChildNode(sem_node);
 
+                            ast.setAstType(SQLASTType.DELETE_ALL);
                             return new SavePoint(--pos, true);
                         } else if (token.getSortCode() == SortCode.WHERE) {
+                            ast.setAstType(SQLASTType.DELETE_WITH_WHERE);
                             //where语句
                             return where_condition(--pos, astNode);
                         }
@@ -354,12 +362,16 @@ public class SQLParser {
      */
     private SavePoint values_single_mutl(int pos, ASTNode astNode) throws Exception {
         Token token = getToken(pos++);
+
+        //判断该是多行插入还是单行插入.
+        int count = 0;
         if (token.getSortCode() == SortCode.VALUES) {
             ASTNode value_node = new ASTNode(false, true, token.getValue());
             astNode.addChildNode(value_node);
 
             token = getToken(pos);
             for (;;) {
+                count++;
                 if (token.getSortCode() == SortCode.LPARENT) {
                     ASTNode lp = new ASTNode(false, true, token.getValue());
                     astNode.addChildNode(lp);
@@ -382,6 +394,25 @@ public class SQLParser {
                                 ASTNode sem = new ASTNode(false, true, token.getValue());
                                 astNode.addChildNode(sem);
 
+                                if (count > 1) {
+                                    //多行
+                                    if (ast.getAstType() == SQLASTType.INSERT_DEFAULT) {
+                                        //多行缺省插入
+                                        ast.setAstType(SQLASTType.INSERT_MULT_DEFAULT);
+                                    } else {
+                                        //多行非缺省插入
+                                        ast.setAstType(SQLASTType.INSERT_MULT);
+                                    }
+                                } else {
+                                    //单行
+                                    if (ast.getAstType() == SQLASTType.INSERT_DEFAULT) {
+                                        //单行缺省插入
+                                        ast.setAstType(SQLASTType.INSERT_SINGLE_DEFAULT);
+                                    } else {
+                                        //单行非缺省插入
+                                        ast.setAstType(SQLASTType.INSERT_SINGLE);
+                                    }
+                                }
                                 return new SavePoint(pos, true);
                             }else if (token.getSortCode() == SortCode.COMMA) {
                                 //多行插入
@@ -428,6 +459,7 @@ public class SQLParser {
                     token = getToken(pos);
                     switch (token.getSortCode()) {
                         case WHERE:
+                            ast.setAstType(SQLASTType.SELECT_WITH_WHERE);
                             return where_condition(pos,astNode);
                         case GROUP:
                             return group_condition(pos, astNode);
@@ -440,6 +472,7 @@ public class SQLParser {
                             ASTNode sem_node = new ASTNode(false, true, token.getValue());
                             astNode.addChildNode(sem_node);
 
+                            ast.setAstType(SQLASTType.SELECT_ONLY);
                             return new SavePoint(pos, true);
                         default:
                             return new SavePoint(pos, false);
@@ -450,7 +483,7 @@ public class SQLParser {
         //token
         return new SavePoint(pos, false);
     }
-    //可选表达式 where
+    //可选表达式 where,生成结点 where_node
     public SavePoint where_condition(int pos, ASTNode astNode) throws Exception {
         Token token = getToken(pos++);
         if (token.getSortCode() == SortCode.WHERE) {
@@ -459,7 +492,7 @@ public class SQLParser {
             astNode.addChildNode(where_node);
 
             //where后的限制条件
-            ASTNode search_node = new ASTNode(false, false, "search_condition");
+            ASTNode search_node = new ASTNode(false, false, "where_search_condition");
             astNode.addChildNode(search_node);
 
             return search_condition(pos, search_node);
@@ -488,6 +521,15 @@ public class SQLParser {
                     ASTNode in_node = new ASTNode(false, true, token.getValue());
                     astNode.addChildNode(in_node);
 
+                    if (ast.getAstType() == SQLASTType.UPDATE_WITH_WHERE) {
+                        ast.setAstType(SQLASTType.UPDATE_WITH_WHERE_IN);
+                    } else if (ast.getAstType() == SQLASTType.DELETE_WITH_WHERE) {
+                        ast.setAstType(SQLASTType.DELETE_WITH_WHERE_IN);
+                    } else if (ast.getAstType() == SQLASTType.SELECT_WITH_WHERE) {
+                        ast.setAstType(SQLASTType.SELECT_WITH_WHERE_IN);
+                    } else {
+                        return new SavePoint(pos, false);
+                    }
                     token = getToken(pos++);
                     if (token.getSortCode() == SortCode.LPARENT) {
                         ASTNode lp = new ASTNode(false, true, token.getValue());
@@ -496,6 +538,7 @@ public class SQLParser {
                         token = getToken(pos++);
                         if (token.getSortCode() == SortCode.SELECT) {
                             //复合查询
+                            ast.setAstType(SQLASTType.SELECT_WITH_SUB);//存在子查询
                             SavePoint sp_dql = DQL(--pos, astNode);
                             pos = sp_dql.pos + 1;//最后一个是分号，则需要+1
                             if (sp_dql.correct) {
@@ -949,16 +992,22 @@ public class SQLParser {
                         astNode.addChildNode(add_node);
 
                         contextSortCode = SortCode.ADD;
+
+                        ast.setAstType(SQLASTType.ALTER_TABLE_ADD);
                     } else if (token.getSortCode() == SortCode.DROP) {
                         ASTNode drop_node = new ASTNode(false, true, token.getValue());
                         astNode.addChildNode(drop_node);
 
                         contextSortCode = SortCode.DROP;
+
+                        ast.setAstType(SQLASTType.ALTER_TABLE_DROP);
                     } else if (token.getSortCode() == SortCode.ALTER) {
                         ASTNode alter_node = new ASTNode(false, true, token.getValue());
                         astNode.addChildNode(alter_node);
 
                         contextSortCode = SortCode.ALTER;
+
+                        ast.setAstType(SQLASTType.ALTER_TABLE_ALTER);
                     } else {
                         break;
                     }
@@ -1027,7 +1076,6 @@ public class SQLParser {
                 ASTNode db_node = new ASTNode(false, true, token.getValue());
                 astNode.addChildNode(db_node);
 
-                ast.setAstType(SQLASTType.SHOW_DATABASES);
                 token = getToken(pos++);
                 if (token.getSortCode() == SortCode.SEMICOLON) {
                     ASTNode sem_node = new ASTNode(false, true, token.getValue());
@@ -1038,8 +1086,6 @@ public class SQLParser {
             } else if (token.getSortCode() == SortCode.TABLES) {
                 ASTNode tab_node = new ASTNode(false, true, token.getValue());
                 astNode.addChildNode(tab_node);
-
-                ast.setAstType(SQLASTType.SHOW_TABLES);
                 token = getToken(pos);
                 if(token.getSortCode() == SortCode.SEMICOLON) {
                     ASTNode sem_node = new ASTNode(false, true, token.getValue());
@@ -1054,7 +1100,7 @@ public class SQLParser {
 
             ast.setAstType(SQLASTType.USE_DATABASE);
             token = getToken(pos++);
-            
+
             if (token.getSortCode() == SortCode.IDENTIFIED) {
                 ASTNode db_name = new ASTNode(false, true, token.getValue());
                 astNode.addChildNode(db_name);
