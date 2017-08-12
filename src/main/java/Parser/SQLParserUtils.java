@@ -1,7 +1,8 @@
 package Parser;
 
-import Log.CheetahASTLog;
 import Parser.AstGen.BaseAST;
+import Support.Logging.Log;
+import Support.Logging.LogFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -9,9 +10,10 @@ import java.util.Map;
 /**
  * Created by roy on 2017/8/6.
  */
-public class SQLParserUntil {
+public class SQLParserUtils {
     String io_file;//file文件暂时内置
 
+    private final static Log log = LogFactory.getLog(SQLParserUtils.class);
     /**
      * 获取token流
      * @return
@@ -20,10 +22,10 @@ public class SQLParserUntil {
         Lexer lexer = new Lexer(sql);
         try {
             List<Token> tokens = lexer.getTokenStream();
-            CheetahASTLog.Info("Lexer", tokens, ' ');
+            log.info(tokens);
             return tokens;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("getToken wrong sql=", sql, e);
         }
         return null;
     }
@@ -58,7 +60,7 @@ public class SQLParserUntil {
             sqlParser.managerSQL();
             return sqlParser.getAst();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("AssSQlASTgen failed sql = ", sql , e);
         }
         return null;
     }

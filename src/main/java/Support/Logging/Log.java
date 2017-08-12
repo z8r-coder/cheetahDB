@@ -16,9 +16,15 @@
  */
 package Support.Logging;
 
+import Parser.Token;
+
+import java.util.List;
+
 public interface Log {
 
     boolean isDebugEnabled();
+
+    void error(String msg, String param, Throwable e);
 
     void error(String msg, Throwable e);
 
@@ -27,6 +33,10 @@ public interface Log {
     boolean isInfoEnabled();
 
     void info(String msg);
+
+    void info(List<Token> tokens);
+
+    void info(String msg, List<Token> tokens);
 
     void debug(String msg);
 

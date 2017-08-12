@@ -1,6 +1,5 @@
 package Parser.AstGen;
 
-import Log.CheetahASTLog;
 import Parser.ASTNode;
 import Parser.Visitor.SQLASTVisitor;
 
@@ -28,11 +27,6 @@ public class SQLSelectAst implements BaseAST{
     }
 
     public void setParentSelect(SQLSelectAst parentSelect) {
-        if (parentSelect == null) {
-            CheetahASTLog.Info("set parentSelect fail! parentSelect=",parentSelect);
-            return;
-        }
-        this.parentSelect = parentSelect;
     }
 
     public SQLSelectAst getParentSelect() {

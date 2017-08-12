@@ -1,6 +1,8 @@
 package Parser;
 
-import Log.CheetahASTLog;
+
+import Support.Logging.Log;
+import Support.Logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,8 @@ public class ASTNode {
      */
     private Token token;
 
+    private final static Log LOG = LogFactory.getLog(ASTNode.class);
+
     public ASTNode(boolean root, boolean leaf, Token token) {
         this.root = root;
         this.leaf = leaf;
@@ -42,7 +46,7 @@ public class ASTNode {
 
     public String getValue() {
         if (token == null) {
-            CheetahASTLog.Info("token = null?");
+            LOG.error("token is null");
             return "";
         }
         return token.getValue();

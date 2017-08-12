@@ -16,9 +16,13 @@
  */
 package Support.Logging;
 
+import Parser.Token;
+import org.apache.log4j.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
+
+import java.util.List;
 
 public class SLF4JImpl implements Log {
 
@@ -49,6 +53,11 @@ public class SLF4JImpl implements Log {
         return log.isDebugEnabled();
     }
 
+    public void error(String msg, String param, Throwable e) {
+        error(msg, e);
+        System.err.print(param);
+    }
+
     public void error(String msg, Throwable e) {
         log.log(null, callerFQCN, LocationAwareLogger.ERROR_INT, msg, null, e);
         errorCount++;
@@ -66,6 +75,21 @@ public class SLF4JImpl implements Log {
     public void info(String msg) {
         infoCount++;
         log.log(null, callerFQCN, LocationAwareLogger.INFO_INT, msg, null, null);
+    }
+
+    public void info(List<Token> tokens) {
+        System.out.print("[");
+        for (Token token : tokens) {
+            System.out.print(token.getValue() + " ");
+        }
+        System.out.println("]");
+    }
+
+    public void info(String msg, List<Token> tokens) {
+        log.log(null, callerFQCN, LocationAwareLogger.INFO_INT, msg, null, null);
+        infoCount++;
+        System.out.print(msg);
+        info(tokens);
     }
 
     public void debug(String msg) {

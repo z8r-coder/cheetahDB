@@ -16,8 +16,11 @@
  */
 package Support.Logging;
 
+import Parser.Token;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import java.util.List;
 
 public class Log4jImpl implements Log {
 
@@ -48,6 +51,11 @@ public class Log4jImpl implements Log {
 
     public boolean isDebugEnabled() {
         return log.isDebugEnabled();
+    }
+
+    public void error(String msg, String param, Throwable e) {
+        error(msg,e);
+        System.err.print(param);
     }
 
     public void error(String s, Throwable e) {
@@ -106,6 +114,21 @@ public class Log4jImpl implements Log {
     public void info(String msg) {
         infoCount++;
         log.log(callerFQCN, Level.INFO, msg, null);
+    }
+
+    public void info(List<Token> tokens) {
+        System.out.print("[");
+        for (Token token : tokens) {
+            System.out.print(token.getValue() + " ");
+        }
+        System.out.println("]");
+    }
+
+    public void info(String msg, List<Token> tokens) {
+        log.log(callerFQCN, Level.INFO, msg, null);
+        infoCount++;
+        System.out.print(msg);
+        info(tokens);
     }
 
     public boolean isWarnEnabled() {

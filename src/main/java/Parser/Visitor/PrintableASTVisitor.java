@@ -1,6 +1,5 @@
 package Parser.Visitor;
 
-import Log.CheetahASTLog;
 import Parser.ASTNode;
 import Parser.AstGen.ASTContext;;
 import Parser.AstGen.BaseAST;

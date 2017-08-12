@@ -16,8 +16,11 @@
  */
 package Support.Logging;
 
+import Parser.Token;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.util.List;
 
 public class JakartaCommonsLoggingImpl implements Support.Logging.Log {
 
@@ -42,6 +45,11 @@ public class JakartaCommonsLoggingImpl implements Support.Logging.Log {
 
     public boolean isDebugEnabled() {
         return log.isDebugEnabled();
+    }
+
+    public void error(String msg, String param, Throwable e) {
+        error(msg, e);
+        System.err.print(param);
     }
 
     public void error(String s, Throwable e) {
@@ -97,6 +105,21 @@ public class JakartaCommonsLoggingImpl implements Support.Logging.Log {
     public void info(String msg) {
         log.info(msg);
         infoCount++;
+    }
+
+    public void info(List<Token> tokens) {
+        System.out.print("[");
+        for (Token token : tokens) {
+            System.out.print(token.getValue() + " ");
+        }
+        System.out.println("]");
+    }
+
+    public void info(String msg, List<Token> tokens) {
+        log.info(msg);
+        infoCount++;
+        System.out.print(msg);
+        info(tokens);
     }
 
     public int getInfoCount() {

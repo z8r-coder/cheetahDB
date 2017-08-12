@@ -1,7 +1,10 @@
 package Parser;
 import Exception.*;
+import Support.Logging.Log;
+import Support.Logging.LogFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,12 +19,19 @@ public class Lexer {
     private int line = 0;//行
     private List<Token> tokenStream = new ArrayList<Token>();
     private final byte ICMask = (byte) 0xDF;
+
+    private final static Log LOG = LogFactory.getLog(Lexer.class);
+
     //从文件读入sql语句
     public Lexer() {
         String url = Lexer.class.getClassLoader().getResource("testSql.txt").getFile();
         File file = new File(url);
         IOSystem io = new IOSystem();
-        sql = io.readFromFile(file);
+        try {
+            sql = io.readFromFile(file);
+        } catch (IOException e) {
+            LOG.error("readFrom File failed", e);
+        }
     }
     //赋值sql语句
     public Lexer(String sql) {

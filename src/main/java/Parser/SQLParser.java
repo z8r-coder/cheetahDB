@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import Exception.SytaxErrorsException;
-import Log.CheetahASTLog;
+
+import Support.Logging.Log;
+import Support.Logging.LogFactory;
 import com.sun.org.apache.bcel.internal.generic.FADD;
 import com.sun.org.apache.bcel.internal.generic.INEG;
 import org.omg.PortableServer.POA;
@@ -19,6 +21,8 @@ public class SQLParser {
     private List<Token> tokens;
     private int parent_match = 0;
     private final byte ICMask = (byte) 0xDF;
+
+    private final static Log LOG = LogFactory.getLog(SQLParser.class);
 
     public SQLParser(List<Token> tokens, AST ast) {
         this.tokens = tokens;
@@ -54,7 +58,7 @@ public class SQLParser {
         for (int i = 0; i < tokens.size();) {
             SavePoint sp = sql(i);
             if (sp == null) {
-                CheetahASTLog.Info("the first token is wrong");
+                LOG.info("the first token is wrong");
                 return null;
             }
             i = sp.pos + 1;
@@ -1276,7 +1280,7 @@ public class SQLParser {
 
                     continue;
                 } else {
-                    CheetahASTLog.Info("Cheetah's grammar is only support Varchar and integer");
+                    LOG.info("Cheetah's grammar is only support Varchar and integer");
                     return new SavePoint(pos, false);
                 }
             }

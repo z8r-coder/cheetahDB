@@ -1,8 +1,11 @@
 package Support.Logging;
 
+import Parser.Token;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.List;
 
 /*
  * Modified from com.alibaba.druid
@@ -47,6 +50,11 @@ public class Log4j2Impl implements Log {
 
     public boolean isDebugEnabled() {
         return log.isDebugEnabled();
+    }
+
+    public void error(String msg, String param, Throwable e) {
+        error(msg,e);
+        System.err.print(param);
     }
 
     public void error(String s, Throwable e) {
@@ -105,6 +113,20 @@ public class Log4j2Impl implements Log {
     public void info(String msg) {
         infoCount++;
         log.info(msg);
+    }
+    public void info(List<Token> tokens) {
+        System.out.print("[");
+        for (Token token : tokens) {
+            System.out.print(token.getValue() + " ");
+        }
+        System.out.println("]");
+    }
+
+    public void info(String msg, List<Token> tokens) {
+        log.info(msg);
+        infoCount++;
+        System.out.print(msg);
+        info(tokens);
     }
 
     public boolean isWarnEnabled() {

@@ -16,6 +16,11 @@
  */
 package Support.Logging;
 
+import Parser.Token;
+import org.apache.log4j.Level;
+
+import java.util.List;
+
 public class NoLoggingImpl implements Log {
 
     private int    infoCount;
@@ -39,6 +44,11 @@ public class NoLoggingImpl implements Log {
 
     public boolean isDebugEnabled() {
         return debugEnable;
+    }
+
+    public void error(String msg, String param, Throwable e) {
+        error(msg, e);
+        System.err.print(param);
     }
 
     public void error(String s, Throwable e) {
@@ -97,6 +107,19 @@ public class NoLoggingImpl implements Log {
 
     public void info(String s) {
         infoCount++;
+    }
+    public void info(List<Token> tokens) {
+        System.out.print("[");
+        for (Token token : tokens) {
+            System.out.print(token.getValue() + " ");
+        }
+        System.out.println("]");
+    }
+
+    public void info(String msg, List<Token> tokens) {
+        infoCount++;
+        System.out.print(msg);
+        info(tokens);
     }
 
     public boolean isWarnEnabled() {

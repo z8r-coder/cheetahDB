@@ -16,6 +16,9 @@
  */
 package Support.Logging;
 
+import Parser.Token;
+
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,6 +40,11 @@ public class Jdk14LoggingImpl implements Log {
 
     public boolean isDebugEnabled() {
         return log.isLoggable(Level.FINE);
+    }
+
+    public void error(String msg, String param, Throwable e) {
+        error(msg,e);
+        System.err.print(param);
     }
 
     public void error(String s, Throwable e) {
@@ -91,6 +99,20 @@ public class Jdk14LoggingImpl implements Log {
     public void info(String msg) {
         log.logp(Level.INFO, loggerName, Thread.currentThread().getStackTrace()[1].getMethodName(), msg);
         infoCount++;
+    }
+    public void info(List<Token> tokens) {
+        System.out.print("[");
+        for (Token token : tokens) {
+            System.out.print(token.getValue() + " ");
+        }
+        System.out.println("]");
+    }
+
+    public void info(String msg, List<Token> tokens) {
+        log.logp(Level.INFO, loggerName, Thread.currentThread().getStackTrace()[1].getMethodName(), msg);
+        infoCount++;
+        System.out.print(msg);
+        info(tokens);
     }
 
     public int getInfoCount() {

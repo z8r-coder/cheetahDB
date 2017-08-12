@@ -1,6 +1,10 @@
 
 package Parser;
 
+import Support.Logging.Log;
+import Support.Logging.LogFactory;
+import Utils.ASTTestUtils;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,45 +15,61 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.Pack200;
 
 public class IOSystem {
     private List<String> linebuf = new ArrayList();
     private static final String ENCODING = "UTF-8";
 
+    private final static Log LOG = LogFactory.getLog(ASTTestUtils.class);
+
     public IOSystem() {
     }
 
-    public String readFromFile(File file) {
+    public String readFromFile(File file) throws IOException {
         StringBuilder sb = new StringBuilder();
+        InputStreamReader e = null;
+        BufferedReader br = null;
         try {
-            InputStreamReader e = new InputStreamReader(new FileInputStream(file), "UTF-8");
-            BufferedReader br = new BufferedReader(e);
+            e = new InputStreamReader(new FileInputStream(file), "UTF-8");
+            br = new BufferedReader(e);
             String lineText = null;
 
             while((lineText = br.readLine()) != null) {
                 sb.append(lineText + '\n');
             }
-            br.close();
-            e.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            LOG.error("readFromFile failed", ex);
+        } finally {
+            if (br != null) {
+                br.close();
+            }
+            if (e != null) {
+                e.close();
+            }
         }
 
         return sb.toString();
     }
 
-    public void writeToFile(File file, List<Token> iobuf) {
+    public void writeToFile(File file, List<Token> iobuf) throws IOException {
+        OutputStreamWriter ow = null;
+        BufferedWriter bw = null;
         try {
-            OutputStreamWriter e1 = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
-            BufferedWriter bw = new BufferedWriter(e1);
+            ow = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+            bw = new BufferedWriter(ow);
             for(int i = 0; i < iobuf.size(); ++i) {
                 bw.write("<" + iobuf.get(i).getValue() + "," + iobuf.get(i).getLine());
             }
-            bw.close();
-            e1.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("writeToFile failed", e);
+        } finally {
+            if (ow != null) {
+                ow.close();
+            }
+            if (bw != null) {
+                bw.close();
+            }
         }
-
     }
 }
