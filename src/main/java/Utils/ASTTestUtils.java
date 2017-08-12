@@ -88,6 +88,7 @@ public class ASTTestUtils {
 //        ASTTestPrint(ast.getRoot_set().get(0));
 //        System.out.println();
 //        System.out.println(ast.getAstType());
+
         //create database语句测试通过
 //        AST ast = SQLParserUntil.AssSQlASTgen("CREATE DATABASE my_db;");
 //        ASTTestPrint(ast.getRoot_set().get(0));

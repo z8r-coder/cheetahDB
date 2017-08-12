@@ -11,12 +11,12 @@ import java.util.List;
  *
  * Created by ruanxin on 2017/8/9.
  */
-public class SelectAst implements BaseAST{
+public class SQLSelectAst implements BaseAST{
     private ASTNode root;
-    private SelectAst parentSelect;// 父查询
-    private SelectAst[] subSelect;//子查询组，20170809:子查询只出现在where后
+    private SQLSelectAst parentSelect;// 父查询
+    private SQLSelectAst[] subSelect;//子查询组，20170809:子查询只出现在where后
 
-    public SelectAst(ASTNode root) {
+    public SQLSelectAst(ASTNode root) {
         this.root = root;
     }
     public void setRoot(ASTNode root) {
@@ -27,7 +27,7 @@ public class SelectAst implements BaseAST{
         return root;
     }
 
-    public void setParentSelect(SelectAst parentSelect) {
+    public void setParentSelect(SQLSelectAst parentSelect) {
         if (parentSelect == null) {
             CheetahASTLog.Info("set parentSelect fail! parentSelect=",parentSelect);
             return;
@@ -35,7 +35,7 @@ public class SelectAst implements BaseAST{
         this.parentSelect = parentSelect;
     }
 
-    public SelectAst getParentSelect() {
+    public SQLSelectAst getParentSelect() {
         return parentSelect;
     }
 

@@ -1,11 +1,4 @@
-import BPT.BPT;
-import BPT.BPTImpl.BPTImpl;
-import BPT.Entry;
-import BPT.Node;
-import BPT.NodeImpl.InteriorNode;
-import BPT.NodeImpl.LeafNode;
 import Parser.Lexer;
-import Parser.SQLDDLPattern;
 import Parser.Token;
 
 import java.util.ArrayList;

@@ -1,6 +1,7 @@
 package Parser.AstGen;
 
 import Parser.ASTNode;
+import Parser.Visitor.SQLASTVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,4 +20,7 @@ public class ParamAST implements BaseAST {
         return root;
     }
 
+    public void accept(SQLASTVisitor visitor) {
+
+    }
 }

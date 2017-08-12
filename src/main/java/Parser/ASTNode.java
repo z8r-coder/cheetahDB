@@ -1,5 +1,7 @@
 package Parser;
 
+import Log.CheetahASTLog;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +40,13 @@ public class ASTNode {
         return token;
     }
 
+    public String getValue() {
+        if (token == null) {
+            CheetahASTLog.Info("token = null?");
+            return "";
+        }
+        return token.getValue();
+    }
     public void set_isLeaf(boolean leaf) {
         this.leaf = leaf;
     }
