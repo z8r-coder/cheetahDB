@@ -22,19 +22,20 @@ public class ASTNode {
     /**
      * 值
      */
-    private String value;
+    private Token token;
 
-    public ASTNode(boolean root, boolean leaf, String value) {
+    public ASTNode(boolean root, boolean leaf, Token token) {
         this.root = root;
         this.leaf = leaf;
-        this.value = value;
-    }
-    public void setValue(String value) {
-        this.value = value;
+        this.token = token;
     }
 
-    public String getValue() {
-        return value;
+    public void setToken(Token token) {
+        this.token = token;
+    }
+
+    public Token getToken() {
+        return token;
     }
 
     public void set_isLeaf(boolean leaf) {

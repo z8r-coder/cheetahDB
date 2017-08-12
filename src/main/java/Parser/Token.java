@@ -13,6 +13,10 @@ public class Token {
         this.sortCode = sortCode;
         this.line = line;
     }
+
+    public Token() {
+    }
+
     public SortCode getSortCode() {
         return sortCode;
     }

@@ -23,28 +23,4 @@ public class PrintableASTVisitor implements SQLASTVisitor {
         String res = ASTUtils.TreeNodeDfsPrintUtils(root, sb);
         CheetahASTLog.Info("InsertSingleRowDefaultAST:", res);
     }
-
-    /**
-     * 输出Insert语句
-     * @param context
-     */
-    public static void InsertASTPrint(ASTContext context) {
-        if (!context.getName().equals("INSERT")) {
-            CheetahASTLog.Info("Not Insert,It's", context.getName());
-            return;
-        }
-        BaseAST baseAST = context.getAst();
-        if (baseAST == null) {
-            CheetahASTLog.Info("InsertSingleRowDefaultASTPrint: bastAST=", baseAST);
-            return;
-        }
-        ASTNode root = baseAST.getRoot();
-        if (root == null) {
-            CheetahASTLog.Info("InsertSingleRowDefaultASTPrint: root=", root);
-            return;
-        }
-        StringBuilder sb = new StringBuilder();
-        String res = ASTUtils.TreeNodeDfsPrintUtils(root, sb);
-        CheetahASTLog.Info("InsertSingleRowDefaultAST:", res);
-    }
 }

@@ -2,6 +2,7 @@ package Parser.AstGen;
 
 import Log.CheetahASTLog;
 import Parser.ASTNode;
+import Parser.Visitor.SQLASTVisitor;
 
 import java.util.List;
 
@@ -36,5 +37,9 @@ public class SelectAst implements BaseAST{
 
     public SelectAst getParentSelect() {
         return parentSelect;
+    }
+
+    public void accept(SQLASTVisitor visitor) {
+
     }
 }

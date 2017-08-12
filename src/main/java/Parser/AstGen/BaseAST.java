@@ -2,6 +2,7 @@ package Parser.AstGen;
 
 import Parser.AST;
 import Parser.ASTNode;
+import Parser.Visitor.SQLASTVisitor;
 
 import java.util.List;
 
@@ -9,13 +10,5 @@ import java.util.List;
  * Created by ruanxin on 2017/8/9.
  */
 public interface BaseAST extends SQLAst {
-    /**
-     * 注入根结点
-     * @param astNode
-     */
-    public void setRoot(ASTNode astNode);
-    /**
-     * 返回根结点
-     */
-    public ASTNode getRoot();
+    public void accept(SQLASTVisitor visitor);
 }
