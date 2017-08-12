@@ -57,6 +57,7 @@ public class Keywords {
         keywords.put("TABLES", SortCode.TABLES);
         keywords.put("USE", SortCode.USE);
         keywords.put("SHOW", SortCode.SHOW);
+        keywords.put("FOREIGN", SortCode.FOREIGN);
     }
 
     public static SortCode getValue(String key) {

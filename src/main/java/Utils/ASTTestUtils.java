@@ -31,16 +31,48 @@ public class ASTTestUtils {
         /**
          * create语句测试
          */
-        //create table语句测试
+        //create table语句测试,无约束语句，通过测试
+//        AST ast = SQLParserUntil.AssSQlASTgen("CREATE TABLE Persons" +
+//                "         (" +
+//                "         Id_P integer(10)," +
+//                "         LastName varchar(255)," +
+//                "         FirstName varchar(255)," +
+//                "         Address varchar(255)," +
+//                "         City varchar(255)" +
+//                "         );");
+//        ASTTestPrint(ast.getRoot_set().get(0));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
+
+        //create table语句测试,含not null约束语句,通过测试
+//        AST ast = SQLParserUntil.AssSQlASTgen("CREATE TABLE Persons" +
+//                "         (" +
+//                "         Id_P integer(10) NOT NULL," +
+//                "         LastName varchar(255) not null," +
+//                "         FirstName varchar(255)," +
+//                "         Address varchar(255)," +
+//                "         City varchar(255)" +
+//                "         );");
+//        ASTTestPrint(ast.getRoot_set().get(0));
+//        System.out.println();
+//        System.out.println(ast.getAstType());
+
+        //create table语句测试,含not null约束语句,含unique,check,primary,foreign约束通过测试
         AST ast = SQLParserUntil.AssSQlASTgen("CREATE TABLE Persons" +
                 "         (" +
-                "         Id_P int," +
-                "         LastName varchar(255)," +
+                "         Id_P integer(10) NOT NULL," +
+                "         LastName varchar(255) not null," +
                 "         FirstName varchar(255)," +
                 "         Address varchar(255)," +
-                "         City varchar(255)" +
+                "         UNIQUE (Id_P)," +
+                "         PRIMARY KEY (Id_P)," +
+                "         FOREIGN KEY (Id_P) REFERENCES Persons(Id_P)," +
+                "         City varchar(255)," +
+                "         CHECK (Id_P>0 AND ID_P < 1)" +
                 "         );");
         ASTTestPrint(ast.getRoot_set().get(0));
+        System.out.println();
+        System.out.println(ast.getAstType());
 
         //create database语句测试通过
 //        AST ast = SQLParserUntil.AssSQlASTgen("CREATE DATABASE my_db;");

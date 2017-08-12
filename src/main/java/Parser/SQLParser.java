@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 import Exception.SytaxErrorsException;
 import Log.CheetahASTLog;
 import com.sun.org.apache.bcel.internal.generic.FADD;
+import com.sun.org.apache.bcel.internal.generic.INEG;
 import org.omg.PortableServer.POA;
 
 /**
@@ -1166,7 +1167,10 @@ public class SQLParser {
 
             switch (con_sort) {
                 case UNIQUE:
-                    sp = ContainsColumn("UNIQUE", pos, astNode);
+                    ASTNode uni_node = new ASTNode(false, false, "unique_node");
+                    astNode.addChildNode(uni_node);
+
+                    sp = ContainsColumn("UNIQUE", pos, uni_node);
                     if (sp.correct) {
                         pos = sp.pos;
                         token = getToken(pos);
@@ -1175,7 +1179,10 @@ public class SQLParser {
                     }
                     continue;
                 case PRIMARY:
-                    sp = ContainsColumn("PRIMARY", pos, astNode);
+                    ASTNode pri_node = new ASTNode(false, false, "prim_node");
+                    astNode.addChildNode(pri_node);
+
+                    sp = ContainsColumn("PRIMARY", pos, pri_node);
                     if (sp.correct) {
                         pos = sp.pos;
                         token = getToken(pos);
@@ -1184,7 +1191,10 @@ public class SQLParser {
                     }
                     continue;
                 case FOREIGN:
-                    sp = ContainsColumn("FOREIGN", pos, astNode);
+                    ASTNode frg_node = new ASTNode(false, false, "frg_node");
+                    astNode.addChildNode(frg_node);
+
+                    sp = ContainsColumn("FOREIGN", pos, frg_node);
                     if (sp.correct) {
                         pos = sp.pos;
                         token = getToken(pos);
@@ -1193,6 +1203,9 @@ public class SQLParser {
                     }
                     continue;
                 case CHECK:
+                    ASTNode check_node = new ASTNode(false, false, "check_node");
+                    astNode.addChildNode(check_node);
+
                     sp = ContainsColumn("CHECK", pos, astNode);
                     if (sp.correct) {
                         pos = sp.pos;
@@ -1205,26 +1218,46 @@ public class SQLParser {
                     break;
             }
             //column名
-            Token lookahead = getToken(pos + 1);//观察数据类型
-            SortCode sortCode = lookahead.getSortCode();
+            ASTNode column_node = new ASTNode(false, false, "column_node");
+            astNode.addChildNode(column_node);
 
-
+            sp = columnPattern(pos, column_node);
+            pos = sp.pos;
+            if (sp.correct) {
+                token = getToken(pos);
+            } else {
+                return sp;
+            }
+            continue;
         }
-        return new SavePoint(pos, true);//分号交给上层执行
+        return new SavePoint(pos, true);//table层次分号和右括号交给上层执行
     }
 
     private SavePoint columnPattern(int pos, ASTNode astNode) throws Exception {
         List<SortCode> patternlist = SQLCreateTablePattern.getCrtTabPat();
         for (SortCode sc : patternlist) {
-            if (sc == SortCode.OPTION) {
-
-            }
             Token token = getToken(pos++);
+            if (sc == SortCode.OPTION) {
+                if (token.getSortCode() == SortCode.VARCHAR) {
+                    ASTNode var_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(var_node);
+
+                    continue;
+                } else if (token.getSortCode() == SortCode.INTEGER) {
+                    ASTNode int_node = new ASTNode(false, true, token.getValue());
+                    astNode.addChildNode(int_node);
+
+                    continue;
+                } else {
+                    CheetahASTLog.Info("Cheetah's grammar is only support Varchar and integer");
+                    return new SavePoint(pos, false);
+                }
+            }
             if (token.getSortCode() == sc) {
                 ASTNode node = new ASTNode(false, true, token.getValue());
                 astNode.addChildNode(node);
             } else {
-                throw new SytaxErrorsException(getClass().toString());
+                return new SavePoint(pos, false);
             }
         }
         Token token = getToken(pos);
@@ -1267,7 +1300,7 @@ public class SQLParser {
             }
         }else if (token.getSortCode() == SortCode.RPARENT) {}
         else {
-            throw new SytaxErrorsException(getClass().toString() + ":" + token.getLine());
+            return new SavePoint(pos, false);
         }
         return new SavePoint(pos, true);
     }
@@ -1280,16 +1313,17 @@ public class SQLParser {
             if (sortCode == token.getSortCode()) {
                 ASTNode tmp_node = new ASTNode(false,true, token.getValue());
                 astNode.addChildNode(tmp_node);
-
-                token = tokens.get(pos++);
             }else {
-                throw new SytaxErrorsException(getClass().toString() + ":" + token.getLine());
+                return new SavePoint(pos, false);
             }
+
+            token = getToken(pos++);
         }
-        ASTNode para_list = new ASTNode(false, false, "ParamsList");
-        astNode.addChildNode(para_list);
+
         if (name.equals("UNIQUE") || name.equals("PRIMARY")) {
-            SavePoint sp = ParamsList(pos, para_list);
+            ASTNode para_list = new ASTNode(false, false, "ParamsList");
+            astNode.addChildNode(para_list);
+            SavePoint sp = ParamsList(--pos, para_list);
             if (sp.correct) {
                 pos = sp.pos;
                 token = getToken(pos++);
@@ -1318,7 +1352,10 @@ public class SQLParser {
                 }
             }
         }else if (name.equals("CHECK")) {
-            SavePoint sp = CheckList(pos, para_list);
+            ASTNode check_list = new ASTNode(false, false, "check_list");
+            astNode.addChildNode(check_list);
+
+            SavePoint sp = CheckList(--pos, check_list);
             if (sp.correct) {
                 pos = sp.pos;
                 token = getToken(pos++);
@@ -1343,15 +1380,15 @@ public class SQLParser {
                 }
             }
         }else if (name.equals("FOREIGN")){
-            token = getToken(pos++);
+            token = getToken(--pos);
             //交给table层处理
             if (token.getSortCode() == SortCode.RPARENT) {
-                return new SavePoint(--pos, true);
+                return new SavePoint(pos, true);
             }else if (token.getSortCode() == SortCode.COMMA) {
                 ASTNode ast_comma = new ASTNode(false, true, token.getValue());
                 astNode.addChildNode(ast_comma);
 
-                token = getToken(pos);
+                token = getToken(++pos);
                 //出现,)情况，错误
                 if (token.getSortCode() == SortCode.RPARENT) {
                     return new SavePoint(pos, false);
