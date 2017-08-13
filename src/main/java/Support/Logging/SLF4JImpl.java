@@ -81,7 +81,7 @@ public class SLF4JImpl implements Log {
         System.out.print("[");
         for (Token token : tokens) {
             System.out.print(token.getValue() + " ");
-        }
+        }  
         System.out.println("]");
     }
 
