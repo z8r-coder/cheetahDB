@@ -47,4 +47,17 @@ public class ASTUtils {
         return sb.substring(0,sb.length() - 1);
     }
 
+    public static ASTNode getASTNodeByValue(ASTNode root,String value) {
+        if (root.getValue().equals(value)) {
+            return root;
+        }
+        if (!root.get_isLeaf()) {
+            List<ASTNode> nodes = root.getChildSet();
+            for (ASTNode tmp_node : nodes) {
+                ASTNode astNode = getASTNodeByValue(tmp_node, value);
+            }
+        }
+        return null;
+    }
+
 }

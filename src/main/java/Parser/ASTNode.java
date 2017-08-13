@@ -51,6 +51,13 @@ public class ASTNode {
         }
         return token.getValue();
     }
+
+    public SortCode getSortCode() {
+        if (token == null) {
+            LOG.error("token is null");
+        }
+        return token.getSortCode();
+    }
     public void set_isLeaf(boolean leaf) {
         this.leaf = leaf;
     }

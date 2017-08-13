@@ -62,6 +62,11 @@ public class Log4j2Impl implements Log {
         log.error(s, e);
     }
 
+    public void error(String msg, String para) {
+        error(msg);
+        System.err.println(para);
+    }
+
     public void error(String s) {
         errorCount++;
         log.error(s);

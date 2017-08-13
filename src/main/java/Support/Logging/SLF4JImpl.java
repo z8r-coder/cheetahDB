@@ -63,6 +63,11 @@ public class SLF4JImpl implements Log {
         errorCount++;
     }
 
+    public void error(String msg, String para) {
+        error(msg);
+        System.err.println(para);
+    }
+
     public void error(String msg) {
         log.log(null, callerFQCN, LocationAwareLogger.ERROR_INT, msg, null, null);
         errorCount++;
@@ -81,7 +86,7 @@ public class SLF4JImpl implements Log {
         System.out.print("[");
         for (Token token : tokens) {
             System.out.print(token.getValue() + " ");
-        }  
+        }
         System.out.println("]");
     }
 

@@ -28,6 +28,8 @@ public interface Log {
 
     void error(String msg, Throwable e);
 
+    void error(String msg, String para);
+
     void error(String msg);
 
     boolean isInfoEnabled();

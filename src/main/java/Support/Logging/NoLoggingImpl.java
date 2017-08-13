@@ -63,6 +63,11 @@ public class NoLoggingImpl implements Log {
         }
     }
 
+    public void error(String msg, String para) {
+        error(msg);
+        System.err.println(para);
+    }
+
     public void error(String s) {
         errorCount++;
         if (s != null) {

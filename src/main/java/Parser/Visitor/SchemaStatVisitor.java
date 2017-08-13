@@ -1,28 +1,173 @@
 package Parser.Visitor;
 
-import Parser.Token;
+import Parser.*;
+import Parser.AstGen.SQLCreateDbAst;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import Support.Logging.Log;
+import Support.Logging.LogFactory;
+import Utils.StringUtils;
+
+import Exception.SytaxErrorsException;
+
+import java.util.*;
 
 /**
  * Created by ruanxin on 2017/8/12.
  */
 public class SchemaStatVisitor extends BaseASTVisitorAdapter {
-    //目前只支持单表查询，向后兼容，此处用容器 20170812
-    private List<String> table_name = new ArrayList<String>();
 
-    //update中的赋值,拿到token资源可判断类型
-    private Map<String, Token> assMap = new HashMap<String, Token>();
-    //表中的row_name,select的行，insert的行
-    private List<String> row_name = new ArrayList<String>();
+    private final Set<Column> crtCol = new HashSet<Column>();
 
-    //insert的值
-    private List<String> value_name = new ArrayList<String>();
-    //
+    private final Map<String, Column> str2Col = new HashMap<String, Column>();
 
+    private final Set<Relationship> relationships = new LinkedHashSet<Relationship>();
+
+    private final List<Value> values = new ArrayList<Value>();
+
+    private final static Log logger = LogFactory.getLog(SchemaStatVisitor.class);
+    @Override
+    public void visit(SQLCreateDbAst ast) throws Exception {
+        AST past = ast.getAst();
+        ASTNode root = past.getRoot();
+        if (past.getAstType() != SQLASTType.CREATE_TABLE) {
+            logger.error("The ast is not create_table!");
+            return;
+        }
+        ASTNode crt_tab = root.getChildSet().get(0);//create_table_node
+        ASTNode colNode = crt_tab.getChildSet().get(0);//column
+
+        String table_name = root.getChildSet().get(2).getValue();//table name
+
+
+        List<ASTNode> nodes = colNode.getChildSet();
+
+        for (ASTNode node : nodes) {
+            //先生成column,再做约束
+            if (StringUtils.equals(node.getValue(), "column_node")) {
+                visitColumn(node, table_name);
+            }
+        }
+
+        for (ASTNode node : nodes) {
+            if (StringUtils.equals(node.getValue(), "unique_node")) {
+                visitConstrains(node);
+            } else if (StringUtils.equals(node.getValue(),"prim_node")) {
+                visitConstrains(node);
+            }
+        }
+        List<Column> columns = new ArrayList<Column>();
+        for (String str : str2Col.keySet()) {
+            Column column = str2Col.get(str);
+            columns.add(column);
+        }
+
+        ast.setColumns(columns);
+    }
+
+    private void visitConstrains(ASTNode astNode) throws Exception {
+        List<ASTNode> childSet = astNode.getChildSet();
+
+        ASTNode para_node = null;
+        if (StringUtils.equals(astNode.getValue(), "unique_node") ||
+                StringUtils.equals(astNode.getValue(), "prim_node")) {
+            for (ASTNode node : childSet) {
+                if (StringUtils.equals(astNode.getValue(), "ParamsList")) {
+                    para_node = node;
+                    break;
+                }
+            }
+
+            if (para_node == null) {
+                throw new SytaxErrorsException(astNode.getValue() + " Parameter missing");
+            }
+
+        }
+        List<ASTNode> paralist = para_node.getChildSet();
+        for (ASTNode node : paralist) {
+            if (node.getSortCode() == SortCode.IDENTIFIED) {
+                Column column = str2Col.get(node.getValue());
+                if (column == null) {
+                    throw new SytaxErrorsException(astNode.getValue() + " constrains error,not exist the column");
+                } else {
+                    if (StringUtils.equals(astNode.getValue(), "unique_node")) {
+                        column.setIsUnique(true);
+                    } else if (StringUtils.equals(astNode.getValue(), "prim_node")) {
+                        column.setIsPrimaryKey(true);
+                    }
+                }
+            }
+        }
+    }
+
+    private void visitColumn(ASTNode astNode, String table_name) throws Exception {
+        List<ASTNode> col_list = astNode.getChildSet();
+        String col_name = col_list.get(0).getValue();
+        String col_dataType = col_list.get(1).getValue().toUpperCase();
+        String dataLength = col_list.get(3).getValue();
+
+        //创建column
+        Column column = new Column(table_name, col_name);
+        if (col_list.size() > 5) {
+            if (col_list.get(5).getSortCode() == SortCode.NOT) {
+                column.setIsNotNull(true);
+            }
+        }
+        if (StringUtils.equals("VARCHAR", col_dataType)) {
+            column.setDataType(SQLDataType.VARCHAR);
+        } else if (StringUtils.equals("INTEGER", col_dataType)) {
+            column.setDataType(SQLDataType.INTEGER);
+        } else {
+            throw new SytaxErrorsException(astNode.getValue() + "now don't support the data type " + col_dataType);
+        }
+        try {
+            int length = Integer.parseInt(dataLength);
+            column.setTypeLength(length);
+            str2Col.put(col_name, column);
+
+        } catch (NumberFormatException ex) {
+            throw ex;
+        }
+    }
+
+    public static class Value {
+        private String          val;
+        private boolean         in;
+        private boolean         insert;
+
+        public Value() {
+
+        }
+
+        public Value(String val) {
+            this.val = val;
+        }
+
+        public void setIsIn(boolean in) {
+            this.in = in;
+        }
+
+        public boolean getIsIn() {
+            return in;
+        }
+
+        public String getVal() {
+            return val;
+        }
+
+        public void setVal(String val) {
+            this.val = val;
+        }
+
+        public void setIsInsert(boolean insert) {
+            this.insert = insert;
+        }
+
+        public boolean getIsInsert() {
+            return insert;
+        }
+
+
+    }
     public static class Column {
         private String          table;
         private String          name;
@@ -33,7 +178,8 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
         private boolean         notNull;
         private boolean         unique;
 
-        private String          dataType;
+        private SQLDataType     dataType;
+        private int             typeLength;
 
         public Column() {
 
@@ -59,11 +205,11 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
             this.name = name;
         }
 
-        public void setDataType(String dataType) {
+        public void setDataType(SQLDataType dataType) {
             this.dataType = dataType;
         }
 
-        public String getDataType() {
+        public SQLDataType getDataType() {
             return dataType;
         }
 
@@ -95,7 +241,7 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
             this.notNull = notNull;
         }
 
-        public boolean getNotNull(boolean notNull) {
+        public boolean getNotNull() {
             return notNull;
         }
 
@@ -107,9 +253,29 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
             return unique;
         }
 
-//        public int hashCode() {
-//            int tableHashCode = table != null ?
-//        }
+        public void setTypeLength(int typeLength) {
+            this.typeLength = typeLength;
+        }
+
+        public int getTypeLength() {
+            return typeLength;
+        }
+        @Override
+        public int hashCode() {
+            int tableHashCode = table != null ? StringUtils.lowerHashCode(table) : 0;
+            int nameHashCode = name != null ? StringUtils.lowerHashCode(name) : 0;
+
+            return tableHashCode + nameHashCode;
+        }
+
+        @Override
+        public String toString() {
+            if (table != null) {
+                return table + "." + name;
+            }
+            return name;
+        }
+
     }
 
     public static class Relationship {
@@ -203,8 +369,5 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
         public String toString() {
             return left + " " + operator + right;
         }
-    }
-    public static class condition {
-
     }
 }

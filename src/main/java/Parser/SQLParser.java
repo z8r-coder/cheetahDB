@@ -73,7 +73,7 @@ public class SQLParser {
     public SavePoint sql(int pos) throws Exception {
         Token middle_token = new MiddleToken("sql_node");
         ASTNode root = new ASTNode(true, false, middle_token);
-        ast.addRootNode(root);
+        ast.setRoot(root);
 
         Token token = getToken(pos);
         String value = token.getValue().toUpperCase();

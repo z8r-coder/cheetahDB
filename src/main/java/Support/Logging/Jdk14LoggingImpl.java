@@ -52,6 +52,11 @@ public class Jdk14LoggingImpl implements Log {
         errorCount++;
     }
 
+    public void error(String msg, String para) {
+        error(msg);
+        System.err.println(para);
+    }
+
     public void error(String s) {
         log.logp(Level.SEVERE, loggerName, Thread.currentThread().getStackTrace()[1].getMethodName(), s);
         errorCount++;

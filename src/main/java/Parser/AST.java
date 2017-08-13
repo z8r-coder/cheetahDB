@@ -9,9 +9,16 @@ import Exception.NotRootException;
  */
 public class AST {
     private SQLASTType astType;
-    private List<ASTNode> root_set = new ArrayList<ASTNode>();
+    private ASTNode root;
     private String name;
 
+    public AST () {
+
+    }
+    public AST(ASTNode root, String name) {
+        this.root = root;
+        this.name = name;
+    }
     public void setName(String name) {
         this.name = name;
     }
@@ -20,20 +27,12 @@ public class AST {
         return name;
     }
 
-    public void setRoot_set(List<ASTNode> root_set) {
-        this.root_set = root_set;
+    public void setRoot(ASTNode root) {
+        this.root = root;
     }
 
-    public List<ASTNode> getRoot_set() {
-        return root_set;
-    }
-
-    public void addRootNode(ASTNode astNode) throws Exception {
-        if (astNode.get_isRoot()) {
-            this.root_set.add(astNode);
-            return;
-        }
-        throw new NotRootException(getClass().toString());
+    public ASTNode getRoot() {
+        return root;
     }
 
     public void setAstType(SQLASTType astType) {

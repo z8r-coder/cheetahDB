@@ -57,6 +57,11 @@ public class JakartaCommonsLoggingImpl implements Support.Logging.Log {
         errorCount++;
     }
 
+    public void error(String msg, String para) {
+        error(msg);
+        System.err.println(para);
+    }
+
     public void error(String s) {
         log.error(s);
         errorCount++;

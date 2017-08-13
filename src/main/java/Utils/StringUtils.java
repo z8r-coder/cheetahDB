@@ -101,7 +101,22 @@ public class StringUtils {
         }
         return a.equalsIgnoreCase(b);
     }
+    public static int lowerHashCode(String text) {
+        if (text == null) {
+            return 0;
+        }
+//        return text.toLowerCase().hashCode();
+        int h = 0;
+        for (int i = 0; i < text.length(); ++i) {
+            char ch = text.charAt(i);
+            if (ch >= 'A' && ch <= 'Z') {
+                ch = (char) (ch + 32);
+            }
 
+            h = 31 * h + ch;
+        }
+        return h;
+    }
     public static boolean isEmpty(CharSequence value) {
         if (value == null || value.length() == 0) {
             return true;

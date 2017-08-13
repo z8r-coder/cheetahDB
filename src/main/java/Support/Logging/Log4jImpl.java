@@ -63,6 +63,11 @@ public class Log4jImpl implements Log {
         log.log(callerFQCN, Level.ERROR, s, e);
     }
 
+    public void error(String msg, String para) {
+        error(msg);
+        System.err.println(para);
+    }
+
     public void error(String s) {
         errorCount++;
         log.log(callerFQCN, Level.ERROR, s, null);
