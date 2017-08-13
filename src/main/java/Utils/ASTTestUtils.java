@@ -85,10 +85,10 @@ public class ASTTestUtils {
 //        System.out.println(ast.getAstType());
 
         //简单select语句测试，带where,不带in,通过测试
-        AST ast = SQLParserUtils.AssSQlASTgen("select a,b from table_a where A = '123' AND B = '321';");
-        ASTTestPrint(ast.getRoot());
-        System.out.println();
-        System.out.println(ast.getAstType());
+//        AST ast = SQLParserUtils.AssSQlASTgen("select a,b from table_a where A = '123' AND B = '321';");
+//        ASTTestPrint(ast.getRoot());
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         //create database语句测试通过
 //        AST ast = SQLParserUtils.AssSQlASTgen("CREATE DATABASE my_db;");
@@ -97,7 +97,7 @@ public class ASTTestUtils {
 //        System.out.println(ast.getAstType());
 
         //use database 语句测试通过
-//        AST ast = SQLParserUtils.AssSQlASTgen("USE db_name;");
+//        AST ast = SQLParserUtils.AssSQlASTgen("use db_name;");
 //        ASTTestPrint(ast.getRoot());
 //        System.out.println();
 //        System.out.println(ast.getAstType());
@@ -133,10 +133,10 @@ public class ASTTestUtils {
          * Insert语句测试
          */
 //        单行缺省值插入通过测试
-//        AST ast = SQLParserUtils.AssSQlASTgen("INSERT INTO Persons VALUES ('Gates', 'Bill', 'Xuanwumen 10', 'Beijing');");
-//        ASTTestPrint(ast.getRoot());
-//        System.out.println();
-//        System.out.println(ast.getAstType());
+        AST ast = SQLParserUtils.AssSQlASTgen("INSERT INTO Persons VALUES ('Gates', 'Bill', 'Xuanwumen 10', 'Beijing');");
+        ASTTestPrint(ast.getRoot());
+        System.out.println();
+        System.out.println(ast.getAstType());
 
         //单行非缺省值通过测试
 //        AST ast = SQLParserUtils.AssSQlASTgen("INSERT INTO Persons (LastName) VALUES ('Wilson');");

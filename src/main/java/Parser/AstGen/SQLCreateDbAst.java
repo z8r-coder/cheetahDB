@@ -5,6 +5,7 @@ import Parser.ASTNode;
 import Parser.Visitor.SQLASTVisitor;
 import Parser.Visitor.SchemaStatVisitor;
 import jdk.internal.dynalink.linker.LinkerServices;
+import org.omg.CORBA.PRIVATE_MEMBER;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +16,13 @@ import java.util.List;
 public class SQLCreateDbAst implements BaseAST{
     private AST ast;
 
-    // TODO: 2017/8/13 column是否应该放在visitor内，再考虑
-    private List<SchemaStatVisitor.Column> columns;
+    private String databaseName;
 
     public SQLCreateDbAst(AST ast) {
+        this.ast = ast;
+    }
+
+    public void setAst(AST ast) {
         this.ast = ast;
     }
 
@@ -26,16 +30,12 @@ public class SQLCreateDbAst implements BaseAST{
         return ast;
     }
 
-    public void setAst(AST ast) {
-        this.ast = ast;
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
     }
 
-    public void setColumns(List<SchemaStatVisitor.Column> columns) {
-        this.columns = columns;
-    }
-
-    public List<SchemaStatVisitor.Column> getColumns() {
-        return columns;
+    public String getDatabaseName() {
+        return databaseName;
     }
 
     public void accept(SQLASTVisitor visitor) throws Exception {

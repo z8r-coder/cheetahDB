@@ -1,9 +1,8 @@
 package Parser.Visitor;
 
 import Parser.*;
-import Parser.AstGen.SQLCreateDbAst;
+import Parser.AstGen.*;
 
-import Parser.AstGen.SQLSelectAst;
 import Support.Logging.Log;
 import Support.Logging.LogFactory;
 import Utils.StringUtils;
@@ -28,6 +27,48 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
     private final List<String> and_or = new ArrayList<String>();
 
     private final static Log logger = LogFactory.getLog(SchemaStatVisitor.class);
+
+    @Override
+    public void visit(SQLInsertAst ast) throws Exception {
+        AST past = ast.getAst();
+        ASTNode root = past.getRoot();
+        ASTNode i_node = root.getChildSet().get(0);
+        if (StringUtils.equals(i_node.getValue(), "INSERT_NODE")) {
+            logger.error("The ast is not insert");
+            return;
+        }
+
+        switch (past.getAstType()) {
+            case INSERT_SINGLE_DEFAULT:
+                break;
+            case INSERT_SINGLE:
+                break;
+            case INSERT_MULT:
+                break;
+            case INSERT_MULT_DEFAULT:
+                break;
+            default:
+                logger.error("wrong with past' ast type = " + past.getAstType());
+                return;
+        }
+
+    }
+
+    @Override
+    public void visit(SQLUseAst ast) throws Exception {
+        AST past = ast.getAst();
+        ASTNode root = past.getRoot();
+        if (past.getAstType() != SQLASTType.USE_DATABASE) {
+            logger.error("The ast is not use_database");
+            return;
+        }
+
+        ASTNode udn = root.getChildSet().get(0);//USE_DB_NODE
+
+        String dataName = udn.getChildSet().get(1).getValue();
+
+        ast.setDataName(dataName);
+    }
 
     @Override
     public void visit(SQLSelectAst ast) throws Exception {
@@ -93,7 +134,7 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
     }
 
     @Override
-    public void visit(SQLCreateDbAst ast) throws Exception {
+    public void visit(SQLCreateTabAST ast) throws Exception {
         AST past = ast.getAst();
         ASTNode root = past.getRoot();
         if (past.getAstType() != SQLASTType.CREATE_TABLE) {

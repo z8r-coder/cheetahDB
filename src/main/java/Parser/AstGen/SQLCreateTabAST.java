@@ -1,26 +1,40 @@
 package Parser.AstGen;
 
+import Parser.AST;
 import Parser.ASTNode;
 import Parser.Visitor.SQLASTVisitor;
+import Parser.Visitor.SchemaStatVisitor;
+
+import java.util.List;
 
 /**
  * Created by ruanxin on 2017/8/12.
  */
 public class SQLCreateTabAST implements BaseAST{
-    private ASTNode astNode;
+    private AST ast;
 
-    public SQLCreateTabAST(ASTNode astNode) {
-        this.astNode = astNode;
+    // TODO: 2017/8/13 column是否应该放在visitor内，再考虑
+    private List<SchemaStatVisitor.Column> columns;
+
+    public SQLCreateTabAST(AST ast) {
+        this.ast = ast;
     }
 
-    public void setRoot(ASTNode astNode) {
-        this.astNode = astNode;
+    public AST getAst() {
+        return ast;
     }
 
-    public ASTNode getRoot() {
-        return astNode;
+    public void setAst(AST ast) {
+        this.ast = ast;
     }
 
+    public void setColumns(List<SchemaStatVisitor.Column> columns) {
+        this.columns = columns;
+    }
+
+    public List<SchemaStatVisitor.Column> getColumns() {
+        return columns;
+    }
 
     public void accept(SQLASTVisitor visitor) throws Exception {
         visitor.visit(this);
