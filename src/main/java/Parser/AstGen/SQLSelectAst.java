@@ -1,9 +1,13 @@
 package Parser.AstGen;
 
+import Parser.AST;
 import Parser.ASTNode;
 import Parser.Visitor.SQLASTVisitor;
+import Parser.Visitor.SchemaStatVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * select ast
@@ -11,29 +15,52 @@ import java.util.List;
  * Created by ruanxin on 2017/8/9.
  */
 public class SQLSelectAst implements BaseAST{
-    private ASTNode root;
-    private SQLSelectAst parentSelect;// 父查询
-    private SQLSelectAst[] subSelect;//子查询组，20170809:子查询只出现在where后
-
-    public SQLSelectAst(ASTNode root) {
-        this.root = root;
-    }
-    public void setRoot(ASTNode root) {
-        this.root = root;
-    }
-
-    public ASTNode getRoot() {
-        return root;
+    private AST ast;
+    //查询的column
+    private List<SchemaStatVisitor.Column> slt_col;
+    //按顺序结合
+    private List<SchemaStatVisitor.Relationship> rls;
+    //and or
+    private List<String> rs = new ArrayList<String>();
+    //查询的表
+    private String table_name;
+    public SQLSelectAst(AST ast) {
+        this.ast = ast;
     }
 
-    public void setParentSelect(SQLSelectAst parentSelect) {
+    public void setAst(AST ast) {
+        this.ast = ast;
     }
 
-    public SQLSelectAst getParentSelect() {
-        return parentSelect;
+    public AST getAst() {
+        return ast;
     }
 
-    public void accept(SQLASTVisitor visitor) {
+    public void accept(SQLASTVisitor visitor) throws Exception {
+        visitor.visit(this);
+    }
 
+    public void setSlt_col(List<SchemaStatVisitor.Column> slt_col) {
+        this.slt_col = slt_col;
+    }
+
+    public List<SchemaStatVisitor.Column> getSlt_col() {
+        return slt_col;
+    }
+
+    public void setTable_name(String table_name) {
+        this.table_name = table_name;
+    }
+
+    public String getTable_name() {
+        return table_name;
+    }
+
+    public void setRls(List<SchemaStatVisitor.Relationship> rls) {
+        this.rls = rls;
+    }
+
+    public List<SchemaStatVisitor.Relationship> getRls() {
+        return rls;
     }
 }

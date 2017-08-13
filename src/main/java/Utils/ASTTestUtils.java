@@ -33,17 +33,17 @@ public class ASTTestUtils {
          * create语句测试
          */
         //create table语句测试,无约束语句，通过测试
-        AST ast = SQLParserUtils.AssSQlASTgen("CREATE TABLE Persons" +
-                "         (" +
-                "         Id_P integer(10)," +
-                "         LastName varchar(255)," +
-                "         FirstName varchar(255)," +
-                "         Address varchar(255)," +
-                "         City varchar(255)" +
-                "         );");
-        ASTTestPrint(ast.getRoot());
-        System.out.println();
-        System.out.println(ast.getAstType());
+//        AST ast = SQLParserUtils.AssSQlASTgen("CREATE TABLE Persons" +
+//                "         (" +
+//                "         Id_P integer(10)," +
+//                "         LastName varchar(255)," +
+//                "         FirstName varchar(255)," +
+//                "         Address varchar(255)," +
+//                "         City varchar(255)" +
+//                "         );");
+//        ASTTestPrint(ast.getRoot());
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         //create table语句测试,含not null约束语句,通过测试
 //        AST ast = SQLParserUtils.AssSQlASTgen("CREATE TABLE Persons" +
@@ -85,10 +85,10 @@ public class ASTTestUtils {
 //        System.out.println(ast.getAstType());
 
         //简单select语句测试，带where,不带in,通过测试
-//        AST ast = SQLParserUtils.AssSQlASTgen("SELECT a,b from table_a where A = '123' AND B = '321';");
-//        ASTTestPrint(ast.getRoot());
-//        System.out.println();
-//        System.out.println(ast.getAstType());
+        AST ast = SQLParserUtils.AssSQlASTgen("SELECT a,b from table_a where A = '123' AND B = '321';");
+        ASTTestPrint(ast.getRoot());
+        System.out.println();
+        System.out.println(ast.getAstType());
 
         //create database语句测试通过
 //        AST ast = SQLParserUtils.AssSQlASTgen("CREATE DATABASE my_db;");

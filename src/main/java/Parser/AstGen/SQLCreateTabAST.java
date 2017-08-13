@@ -22,7 +22,7 @@ public class SQLCreateTabAST implements BaseAST{
     }
 
 
-    public void accept(SQLASTVisitor visitor) {
+    public void accept(SQLASTVisitor visitor) throws Exception {
         visitor.visit(this);
     }
 }

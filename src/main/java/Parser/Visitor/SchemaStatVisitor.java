@@ -3,6 +3,7 @@ package Parser.Visitor;
 import Parser.*;
 import Parser.AstGen.SQLCreateDbAst;
 
+import Parser.AstGen.SQLSelectAst;
 import Support.Logging.Log;
 import Support.Logging.LogFactory;
 import Utils.StringUtils;
@@ -16,7 +17,7 @@ import java.util.*;
  */
 public class SchemaStatVisitor extends BaseASTVisitorAdapter {
 
-    private final Set<Column> crtCol = new HashSet<Column>();
+    private final Set<Column> columns = new HashSet<Column>();
 
     private final Map<String, Column> str2Col = new HashMap<String, Column>();
 
@@ -25,6 +26,49 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
     private final List<Value> values = new ArrayList<Value>();
 
     private final static Log logger = LogFactory.getLog(SchemaStatVisitor.class);
+
+    @Override
+    public void visit(SQLSelectAst ast) throws Exception {
+        AST past = ast.getAst();
+        ASTNode root = past.getRoot();
+        if (past.getAstType() != SQLASTType.SELECT_WITH_WHERE &&
+                past.getAstType() != SQLASTType.SELECT_ONLY) {
+            logger.error("The ast is not select");
+            return;
+        }
+
+        ASTNode slt_node = root.getChildSet().get(0); //SELECT_NODE
+        ASTNode slt_list_node = slt_node.getChildSet().get(1); //SELECT_LIST
+        List<ASTNode> slt_list = slt_list_node.getChildSet();
+
+        String table_name = slt_node.getChildSet().get(3).getValue();
+
+        List<Column> columns = new ArrayList<Column>();
+
+        //select * pat,单表插入
+        if (slt_list.size() == 1 && slt_list.get(0).equals("*")) {
+            Column column = new Column(table_name, "*");
+            column.setIsSelect(true);
+            columns.add(column);
+        } else {
+            for (ASTNode node : slt_list) {
+                if (node.getSortCode() == SortCode.IDENTIFIED) {
+                    Column column = new Column(table_name, node.getValue());
+                    column.setIsSelect(true);
+                    columns.add(column);
+                }
+            }
+        }
+        ast.setSlt_col(columns);
+        ast.setTable_name(table_name);
+        if (past.getAstType() == SQLASTType.SELECT_ONLY) {
+            return;
+        } else if (past.getAstType() == SQLASTType.SELECT_WITH_WHERE) {
+            
+        }
+
+    }
+
     @Override
     public void visit(SQLCreateDbAst ast) throws Exception {
         AST past = ast.getAst();
