@@ -85,7 +85,7 @@ public class ASTTestUtils {
 //        System.out.println(ast.getAstType());
 
         //简单select语句测试，带where,不带in,通过测试
-        AST ast = SQLParserUtils.AssSQlASTgen("SELECT a,b from table_a where A = '123' AND B = '321';");
+        AST ast = SQLParserUtils.AssSQlASTgen("select a,b from table_a where A = '123' AND B = '321';");
         ASTTestPrint(ast.getRoot());
         System.out.println();
         System.out.println(ast.getAstType());

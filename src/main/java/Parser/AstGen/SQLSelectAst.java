@@ -1,12 +1,13 @@
 package Parser.AstGen;
 
 import Parser.AST;
-import Parser.ASTNode;
+
 import Parser.Visitor.SQLASTVisitor;
 import Parser.Visitor.SchemaStatVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -19,9 +20,9 @@ public class SQLSelectAst implements BaseAST{
     //查询的column
     private List<SchemaStatVisitor.Column> slt_col;
     //按顺序结合
-    private List<SchemaStatVisitor.Relationship> rls;
+    private Set<SchemaStatVisitor.Relationship> rls;
     //and or
-    private List<String> rs = new ArrayList<String>();
+    private List<String> rs;
     //查询的表
     private String table_name;
     public SQLSelectAst(AST ast) {
@@ -56,11 +57,19 @@ public class SQLSelectAst implements BaseAST{
         return table_name;
     }
 
-    public void setRls(List<SchemaStatVisitor.Relationship> rls) {
+    public void setRls(Set<SchemaStatVisitor.Relationship> rls) {
         this.rls = rls;
     }
 
-    public List<SchemaStatVisitor.Relationship> getRls() {
+    public Set<SchemaStatVisitor.Relationship> getRls() {
         return rls;
+    }
+
+    public void setRs(List<String> rs) {
+        this.rs = rs;
+    }
+
+    public List<String> getRs() {
+        return rs;
     }
 }

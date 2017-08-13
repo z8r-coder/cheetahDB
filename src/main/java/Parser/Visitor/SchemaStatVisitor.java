@@ -25,6 +25,8 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
 
     private final List<Value> values = new ArrayList<Value>();
 
+    private final List<String> and_or = new ArrayList<String>();
+
     private final static Log logger = LogFactory.getLog(SchemaStatVisitor.class);
 
     @Override
@@ -59,14 +61,35 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
                 }
             }
         }
-        ast.setSlt_col(columns);
-        ast.setTable_name(table_name);
+        ast.setSlt_col(columns);//查询的column
+        ast.setTable_name(table_name);//表名
         if (past.getAstType() == SQLASTType.SELECT_ONLY) {
             return;
         } else if (past.getAstType() == SQLASTType.SELECT_WITH_WHERE) {
-            
+            visitWhere(slt_node, table_name, 5);
+            ast.setRs(and_or);
+            ast.setRls(relationships);
         }
+    }
 
+    public void visitWhere(ASTNode astNode, String table_name, int where_index) {
+        ASTNode where_condition = astNode.getChildSet().get(where_index);
+        List<ASTNode> con_list = where_condition.getChildSet();
+
+        for (int i = 0; i < con_list.size();) {
+            Column left = new Column(table_name, con_list.get(i).getValue());
+            left.setIsWhere(true);
+            String opS = con_list.get(++i).getValue();
+            Token right = con_list.get(++i).getToken();
+            Relationship rps = new Relationship(left, right, opS);
+
+            relationships.add(rps);
+            if (++i < con_list.size()) {
+                String oper = con_list.get(i).getValue();
+                and_or.add(oper);//存放and or关系
+            }
+            ++i;
+        }
     }
 
     @Override
@@ -324,14 +347,14 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
 
     public static class Relationship {
         private Column left;
-        private String right;
+        private Token right;
         private String operator;
 
         public Relationship() {
 
         }
 
-        public Relationship(Column left, String right,String operator) {
+        public Relationship(Column left, Token right,String operator) {
             this.left = left;
             this.right = right;
             this.operator = operator;
@@ -345,11 +368,11 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
             this.left = left;
         }
 
-        public String getRight() {
+        public Token getRight() {
             return right;
         }
 
-        public void setRight(String right) {
+        public void setRight(Token right) {
             this.right = right;
         }
 
