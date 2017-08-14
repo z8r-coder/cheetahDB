@@ -29,6 +29,39 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
     private final static Log logger = LogFactory.getLog(SchemaStatVisitor.class);
 
     @Override
+    public void visit(SQLAlterAst ast) throws Exception {
+        super.visit(ast);
+    }
+
+    @Override
+    public void visit(SQLShowDbAst ast) throws Exception {
+        //showDb 无需处理
+    }
+
+    @Override
+    public void visit(SQLDeleteAst ast) throws Exception {
+        super.visit(ast);
+    }
+
+    @Override
+    public void visit(SQLUpdateAst ast) throws Exception {
+
+    }
+
+    @Override
+    public void visit(SQLCreateDbAst ast) throws Exception {
+        AST past = ast.getAst();
+        ASTNode root = past.getRoot();//sql_node
+        ASTNode cd_node = root.getChildSet().get(0);
+        if (past.getAstType() == SQLASTType.CREATE_DATABASE) {
+            logger.error("The ast is not create database");
+        }
+
+        String DatabaseName = cd_node.getChildSet().get(2).getValue();
+        ast.setDatabaseName(DatabaseName);
+    }
+
+    @Override
     public void visit(SQLInsertAst ast) throws Exception {
         AST past = ast.getAst();
         ASTNode root = past.getRoot();//sql_node

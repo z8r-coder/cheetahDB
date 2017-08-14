@@ -103,10 +103,10 @@ public class ASTTestUtils {
 //        System.out.println(ast.getAstType());
 
         //show databases 语句测试通过
-//        AST ast = SQLParserUtils.AssSQlASTgen("SHOW DATABASES;");
-//        ASTTestPrint(ast.getRoot());
-//        System.out.println();
-//        System.out.println(ast.getAstType());
+        AST ast = SQLParserUtils.AssSQlASTgen("SHOW DATABASES;");
+        ASTTestPrint(ast.getRoot());
+        System.out.println();
+        System.out.println(ast.getAstType());
 
         //show tables;通过
 //        AST ast = SQLParserUtils.AssSQlASTgen("SHOW TABLES;");
@@ -156,14 +156,14 @@ public class ASTTestUtils {
 //        System.out.println(ast.getAstType());
 
         //多行插入缺省值测试通过
-        AST ast = SQLParserUtils.AssSQlASTgen("insert into persons " +
-                "values" +
-                "(200,'haha' , 'deng' , 'shenzhen')," +
-                "(201,'haha2' , 'deng' , 'GD')," +
-                "(202,'haha3' , 'deng' , 'Beijing');");
-        ASTTestPrint(ast.getRoot());
-        System.out.println();
-        System.out.println(ast.getAstType());
+//        AST ast = SQLParserUtils.AssSQlASTgen("insert into persons " +
+//                "values" +
+//                "(200,'haha' , 'deng' , 'shenzhen')," +
+//                "(201,'haha2' , 'deng' , 'GD')," +
+//                "(202,'haha3' , 'deng' , 'Beijing');");
+//        ASTTestPrint(ast.getRoot());
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         /**
          * update语句测试
