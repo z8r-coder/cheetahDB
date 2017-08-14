@@ -133,16 +133,16 @@ public class ASTTestUtils {
          * Insert语句测试
          */
 //        单行缺省值插入通过测试
-        AST ast = SQLParserUtils.AssSQlASTgen("INSERT INTO Persons VALUES ('Gates', 'Bill', 'Xuanwumen 10', 'Beijing');");
-        ASTTestPrint(ast.getRoot());
-        System.out.println();
-        System.out.println(ast.getAstType());
-
-        //单行非缺省值通过测试
-//        AST ast = SQLParserUtils.AssSQlASTgen("INSERT INTO Persons (LastName) VALUES ('Wilson');");
+//        AST ast = SQLParserUtils.AssSQlASTgen("INSERT INTO Persons VALUES ('Gates', 'Bill', 'Xuanwumen 10', 'Beijing');");
 //        ASTTestPrint(ast.getRoot());
 //        System.out.println();
 //        System.out.println(ast.getAstType());
+
+        //单行非缺省值通过测试
+        AST ast = SQLParserUtils.AssSQlASTgen("INSERT INTO Persons (LastName, FirstName) VALUES ('Wilson',123);");
+        ASTTestPrint(ast.getRoot());
+        System.out.println();
+        System.out.println(ast.getAstType());
 
         //多行插入非缺省值测试通过
 //        AST ast = SQLParserUtils.AssSQlASTgen("insert into persons" +

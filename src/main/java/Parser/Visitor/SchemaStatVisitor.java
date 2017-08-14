@@ -31,17 +31,39 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
     @Override
     public void visit(SQLInsertAst ast) throws Exception {
         AST past = ast.getAst();
-        ASTNode root = past.getRoot();
-        ASTNode i_node = root.getChildSet().get(0);
+        ASTNode root = past.getRoot();//sql_node
+        ASTNode i_node = root.getChildSet().get(0);//INSERT_NODE
         if (StringUtils.equals(i_node.getValue(), "INSERT_NODE")) {
             logger.error("The ast is not insert");
             return;
         }
+        String table_name = i_node.getChildSet().get(2).getValue();
 
         switch (past.getAstType()) {
             case INSERT_SINGLE_DEFAULT:
+                //单行缺省插入
+                ASTNode values_list_node = i_node.getChildSet().get(5);
+
+                logger.info(values_list_node.getValue());
+
+                List<Value> values_list = visitValue(values_list_node,"INSERT");
+                List<List<Value>> mutil_value = new ArrayList<List<Value>>();
+
+                mutil_value.add(values_list);
+
+                ast.setValues(mutil_value);
+                ast.setTableName(table_name);
                 break;
             case INSERT_SINGLE:
+                //单行非缺省插入
+                ASTNode column_list_node = i_node.getChildSet().get(4);
+
+                logger.info("INSERT_SINGLE,insert column_list_node:" + column_list_node.getValue());
+
+                List<Column> columns = visitInsertColumn(column_list_node, "INSERT", table_name);
+
+                ASTNode value_list_node = i_node.getChildSet().get(8);
+
                 break;
             case INSERT_MULT:
                 break;
@@ -53,7 +75,39 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
         }
 
     }
+    private List<Column> visitInsertColumn(ASTNode astNode, String opname, String tableName) {
+        List<ASTNode> nodes = astNode.getChildSet();
 
+        List<Column> columns = new ArrayList<Column>();
+        for (ASTNode node : nodes) {
+            if (node.getSortCode() == SortCode.IDENTIFIED) {
+                //column name
+                Column column = new Column(tableName, node.getValue());
+                columns.add(column);
+            }
+        }
+        return columns;
+    }
+    private List<Value> visitValue(ASTNode astNode, String opname) {
+        List<ASTNode> nodes = astNode.getChildSet();
+
+        List<Value> values = new ArrayList<Value>();
+        for (ASTNode node : nodes) {
+            if (node.getSortCode() == SortCode.NUMBER) {
+                Value value = new Value(node.getValue(), "NUMBER");
+                if (StringUtils.equals(opname, "INSERT")) {
+                    value.setIsInsert(true);
+                } else if (StringUtils.equals(opname, "IN")){
+                    value.setIsIn(true);
+                }
+                values.add(value);
+            } else if (node.getSortCode() == SortCode.STRING) {
+                Value value = new Value(node.getValue(), "STRING");
+                values.add(value);
+            }
+        }
+        return values;
+    }
     @Override
     public void visit(SQLUseAst ast) throws Exception {
         AST past = ast.getAst();
@@ -239,6 +293,7 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
 
     public static class Value {
         private String          val;
+        private String          dataType;
         private boolean         in;
         private boolean         insert;
 
@@ -246,8 +301,9 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
 
         }
 
-        public Value(String val) {
+        public Value(String val, String dataType) {
             this.val = val;
+            this.dataType = dataType;
         }
 
         public void setIsIn(boolean in) {
@@ -274,13 +330,20 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
             return insert;
         }
 
+        public void setDataType(String dataType) {
+            this.dataType = dataType;
+        }
 
+        public String getDataType() {
+            return dataType;
+        }
     }
     public static class Column {
         private String          table;
         private String          name;
         private boolean         where;
         private boolean         select;
+        private boolean         insert;
 
         private boolean         primaryKey;
         private boolean         notNull;
@@ -368,6 +431,14 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
         public int getTypeLength() {
             return typeLength;
         }
+
+        public void setInsert(boolean insert) {
+            this.insert = insert;
+        }
+        public boolean getInsert() {
+            return insert;
+        }
+
         @Override
         public int hashCode() {
             int tableHashCode = table != null ? StringUtils.lowerHashCode(table) : 0;

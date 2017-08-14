@@ -13,9 +13,11 @@ import java.util.List;
 public class SQLInsertAst implements BaseAST {
     private AST ast;
 
+    private String tableName;
+
     private List<SchemaStatVisitor.Column> columns;//插入columns
 
-    private List<SchemaStatVisitor.Value> values;//插入集合
+    private List<List<SchemaStatVisitor.Value>> list_values;//插入集合
 
     public SQLInsertAst (AST ast) {
         this.ast = ast;
@@ -37,13 +39,22 @@ public class SQLInsertAst implements BaseAST {
         return columns;
     }
 
-    public void setValues(List<SchemaStatVisitor.Value> values) {
-        this.values = values;
+    public void setValues(List<List<SchemaStatVisitor.Value>> list_values) {
+        this.list_values = list_values;
     }
 
-    public List<SchemaStatVisitor.Value> getValues() {
-        return values;
+    public List<List<SchemaStatVisitor.Value>> getValues() {
+        return list_values;
     }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
     public void accept(SQLASTVisitor visitor) throws Exception {
         visitor.visit(this);
     }
