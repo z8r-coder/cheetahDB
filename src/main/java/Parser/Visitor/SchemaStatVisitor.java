@@ -57,17 +57,53 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
             case INSERT_SINGLE:
                 //单行非缺省插入
                 ASTNode column_list_node = i_node.getChildSet().get(4);
-
                 logger.info("INSERT_SINGLE,insert column_list_node:" + column_list_node.getValue());
 
                 List<Column> columns = visitInsertColumn(column_list_node, "INSERT", table_name);
 
                 ASTNode value_list_node = i_node.getChildSet().get(8);
 
+                List<List<Value>> mutil_list = new ArrayList<List<Value>>();
+                List<Value> value_list = visitValue(value_list_node,"INSERT");
+                mutil_list.add(value_list);
+
+                ast.setTableName(table_name);
+                ast.setValues(mutil_list);
+                ast.setColumns(columns);
                 break;
             case INSERT_MULT:
+                //多行非缺省插入
+                ASTNode column_list_node_mult = i_node.getChildSet().get(4);
+                logger.info("INSERT_MULT,insert column_list_node:" + column_list_node_mult.getValue());
+
+                List<Column> columns_mult = visitInsertColumn(column_list_node_mult, "INSERT", table_name);
+
+                List<List<Value>> mults_values = new ArrayList<List<Value>>();
+                List<ASTNode> nodes = i_node.getChildSet();
+
+                for (ASTNode node : nodes) {
+                    if (StringUtils.equals(node.getValue(), "values_list")) {
+                        List<Value> values = visitValue(node, "INSERT");
+                        mults_values.add(values);
+                    }
+                }
+                ast.setColumns(columns_mult);
+                ast.setValues(mults_values);
+                ast.setTableName(table_name);
                 break;
             case INSERT_MULT_DEFAULT:
+                //多行非缺省插入
+                List<List<Value>> mult_def_values = new ArrayList<List<Value>>();
+                List<ASTNode> mtDef_nodes = i_node.getChildSet();
+                for (ASTNode node : mtDef_nodes) {
+                    if (StringUtils.equals(node.getValue(), "values_list")) {
+                        List<Value> values = visitValue(node, table_name);
+                        mult_def_values.add(values);
+                    }
+                }
+
+                ast.setTableName(table_name);
+                ast.setValues(mult_def_values);
                 break;
             default:
                 logger.error("wrong with past' ast type = " + past.getAstType());
@@ -82,8 +118,11 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
         for (ASTNode node : nodes) {
             if (node.getSortCode() == SortCode.IDENTIFIED) {
                 //column name
-                Column column = new Column(tableName, node.getValue());
-                columns.add(column);
+                if (StringUtils.equals(opname, "INSERT")) {
+                    Column column = new Column(tableName, node.getValue());
+                    column.setInsert(true);
+                    columns.add(column);
+                }
             }
         }
         return columns;
