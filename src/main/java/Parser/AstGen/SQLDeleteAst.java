@@ -3,25 +3,59 @@ package Parser.AstGen;
 import Parser.AST;
 import Parser.ASTNode;
 import Parser.Visitor.SQLASTVisitor;
+import Parser.Visitor.SchemaStatVisitor;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by ruanxin on 2017/8/12.
  */
 public class SQLDeleteAst implements BaseAST {
     private AST ast;
-    public SQLDeleteAst(ASTNode astNode) {
-        this.astNode = astNode;
+
+    private Set<SchemaStatVisitor.Relationship> rls;
+
+    private List<String> rs;
+
+    private String tableName;
+    public SQLDeleteAst(AST ast) {
+        this.ast = ast;
     }
 
-    public void setAstNode(ASTNode astNode) {
-        this.astNode = astNode;
+    public void setAst(AST ast) {
+        this.ast = ast;
     }
 
-    public ASTNode getAstNode() {
-        return astNode;
+    public AST getAst() {
+        return ast;
     }
 
-    public void accept(SQLASTVisitor visitor) {
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
 
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setRs(List<String> rs) {
+        this.rs = rs;
+    }
+
+    public List<String> getRs() {
+        return rs;
+    }
+
+    public void setRls(Set<SchemaStatVisitor.Relationship> rls) {
+        this.rls = rls;
+    }
+
+    public Set<SchemaStatVisitor.Relationship> getRls() {
+        return rls;
+    }
+
+    public void accept(SQLASTVisitor visitor) throws Exception {
+        visitor.visit(this);
     }
 }

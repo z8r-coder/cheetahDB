@@ -40,14 +40,31 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
 
     @Override
     public void visit(SQLDeleteAst ast) throws Exception {
-        
+        AST past = ast.getAst();
+        ASTNode root = past.getRoot();
+        if (past.getAstType() != SQLASTType.DELETE_WITH_WHERE &&
+                past.getAstType() != SQLASTType.DELETE_ALL) {
+            logger.error("The ast is not delete");
+            return;
+        }
+        ASTNode delete_node = root.getChildSet().get(0);
+        String tableName = delete_node.getChildSet().get(2).getValue();
+
+        ast.setTableName(tableName);
+
+        if (past.getAstType() == SQLASTType.UPDATE_WITH_WHERE) {
+            visitWhere(delete_node, tableName,4);
+        }
+
+        ast.setRs(and_or);
+        ast.setRls(relationships);
     }
 
     @Override
     public void visit(SQLUpdateAst ast) throws Exception {
         AST past = ast.getAst();
         ASTNode root = past.getRoot();//sql_node
-        if (past.getAstType() != SQLASTType.UPDATE_WITH_WHERE ||
+        if (past.getAstType() != SQLASTType.UPDATE_WITH_WHERE &&
                 past.getAstType() != SQLASTType.UPDATE_WITHOUT_WHERE) {
             logger.error("The ast is not update");
             return;
