@@ -40,21 +40,68 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
 
     @Override
     public void visit(SQLDeleteAst ast) throws Exception {
-        super.visit(ast);
+        
     }
 
     @Override
     public void visit(SQLUpdateAst ast) throws Exception {
+        AST past = ast.getAst();
+        ASTNode root = past.getRoot();//sql_node
+        if (past.getAstType() != SQLASTType.UPDATE_WITH_WHERE ||
+                past.getAstType() != SQLASTType.UPDATE_WITHOUT_WHERE) {
+            logger.error("The ast is not update");
+            return;
+        }
 
+        ASTNode u_node = root.getChildSet().get(0);//UPDATE_NODE
+        String tableName = u_node.getChildSet().get(1).getValue();
+        ASTNode set_list = u_node.getChildSet().get(3);
+        Map<String, Value> paraMap = new HashMap<String, Value>();
+        visitAss(set_list, tableName, paraMap);
+
+        ast.setTableName(tableName);
+        ast.setAssMap(paraMap);
+
+        if (past.getAstType() == SQLASTType.UPDATE_WITH_WHERE) {
+            visitWhere(u_node,tableName,5);
+            ast.setRls(relationships);
+            ast.setRs(and_or);
+        }
     }
 
+    private void visitAss(ASTNode astNode, String tableName,Map<String, Value> paraMap) {
+        List<ASTNode> assList = astNode.getChildSet();
+        for (int i = 0; i < assList.size();) {
+            ASTNode id_node = assList.get(i++);
+            //只需要获取名字
+            String columnName = id_node.getValue();
+
+            ASTNode value_node = assList.get(++i);
+            Value value;
+            if (value_node.getSortCode() == SortCode.NUMBER) {
+                value = new Value(value_node.getValue(), "NUMBER");
+            } else if (value_node.getSortCode() == SortCode.STRING) {
+                value = new Value(value_node.getValue(), "STRING");
+            } else {
+                logger.error("visitAss don't support the data type " + value_node.getSortCode().toString());
+                return;
+            }
+
+            paraMap.put(columnName, value);
+            i++;
+            if (assList.get(i).getSortCode() == SortCode.COMMA) {
+                i++;
+            }
+        }
+    }
     @Override
     public void visit(SQLCreateDbAst ast) throws Exception {
         AST past = ast.getAst();
         ASTNode root = past.getRoot();//sql_node
         ASTNode cd_node = root.getChildSet().get(0);
-        if (past.getAstType() == SQLASTType.CREATE_DATABASE) {
+        if (past.getAstType() != SQLASTType.CREATE_DATABASE) {
             logger.error("The ast is not create database");
+            return;
         }
 
         String DatabaseName = cd_node.getChildSet().get(2).getValue();
@@ -66,7 +113,7 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
         AST past = ast.getAst();
         ASTNode root = past.getRoot();//sql_node
         ASTNode i_node = root.getChildSet().get(0);//INSERT_NODE
-        if (StringUtils.equals(i_node.getValue(), "INSERT_NODE")) {
+        if (!StringUtils.equals(i_node.getValue(), "INSERT_NODE")) {
             logger.error("The ast is not insert");
             return;
         }
@@ -413,6 +460,7 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
     public static class Column {
         private String          table;
         private String          name;
+        private Token           token;//需要知道类型时候，注入token
         private boolean         where;
         private boolean         select;
         private boolean         insert;
