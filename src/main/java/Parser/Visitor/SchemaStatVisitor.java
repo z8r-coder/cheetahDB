@@ -28,8 +28,10 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
 
     private final static Log logger = LogFactory.getLog(SchemaStatVisitor.class);
 
+    // TODO: 2017/8/15 暂且不支持，先写索引引擎 
     @Override
     public void visit(SQLAlterAst ast) throws Exception {
+        logger.error("暂且不支持");
         super.visit(ast);
     }
 

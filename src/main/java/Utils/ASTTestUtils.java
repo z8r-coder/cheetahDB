@@ -109,10 +109,10 @@ public class ASTTestUtils {
 //        System.out.println(ast.getAstType());
 
         //show tables;通过
-//        AST ast = SQLParserUtils.AssSQlASTgen("SHOW TABLES;");
-//        ASTTestPrint(ast.getRoot());
-//        System.out.println();
-//        System.out.println(ast.getAstType());
+        AST ast = SQLParserUtils.AssSQlASTgen("SHOW TABLES;");
+        ASTTestPrint(ast.getRoot());
+        System.out.println();
+        System.out.println(ast.getAstType());
 
         /**
          * drop语句
@@ -184,11 +184,11 @@ public class ASTTestUtils {
          * delete语句测试
          */
         //不带where delete测试成功
-        AST ast = SQLParserUtils.AssSQlASTgen("DELETE FROM Person;");
-        assert ast == null;
-        ASTTestPrint(ast.getRoot());
-        System.out.println();
-        System.out.println(ast.getAstType());
+//        AST ast = SQLParserUtils.AssSQlASTgen("DELETE FROM Person;");
+//        assert ast == null;
+//        ASTTestPrint(ast.getRoot());
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         //带where delete测试成功
 //        AST ast = SQLParserUtils.AssSQlASTgen("DELETE FROM Person WHERE LastName = 'Wilson' AND LastName = 'Wilson' OR LastName = 'Wilson';");
