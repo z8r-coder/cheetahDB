@@ -338,6 +338,7 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
 
         String table_name = root.getChildSet().get(2).getValue();//table name
 
+        ast.setTableName(table_name);
 
         List<ASTNode> nodes = colNode.getChildSet();
 

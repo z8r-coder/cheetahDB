@@ -16,6 +16,7 @@ public class SQLCreateTabAST implements BaseAST{
     // TODO: 2017/8/13 column是否应该放在visitor内，再考虑
     private List<SchemaStatVisitor.Column> columns;
 
+    private String tableName;
     public SQLCreateTabAST(AST ast) {
         this.ast = ast;
     }
@@ -34,6 +35,14 @@ public class SQLCreateTabAST implements BaseAST{
 
     public List<SchemaStatVisitor.Column> getColumns() {
         return columns;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public String getTableName() {
+        return tableName;
     }
 
     public void accept(SQLASTVisitor visitor) throws Exception {
