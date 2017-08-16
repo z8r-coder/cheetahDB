@@ -2,39 +2,37 @@ package Parser.Builder.impl;
 
 import Parser.AST;
 import Parser.AstGen.SQLCreateTabAST;
-import Parser.Builder.SQLBuildAdapter;
+import Parser.Builder.SQLBuilder;
 import Parser.Builder.SQLCreateTabBuilder;
 import Parser.SQLParserUtils;
 import Parser.Visitor.SchemaStatVisitor;
-import Utils.ASTUtils;
-import Utils.StringUtils;
 
 import java.util.List;
 
 /**
  * Created by ruanxin on 2017/8/16.
  */
-public class SQLCreateTabBuilderImpl implements SQLCreateTabBuilder, SQLBuildAdapter {
+public class SQLCreateTabBuilderImpl implements SQLCreateTabBuilder, SQLBuilder {
     private SQLCreateTabAST ast;
 
-    public SQLCreateTabBuilderImpl(SQLCreateTabAST ast) {
-        this.ast = ast;
+    public SQLCreateTabBuilderImpl() {
     }
 
-    public void build(String sql) {
-        AST ast = SQLParserUtils.AssSQlASTgen(sql);
+    public void build(String sql) throws Exception {
+        AST past = SQLParserUtils.AssSQlASTgen(sql);
+        ast = new SQLCreateTabAST(past);
+        ast.accept(new SchemaStatVisitor());
+    }
 
+    public String grammerType() {
+        return "Crt_tab";
     }
 
     public String tableName() {
-        if (StringUtils.isEmpty(ast.getTableName())) {
-            return null;
-        }
         return ast.getTableName();
     }
 
     public List<SchemaStatVisitor.Column> Columns() {
-
-        return null;
+        return ast.getColumns();
     }
 }

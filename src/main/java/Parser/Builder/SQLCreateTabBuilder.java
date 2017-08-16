@@ -21,5 +21,4 @@ public interface SQLCreateTabBuilder {
      */
     public List<SchemaStatVisitor.Column> Columns();
 
-
 }

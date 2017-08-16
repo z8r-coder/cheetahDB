@@ -1,6 +1,6 @@
 package Parser.Builder;
 
-import Parser.RelationOps;
+import Parser.Visitor.SchemaStatVisitor;
 
 import java.util.List;
 import java.util.Set;
@@ -20,7 +20,7 @@ public interface SQLDeleteBuilder {
      * where后筛选
      * @return
      */
-    public Set<RelationOps> where();
+    public Set<SchemaStatVisitor.Relationship> where();
 
     /**
      * 筛选关系连接
