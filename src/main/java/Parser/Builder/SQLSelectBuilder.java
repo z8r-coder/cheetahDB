@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * Created by ruanxin on 2017/8/16.
  */
-public interface SQLSelectBuilder {
+public interface SQLSelectBuilder extends SQLBuilder {
     /**
      * 查询的表
      * @return
@@ -32,4 +32,10 @@ public interface SQLSelectBuilder {
      * @return
      */
     public List<String> AndOr();
+
+    /**
+     * 获取语句类型
+     * @return
+     */
+    public String grammerType();
 }

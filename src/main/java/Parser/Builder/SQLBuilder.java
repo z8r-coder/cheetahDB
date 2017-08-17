@@ -12,9 +12,4 @@ public interface SQLBuilder {
      */
     public void build(String sql) throws Exception;
 
-    /**
-     * 获取语法类型
-     * @return
-     */
-    public String grammerType();
 }

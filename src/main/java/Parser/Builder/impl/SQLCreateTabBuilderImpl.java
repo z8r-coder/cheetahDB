@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by ruanxin on 2017/8/16.
  */
-public class SQLCreateTabBuilderImpl implements SQLCreateTabBuilder, SQLBuilder {
+public class SQLCreateTabBuilderImpl implements SQLCreateTabBuilder {
     private SQLCreateTabAST ast;
 
     public SQLCreateTabBuilderImpl() {

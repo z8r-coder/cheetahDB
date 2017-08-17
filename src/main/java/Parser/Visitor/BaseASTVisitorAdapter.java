@@ -6,7 +6,7 @@ import Parser.AstGen.*;
 import java.util.List;
 
 /**
- * Created by ruanin on 2017/8/9.
+ * Created by ruanxin on 2017/8/9.
  */
 public class BaseASTVisitorAdapter implements SQLASTVisitor {
 

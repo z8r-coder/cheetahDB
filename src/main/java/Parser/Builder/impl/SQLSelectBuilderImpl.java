@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Created by ruanxin on 2017/8/16.
  */
-public class SQLSelectBuilderImpl implements SQLSelectBuilder, SQLBuilder {
+public class SQLSelectBuilderImpl implements SQLSelectBuilder {
     private SQLSelectAst selectAst;
 
     public SQLSelectBuilderImpl(){

@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Created by ruanxin on 2017/8/16.
  */
-public interface SQLUpdateBuilder {
+public interface SQLUpdateBuilder extends SQLBuilder {
     /**
      * 获取表名
      * @return
@@ -33,4 +33,10 @@ public interface SQLUpdateBuilder {
      * @return
      */
     public List<String> AndOr();
+
+    /**
+     * 获取语句类型
+     * @return
+     */
+    public String grammerType();
 }

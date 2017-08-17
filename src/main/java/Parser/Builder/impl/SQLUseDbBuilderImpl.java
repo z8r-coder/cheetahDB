@@ -10,7 +10,7 @@ import Parser.Visitor.SchemaStatVisitor;
 /**
  * Created by ruanxin on 2017/8/16.
  */
-public class SQLUseDbBuilderImpl implements SQLUseDbBuilder, SQLBuilder {
+public class SQLUseDbBuilderImpl implements SQLUseDbBuilder {
 
     private SQLUseAst useAst;
     public SQLUseDbBuilderImpl(){

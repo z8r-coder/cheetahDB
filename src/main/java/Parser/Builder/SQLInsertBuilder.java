@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by ruanxin on 2017/8/16.
  */
-public interface SQLInsertBuilder {
+public interface SQLInsertBuilder extends SQLBuilder {
 
     /**
      * 获取表名
@@ -26,4 +26,10 @@ public interface SQLInsertBuilder {
      * @return
      */
     public List<List<SchemaStatVisitor.Value>> values();
+
+    /**
+     * 获取语句类型
+     * @return
+     */
+    public String grammerType();
 }

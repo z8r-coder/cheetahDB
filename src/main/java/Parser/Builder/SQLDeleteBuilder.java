@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * Created by ruanxin on 2017/8/16.
  */
-public interface SQLDeleteBuilder {
+public interface SQLDeleteBuilder extends SQLBuilder {
 
     /**
      * 获取表名
@@ -27,4 +27,10 @@ public interface SQLDeleteBuilder {
      * @return
      */
     public List<String> AndOr();
+
+    /**
+     * 获取语句类型
+     * @return
+     */
+    public String grammerType();
 }

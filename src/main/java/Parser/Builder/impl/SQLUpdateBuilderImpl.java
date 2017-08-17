@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Created by ruanxin on 2017/8/16.
  */
-public class SQLUpdateBuilderImpl implements SQLUpdateBuilder, SQLBuilder {
+public class SQLUpdateBuilderImpl implements SQLUpdateBuilder {
     private SQLUpdateAst updateAst;
 
     public SQLUpdateBuilderImpl() {

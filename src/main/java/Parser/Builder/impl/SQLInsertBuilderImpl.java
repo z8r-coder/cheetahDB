@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by ruanxin on 2017/8/16.
  */
-public class SQLInsertBuilderImpl implements SQLInsertBuilder, SQLBuilder {
+public class SQLInsertBuilderImpl implements SQLInsertBuilder {
     private SQLInsertAst insertAst;
 
     public SQLInsertBuilderImpl(){
