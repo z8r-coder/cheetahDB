@@ -4,6 +4,7 @@ import Parser.AST;
 import Parser.AstGen.SQLCreateDbAst;
 import Parser.Builder.SQLBuilder;
 import Parser.Builder.SQLCreateDbBuilder;
+import Parser.SQLASTType;
 import Parser.SQLParserUtils;
 import Parser.Visitor.SchemaStatVisitor;
 
@@ -25,7 +26,7 @@ public class SQLCreateDbBuilderImpl implements SQLCreateDbBuilder {
         crtDbAst.accept(new SchemaStatVisitor());
     }
 
-    public String grammerType() {
-        return "CrtDb";
+    public SQLASTType grammerType() {
+        return crtDbAst.getAst().getAstType();
     }
 }

@@ -4,6 +4,7 @@ import Parser.AST;
 import Parser.AstGen.SQLDeleteAst;
 import Parser.Builder.SQLBuilder;
 import Parser.Builder.SQLDeleteBuilder;
+import Parser.SQLASTType;
 import Parser.SQLParserUtils;
 import Parser.Visitor.SchemaStatVisitor;
 
@@ -25,8 +26,8 @@ public class SQLDeleteBuilderImpl implements SQLDeleteBuilder {
         deleteAst.accept(new SchemaStatVisitor());
     }
 
-    public String grammerType() {
-        return "delete";
+    public SQLASTType grammerType() {
+        return deleteAst.getAst().getAstType();
     }
 
     public String from() {

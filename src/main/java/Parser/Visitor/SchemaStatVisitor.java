@@ -54,7 +54,7 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
 
         ast.setTableName(tableName);
 
-        if (past.getAstType() == SQLASTType.UPDATE_WITH_WHERE) {
+        if (past.getAstType() == SQLASTType.DELETE_WITH_WHERE) {
             visitWhere(delete_node, tableName,4);
         }
 
@@ -108,7 +108,8 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
 
             paraMap.put(columnName, value);
             i++;
-            if (assList.get(i).getSortCode() == SortCode.COMMA) {
+            if (i < assList.size() &&
+                    assList.get(i).getSortCode() == SortCode.COMMA) {
                 i++;
             }
         }
@@ -281,7 +282,7 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
         List<Column> columns = new ArrayList<Column>();
 
         //select * pat,单表插入
-        if (slt_list.size() == 1 && slt_list.get(0).equals("*")) {
+        if (slt_list.size() == 1 && slt_list.get(0).getValue().equals("*")) {
             Column column = new Column(table_name, "*");
             column.setIsSelect(true);
             columns.add(column);

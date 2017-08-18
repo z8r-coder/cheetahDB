@@ -4,6 +4,7 @@ import Parser.AST;
 import Parser.AstGen.SQLInsertAst;
 import Parser.Builder.SQLBuilder;
 import Parser.Builder.SQLInsertBuilder;
+import Parser.SQLASTType;
 import Parser.SQLParserUtils;
 import Parser.Visitor.SchemaStatVisitor;
 
@@ -23,8 +24,8 @@ public class SQLInsertBuilderImpl implements SQLInsertBuilder {
         insertAst.accept(new SchemaStatVisitor());
     }
 
-    public String grammerType() {
-        return "Insert";
+    public SQLASTType grammerType() {
+        return insertAst.getAst().getAstType();
     }
 
     public String from() {

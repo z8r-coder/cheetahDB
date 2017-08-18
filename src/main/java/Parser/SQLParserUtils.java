@@ -66,6 +66,7 @@ public class SQLParserUtils {
     }
 
     public static String getSQLType(String sql) {
+        //作为表驱动的key
         List<Token> tokens = getToken(sql);
         SortCode sortCode = tokens.get(0).getSortCode();
         switch (sortCode) {

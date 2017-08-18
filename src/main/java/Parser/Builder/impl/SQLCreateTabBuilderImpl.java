@@ -4,6 +4,7 @@ import Parser.AST;
 import Parser.AstGen.SQLCreateTabAST;
 import Parser.Builder.SQLBuilder;
 import Parser.Builder.SQLCreateTabBuilder;
+import Parser.SQLASTType;
 import Parser.SQLParserUtils;
 import Parser.Visitor.SchemaStatVisitor;
 
@@ -24,8 +25,8 @@ public class SQLCreateTabBuilderImpl implements SQLCreateTabBuilder {
         ast.accept(new SchemaStatVisitor());
     }
 
-    public String grammerType() {
-        return "Crt_tab";
+    public SQLASTType grammerType() {
+        return ast.getAst().getAstType();
     }
 
     public String tableName() {

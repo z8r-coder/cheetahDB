@@ -4,6 +4,7 @@ import Parser.AST;
 import Parser.AstGen.SQLUpdateAst;
 import Parser.Builder.SQLBuilder;
 import Parser.Builder.SQLUpdateBuilder;
+import Parser.SQLASTType;
 import Parser.SQLParserUtils;
 import Parser.Visitor.SchemaStatVisitor;
 
@@ -25,8 +26,8 @@ public class SQLUpdateBuilderImpl implements SQLUpdateBuilder {
         updateAst.accept(new SchemaStatVisitor());
     }
 
-    public String grammerType() {
-        return "Update";
+    public SQLASTType grammerType() {
+        return updateAst.getAst().getAstType();
     }
 
     public String from() {

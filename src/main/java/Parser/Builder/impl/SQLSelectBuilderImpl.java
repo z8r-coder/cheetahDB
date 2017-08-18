@@ -4,6 +4,7 @@ import Parser.AST;
 import Parser.AstGen.SQLSelectAst;
 import Parser.Builder.SQLBuilder;
 import Parser.Builder.SQLSelectBuilder;
+import Parser.SQLASTType;
 import Parser.SQLParserUtils;
 import Parser.Visitor.SchemaStatVisitor;
 
@@ -24,8 +25,8 @@ public class SQLSelectBuilderImpl implements SQLSelectBuilder {
         selectAst.accept(new SchemaStatVisitor());
     }
 
-    public String grammerType() {
-        return "select";
+    public SQLASTType grammerType() {
+        return selectAst.getAst().getAstType();
     }
 
     public String from() {

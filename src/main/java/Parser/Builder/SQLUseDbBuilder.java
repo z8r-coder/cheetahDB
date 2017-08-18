@@ -1,5 +1,7 @@
 package Parser.Builder;
 
+import Parser.SQLASTType;
+
 /**
  * Created by ruanxin on 2017/8/16.
  */
@@ -15,5 +17,5 @@ public interface SQLUseDbBuilder extends SQLBuilder {
      * 获取语句类型
      * @return
      */
-    public String grammerType();
+    public SQLASTType grammerType();
 }

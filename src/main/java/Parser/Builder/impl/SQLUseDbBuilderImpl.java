@@ -4,6 +4,7 @@ import Parser.AST;
 import Parser.AstGen.SQLUseAst;
 import Parser.Builder.SQLBuilder;
 import Parser.Builder.SQLUseDbBuilder;
+import Parser.SQLASTType;
 import Parser.SQLParserUtils;
 import Parser.Visitor.SchemaStatVisitor;
 
@@ -26,7 +27,7 @@ public class SQLUseDbBuilderImpl implements SQLUseDbBuilder {
         useAst.accept(new SchemaStatVisitor());
     }
 
-    public String grammerType() {
-        return "UseDb";
+    public SQLASTType grammerType() {
+        return useAst.getAst().getAstType();
     }
 }

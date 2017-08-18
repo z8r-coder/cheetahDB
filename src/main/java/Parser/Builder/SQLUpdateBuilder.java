@@ -1,5 +1,6 @@
 package Parser.Builder;
 
+import Parser.SQLASTType;
 import Parser.Visitor.SchemaStatVisitor;
 
 import java.util.List;
@@ -38,5 +39,5 @@ public interface SQLUpdateBuilder extends SQLBuilder {
      * 获取语句类型
      * @return
      */
-    public String grammerType();
+    public SQLASTType grammerType();
 }
