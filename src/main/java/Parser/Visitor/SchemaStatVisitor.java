@@ -334,9 +334,9 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
             return;
         }
         ASTNode crt_tab = root.getChildSet().get(0);//create_table_node
-        ASTNode colNode = crt_tab.getChildSet().get(0);//column
+        ASTNode colNode = crt_tab.getChildSet().get(4);//column
 
-        String table_name = root.getChildSet().get(2).getValue();//table name
+        String table_name = crt_tab.getChildSet().get(2).getValue();//table name
 
         ast.setTableName(table_name);
 
@@ -372,7 +372,7 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
         if (StringUtils.equals(astNode.getValue(), "unique_node") ||
                 StringUtils.equals(astNode.getValue(), "prim_node")) {
             for (ASTNode node : childSet) {
-                if (StringUtils.equals(astNode.getValue(), "ParamsList")) {
+                if (StringUtils.equals(node.getValue(), "ParamsList")) {
                     para_node = node;
                     break;
                 }

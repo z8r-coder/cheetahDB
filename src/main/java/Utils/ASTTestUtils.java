@@ -2,11 +2,16 @@ package Utils;
 
 import Parser.AST;
 import Parser.ASTNode;
+import Parser.Builder.SQLBuilderWraper;
+import Parser.Builder.SQLCreateTabBuilder;
+import Parser.Builder.impl.SQLCreateTabBuilderImpl;
 import Parser.SQLParserUtils;
+import Parser.Visitor.SchemaStatVisitor;
 import Support.Logging.Log;
 import Support.Logging.LogFactory;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by ruanxin on 2017/8/10.
@@ -33,56 +38,126 @@ public class ASTTestUtils {
          * create语句测试
          */
         //create table语句测试,无约束语句，通过测试
-//        AST ast = SQLParserUtils.AssSQlASTgen("CREATE TABLE Persons" +
+//        String sql = "CREATE TABLE Persons" +
 //                "         (" +
 //                "         Id_P integer(10)," +
 //                "         LastName varchar(255)," +
 //                "         FirstName varchar(255)," +
 //                "         Address varchar(255)," +
 //                "         City varchar(255)" +
-//                "         );");
+//                "         );";
+//        AST ast = SQLParserUtils.AssSQlASTgen(sql);
 //        ASTTestPrint(ast.getRoot());
 //        System.out.println();
 //        System.out.println(ast.getAstType());
+//        System.out.println("----------------------------------------------");
+//        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
+//        try {
+//            SQLCreateTabBuilderImpl scb = (SQLCreateTabBuilderImpl) sbw.getSQLBuilder();
+//            String tableName = scb.tableName();
+//            List<SchemaStatVisitor.Column> columns = scb.Columns();
+//            String gt = scb.grammerType();
+//
+//            System.out.println("tableName: " + tableName);
+//            System.out.println("grammer type: " + gt);
+//            for (SchemaStatVisitor.Column column : columns) {
+//                System.out.println(" column table name=" + column.getTable());
+//                System.out.print(" column value=" + column.getName());
+//                System.out.print(" column type=" + column.getDataType());
+//                System.out.print(" column type length=" + column.getTypeLength());
+//                System.out.print(" column not null=" + column.getNotNull());
+//                System.out.print(" column is primaryKey=" + column.getPrimaryKey());
+//                System.out.print(" column is unique=" + column.getUnique());
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
 
         //create table语句测试,含not null约束语句,通过测试
-//        AST ast = SQLParserUtils.AssSQlASTgen("CREATE TABLE Persons" +
+//        String sql = "CREATE TABLE Persons" +
 //                "         (" +
 //                "         Id_P integer(10) NOT NULL," +
 //                "         LastName varchar(255) not null," +
 //                "         FirstName varchar(255)," +
 //                "         Address varchar(255)," +
 //                "         City varchar(255)" +
-//                "         );");
+//                "         );";
+//        AST ast = SQLParserUtils.AssSQlASTgen(sql);
 //        ASTTestPrint(ast.getRoot());
 //        System.out.println();
 //        System.out.println(ast.getAstType());
+//        System.out.println("----------------------------------------------");
+//        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
+//        try {
+//            SQLCreateTabBuilderImpl scb = (SQLCreateTabBuilderImpl) sbw.getSQLBuilder();
+//            String tableName = scb.tableName();
+//            List<SchemaStatVisitor.Column> columns = scb.Columns();
+//            String gt = scb.grammerType();
+//
+//            System.out.println("tableName: " + tableName);
+//            System.out.println("grammer type: " + gt);
+//            for (SchemaStatVisitor.Column column : columns) {
+//                System.out.println(" column table name=" + column.getTable());
+//                System.out.print(" column value=" + column.getName());
+//                System.out.print(" column type=" + column.getDataType());
+//                System.out.print(" column type length=" + column.getTypeLength());
+//                System.out.print(" column not null=" + column.getNotNull());
+//                System.out.print(" column is primaryKey=" + column.getPrimaryKey());
+//                System.out.print(" column is unique=" + column.getUnique());
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         //create table语句测试,含not null约束语句,含unique,check,primary,foreign约束通过测试
-//        AST ast = SQLParserUtils.AssSQlASTgen("CREATE TABLE Persons" +
-//                "         (" +
-//                "         Id_P integer(10) NOT NULL," +
-//                "         LastName varchar(255) not null," +
-//                "         FirstName varchar(255)," +
-//                "         Address varchar(255)," +
-//                "         UNIQUE (Id_P)," +
-//                "         PRIMARY KEY (Id_P)," +
-//                "         FOREIGN KEY (Id_P) REFERENCES Persons(Id_P)," +
-//                "         City varchar(255)," +
-//                "         CHECK (Id_P>0 AND ID_P < 1)" +
-//                "         );");
+//            String sql = "CREATE TABLE Persons" +
+//                    "         (" +
+//                    "         Id_P integer(10) NOT NULL," +
+//                    "         LastName varchar(255) not null," +
+//                    "         FirstName varchar(255)," +
+//                    "         Address varchar(255)," +
+//                    "         UNIQUE (Id_P)," +
+//                    "         PRIMARY KEY (Id_P)," +
+////                    "         FOREIGN KEY (Id_P) REFERENCES Persons(Id_P)," +
+//                    "         City varchar(255)" +
+////                    "         CHECK (Id_P>0 AND ID_P < 1)" +
+//                    "         );";
+//        AST ast = SQLParserUtils.AssSQlASTgen(sql);
 //        ASTTestPrint(ast.getRoot());
 //        System.out.println();
 //        System.out.println(ast.getAstType());
+//        System.out.println("----------------------------------------------");
+//        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
+//        try {
+//            SQLCreateTabBuilderImpl scb = (SQLCreateTabBuilderImpl) sbw.getSQLBuilder();
+//            String tableName = scb.tableName();
+//            List<SchemaStatVisitor.Column> columns = scb.Columns();
+//            String gt = scb.grammerType();
+//
+//            System.out.println("tableName: " + tableName);
+//            System.out.println("grammer type: " + gt);
+//            for (SchemaStatVisitor.Column column : columns) {
+//                System.out.println(" column table name=" + column.getTable());
+//                System.out.print(" column value=" + column.getName());
+//                System.out.print(" column type=" + column.getDataType());
+//                System.out.print(" column type length=" + column.getTypeLength());
+//                System.out.print(" column not null=" + column.getNotNull());
+//                System.out.print(" column is primaryKey=" + column.getPrimaryKey());
+//                System.out.print(" column is unique=" + column.getUnique());
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         /**
          * select暂时只支持简单select和带where的简单select
          */
         //简单select语句测试，不带where,通过测试
-//        AST ast = SQLParserUtils.AssSQlASTgen("select * from table_a;");
-//        ASTTestPrint(ast.getRoot());
-//        System.out.println();
-//        System.out.println(ast.getAstType());
+        AST ast = SQLParserUtils.AssSQlASTgen("select * from table_a;");
+        ASTTestPrint(ast.getRoot());
+        System.out.println();
+        System.out.println(ast.getAstType());
 
         //简单select语句测试，带where,不带in,通过测试
 //        AST ast = SQLParserUtils.AssSQlASTgen("select a,b from table_a where A = '123' AND B = '321';");
@@ -109,10 +184,10 @@ public class ASTTestUtils {
 //        System.out.println(ast.getAstType());
 
         //show tables;通过
-        AST ast = SQLParserUtils.AssSQlASTgen("SHOW TABLES;");
-        ASTTestPrint(ast.getRoot());
-        System.out.println();
-        System.out.println(ast.getAstType());
+//        AST ast = SQLParserUtils.AssSQlASTgen("SHOW TABLES;");
+//        ASTTestPrint(ast.getRoot());
+//        System.out.println();
+//        System.out.println(ast.getAstType());
 
         /**
          * drop语句
