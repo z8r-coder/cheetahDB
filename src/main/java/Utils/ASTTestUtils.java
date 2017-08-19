@@ -465,31 +465,31 @@ public class ASTTestUtils {
 //        }
 
         //带where delete测试成功
-        String sql = "DELETE FROM Person WHERE LastName = 'Wilson' AND LastName = 'Wilson' OR LastName = 'Wilson';";
-        AST ast = SQLParserUtils.AssSQlASTgen(sql);
-        ASTTestPrint(ast.getRoot());
-        System.out.println();
-        System.out.println(ast.getAstType());
-        System.out.println("----------------------------------------------");
-        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
-        try {
-            SQLDeleteBuilderImpl sdi = (SQLDeleteBuilderImpl) sbw.getSQLBuilder();
-            String tableName = sdi.from();
-            Set<SchemaStatVisitor.Relationship> rls = sdi.where();
-            List<String> andOr = sdi.AndOr();
-
-            for (SchemaStatVisitor.Relationship rs : rls) {
-                System.out.println(rs.getLeft().getName() + rs.getOperator() + rs.getRight().getValue());
-            }
-
-            for (String str: andOr) {
-                System.out.print(str + "  ");
-            }
-            System.out.println();
-            System.out.println("tableName= " + tableName);
-            System.out.println("grammer type=" + sdi.grammerType());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        String sql = "DELETE FROM Person WHERE LastName = 'Wilson' AND LastName = 'Wilson' OR LastName = 'Wilson';";
+//        AST ast = SQLParserUtils.AssSQlASTgen(sql);
+//        ASTTestPrint(ast.getRoot());
+//        System.out.println();
+//        System.out.println(ast.getAstType());
+//        System.out.println("----------------------------------------------");
+//        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
+//        try {
+//            SQLDeleteBuilderImpl sdi = (SQLDeleteBuilderImpl) sbw.getSQLBuilder();
+//            String tableName = sdi.from();
+//            Set<SchemaStatVisitor.Relationship> rls = sdi.where();
+//            List<String> andOr = sdi.AndOr();
+//
+//            for (SchemaStatVisitor.Relationship rs : rls) {
+//                System.out.println(rs.getLeft().getName() + rs.getOperator() + rs.getRight().getValue());
+//            }
+//
+//            for (String str: andOr) {
+//                System.out.print(str + "  ");
+//            }
+//            System.out.println();
+//            System.out.println("tableName= " + tableName);
+//            System.out.println("grammer type=" + sdi.grammerType());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 }
