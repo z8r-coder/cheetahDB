@@ -5,5 +5,5 @@ import Engine.Bplus.Bpt;
 /**
  * Created by rx on 2017/8/19.
  */
-public class BptImpl implements Bpt<T,E> {
+public class BptImpl<T,E> implements Bpt<T,E> {
 }
