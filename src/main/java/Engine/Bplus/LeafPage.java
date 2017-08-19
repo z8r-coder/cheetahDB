@@ -5,4 +5,10 @@ package Engine.Bplus;
  * Created by ruanxin on 2017/8/19.
  */
 public interface LeafPage<T,E> extends Page<T,E> {
+    /**
+     * 插入条目
+     * @param entry
+     * @return
+     */
+    public boolean insert(Entry<T,E> entry);
 }
