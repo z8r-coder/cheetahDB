@@ -3,6 +3,8 @@ package Engine.Bplus.impl;
 import Engine.Bplus.*;
 import Utils.ListUtils;
 
+import java.util.List;
+
 /**
  * Created by rx on 2017/8/19.
  */
@@ -23,11 +25,32 @@ public class BptImpl<T,E> implements Bpt<T,E> {
                 //结点空间满,分裂
                 IndexPage<T,E> indexPage = new IndexPageImpl<T, E>();
                 indexPage.insert(entry);
+                setRoot(indexPage);
+
                 int splitPoint = BptConstant.PAGE_SIZE / 2 + 1;
-                ListUtils.copyFromTo();
+                List<Entry<T,E>> list = ((LeafPage) root).getEntries();
+                //创建左结点
+                LeafPage<T,E> leftLeafPage = new LeafPageImpl<T, E>(null, null);
+                //创建右结点
+                LeafPage<T,E> rightLeafPage = new LeafPageImpl<T, E>(leftLeafPage, null);
+                leftLeafPage.setFirst(true);
+                rightLeafPage.setLast(true);
+
+                //初始化左结点的条目数
+                List<Entry<T,E>> leftEntries = leftLeafPage.getEntries();
+                ListUtils.copyFromTo(0, splitPoint - 1, list, leftEntries);
+
+                //初始化右节点的条目数
+                List<Entry<T,E>> rightEntries = rightLeafPage.getEntries();
+                ListUtils.copyFromTo(splitPoint, BptConstant.PAGE_SIZE + 1, list, rightEntries);
+
+
             }
+        } else {
+            //根结点为索引结点
+            root.insert(entry);
         }
-        root.insert(entry);
+
         return false;
     }
 

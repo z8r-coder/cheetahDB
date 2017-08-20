@@ -13,4 +13,10 @@ public interface IndexPage<T,E> extends Page<T,E> {
      * @return
      */
     public Entry<T,E> insert(Entry<T,E> entry);
+
+    /**
+     * 添加子结点
+     * @param leafPage
+     */
+    public void add(LeafPage<T,E> leafPage);
 }

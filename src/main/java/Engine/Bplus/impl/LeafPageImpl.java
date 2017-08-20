@@ -16,8 +16,8 @@ import java.util.List;
 public class LeafPageImpl<T,E> implements LeafPage<T,E> {
     private LeafPage before;
     private LeafPage after;
-    private boolean first;//是否是第一个子节点
-    private boolean last;//是否是最后一个子节点
+    private boolean first = false;//是否是第一个子节点
+    private boolean last = false;//是否是最后一个子节点
     private List<Entry<T, E>> entries = new ArrayList<Entry<T, E>>(BptConstant.PAGE_SIZE);
 
     public LeafPageImpl(LeafPage before, LeafPage after) {
@@ -67,6 +67,10 @@ public class LeafPageImpl<T,E> implements LeafPage<T,E> {
 
     public void add(int index, Entry<T, E> entry) {
         entries.add(index, entry);
+    }
+
+    public List<Entry<T, E>> getEntries() {
+        return entries;
     }
 
     //现默认按mid点分裂
