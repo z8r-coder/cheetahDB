@@ -42,4 +42,23 @@ public class ListUtils {
         }
         return isEq;
     }
+
+    /**
+     * for example list = [0,1,2,3,4,5,6,7,8]
+     *             target = [];
+     * copyFromTo(3,6)
+     * target = [3,4,5,6]
+     * @param start
+     * @param end
+     * @param list
+     * @param target
+     */
+    public static void copyFromTo(int start, int end, List list, List target) {
+        if (end >= list.size()) {
+            return;
+        }
+        for (;start <= end;start++) {
+            target.add(list.get(start));
+        }
+    }
 }

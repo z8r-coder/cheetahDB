@@ -2,6 +2,7 @@ package Engine;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Created by ruanxin on 2017/8/19.
@@ -66,7 +67,7 @@ public class EngineUtils {
 //        int mid = dichotomy(list, "n");
 //        System.out.println(mid);
 
-        List<Integer> list = new ArrayList<Integer>(5);
-        System.out.println(list.size());
+//        List<Integer> list = new ArrayList<Integer>(5);
+//        System.out.println(list.size());
     }
 }

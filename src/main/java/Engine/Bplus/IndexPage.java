@@ -9,9 +9,8 @@ import java.util.List;
 public interface IndexPage<T,E> extends Page<T,E> {
 
     /**
-     * 插入条目
-     * @param entry
+     * 插入索引
      * @return
      */
-    public boolean insert(Entry<T,E> entry);
+    public Entry<T,E> insert(Entry<T,E> entry);
 }

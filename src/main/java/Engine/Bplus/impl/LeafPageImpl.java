@@ -2,6 +2,7 @@ package Engine.Bplus.impl;
 
 import Engine.Bplus.BptConstant;
 import Engine.Bplus.Entry;
+import Engine.Bplus.IndexPage;
 import Engine.Bplus.LeafPage;
 import Engine.EngineUtils;
 import Utils.StringUtils;
@@ -70,9 +71,14 @@ public class LeafPageImpl<T,E> implements LeafPage<T,E> {
 
     //现默认按mid点分裂
     public Entry<T,E> insert(Entry<T, E> entry) {
+        if (entries.size() == 0) {
+            entries.add(entry);
+            return null;
+        }
         int mid = binarySearch(entries, entry.getKey());
         if (entries.size() < BptConstant.PAGE_SIZE) {
             entries.add(mid, entry);
+            return null;
         } else if (first == false && before != null && before.length() < BptConstant.PAGE_SIZE) {
             //先看左结点，非首结点并且左兄弟结点非空(该判断可无),且未满，则旋转结点
             Entry<T,E> tmp = entries.get(0);
@@ -94,10 +100,11 @@ public class LeafPageImpl<T,E> implements LeafPage<T,E> {
             //返回索引层
             return tmp;
         } else {
-            //分裂
+            //分裂交给上indexPage来处理，此处返回索引entry
             int splitMid = BptConstant.PAGE_SIZE / 2 + 1;
+            entries.add(mid, entry);
+            return entries.get(splitMid);
         }
-        return null;
     }
 
     private int binarySearch(List<Entry<T, E>> list, T target) {
