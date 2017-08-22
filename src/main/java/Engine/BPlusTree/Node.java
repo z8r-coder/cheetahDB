@@ -2,10 +2,7 @@ package Engine.BPlusTree;
 
 import Engine.Bplustree;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by rx on 2017/8/21.
@@ -125,13 +122,112 @@ public class Node {
         if (leaf) {
             //叶子结点
             if (contains(key) || entries.size() < bpt.getOrder()) {
-                
+                insert(key,obj);
+                if (parent != null) {
+                    //更新父结点
+                    parent.updateInsert(bpt);
+                }
+            } else {
+                //需要分裂
+                Node left = new Node(true);
+                Node right = new Node(true);
+
+                if (previous != null) {
+                    previous.setNext(left);
+                    left.setPrevious(previous);
+                }
+                if (next != null) {
+                    next.setPrevious(right);
+                    right.setNext(next);
+                }
+                if (previous == null) {
+                    bpt.setHead(left);
+                }
+
+                left.setNext(right);
+                right.setPrevious(left);
+                previous = null;
+                next = null;
+
+                int leftSize = (bpt.getOrder() + 1) / 2 + (bpt.getOrder() + 1) % 2;
+                int rightSize = (bpt.getOrder() + 1) / 2;
+
+                insert(key, obj);
+                for (int i = 0; i < leftSize; i++) {
+                    left.getEntries().add(entries.get(i));
+                }
+
+                for (int i = 0; i < rightSize; i++) {
+                    right.getEntries().add(entries.get(leftSize + i));
+                }
+
+                //非根结点
+                if (parent != null) {
+                    int index = parent.getChildren().indexOf(this);
+                    parent.getChildren().remove(this);
+                    left.setParent(parent);
+                    right.setParent(parent);
+                    parent.getChildren().add(index, left);
+                    parent.getChildren().add(index + 1, right);
+                    setEntries(null);
+                    setChildren(null);
+
+                    parent.updateInsert(bpt);
+                    setParent(null);
+                } else {
+                    root = false;
+                    Node parent = new Node(false, true);
+                    bpt.setRoot(parent);
+                    left.setParent(parent);
+                    right.setParent(parent);
+                    parent.getChildren().add(left);
+                    parent.getChildren().add(right);
+                    setEntries(null);
+                    setChildren(null);
+
+                    parent.updateInsert(bpt);
+                }
+            }
+        } else {
+            //非叶节点
+            if (key.compareTo(entries.get(0).getKey()) <= 0) {
+                children.get(0).insert(key,obj, bpt);
+            } else if (key.compareTo(entries.get(entries.size() - 1).getKey()) >= 0) {
+                children.get(children.size() - 1).insert(key, obj, bpt);
+            } else {
+                for (int i = 0; i < entries.size(); i++) {
+                    if (entries.get(i).getKey().compareTo(key) <= 0 &&
+                            entries.get(i + 1).getKey().compareTo(key) >0) {
+                        children.get(i).insert(key, obj, bpt);
+                        break;
+                    }
+                }
             }
         }
     }
 
+    /**
+     * 插入关键字
+     * @param key
+     * @param obj
+     */
     public void insert(Comparable key, Object obj) {
+        Map.Entry<Comparable, Object> entry = new SimpleEntry<Comparable, Object>(key, obj);
+        if (entries.size() == 0) {
+            entries.add(entry);
+            return;
+        }
 
+        for (int i = 0; i < entries.size();i++) {
+            if (entries.get(i).getKey().compareTo(key) == 0) {
+                entries.add(i, entry);
+                return;
+            } else if (entries.get(i).getKey().compareTo(key) > 0) {
+                entries.add(0, entry);
+            }
+        }
+
+        entries.add(entry);
     }
     public void update(Comparable key, Object obj, Bplustree bpt) {
 
@@ -151,14 +247,14 @@ public class Node {
             for (int i = 0; i < leftSize; i++) {
                 left.getChildren().add(children.get(i));
                 Comparable key = children.get(i).getEntries().get(0).getKey();
-                left.getEntries().add(new SimpleEntry<Comparable, Object>(key));
+                left.getEntries().add(new SimpleEntry<Comparable, Object>(key,null));
                 children.get(i).setParent(left);
             }
 
             for (int i = 0; i < rightSize;i++) {
                 right.getChildren().add(children.get(i));
                 Comparable key = children.get(leftSize + i).getEntries().get(0).getKey();
-                right.getEntries().add(new SimpleEntry<Comparable, Object>(key));
+                right.getEntries().add(new SimpleEntry<Comparable, Object>(key,null));
                 children.get(leftSize + i).setParent(right);
             }
 
@@ -204,7 +300,7 @@ public class Node {
                 Comparable key = node.getChildren().get(i).getEntries().get(0).getKey();
                 if (node.getEntries().get(i).getKey().compareTo(key) != 0) {
                     node.getEntries().remove(i);
-                    node.getEntries().add(i, new SimpleEntry<Comparable, Object>(key));
+                    node.getEntries().add(i, new SimpleEntry<Comparable, Object>(key, null));
                     if (!node.root) {
                         validate(node.getParent(), bpt);
                     }
@@ -218,7 +314,7 @@ public class Node {
             node.getEntries().clear();
             for (int i = 0; i < node.getChildren().size();i++) {
                 Comparable key = node.getChildren().get(i).getEntries().get(0).getKey();
-                node.getEntries().add(new SimpleEntry<Comparable, Object>(key));
+                node.getEntries().add(new SimpleEntry<Comparable, Object>(key, null));
                 if (!node.root) {
                     validate(node.getParent(), bpt);
                 }

@@ -44,4 +44,10 @@ public interface Bplustree {
      * @param root
      */
     public void setRoot(Node root);
+
+    /**
+     * 设置b+树叶子的头结点
+     * @param head
+     */
+    public void setHead(Node head);
 }

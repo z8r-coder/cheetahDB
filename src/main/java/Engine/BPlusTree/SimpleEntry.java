@@ -7,9 +7,11 @@ import java.util.Map;
  */
 public class SimpleEntry<T,E> implements Map.Entry<T,E>{
     private T key;
+    private E value;
 
-    public SimpleEntry(T key) {
+    public SimpleEntry(T key, E value) {
         this.key = key;
+        this.value = value;
     }
     public T getKey() {
         return key;
@@ -19,12 +21,12 @@ public class SimpleEntry<T,E> implements Map.Entry<T,E>{
         this.key = key;
     }
 
-    //无value值
     public E getValue() {
-        return null;
+        return value;
     }
 
-    public Object setValue(Object value) {
-        return null;
+    public E setValue(E value) {
+        this.value = value;
+        return value;
     }
 }
