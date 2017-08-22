@@ -1,5 +1,7 @@
 package Engine;
 
+import Engine.BPlusTree.Node;
+
 /**
  * Created by rx on 2017/8/21.
  */
@@ -30,4 +32,16 @@ public interface Bplustree {
      * @param obj
      */
     public void update(Comparable key, Object obj);
+
+    /**
+     * 获取B+树的阶数
+     * @return
+     */
+    public int getOrder();
+
+    /**
+     * 设置根结点
+     * @param root
+     */
+    public void setRoot(Node root);
 }

@@ -122,15 +122,74 @@ public class Node {
     }
 
     public void insert(Comparable key, Object obj, Bplustree bpt) {
-
+        if (leaf) {
+            //叶子结点
+            if (contains(key) || entries.size() < bpt.getOrder()) {
+                
+            }
+        }
     }
 
+    public void insert(Comparable key, Object obj) {
+
+    }
     public void update(Comparable key, Object obj, Bplustree bpt) {
 
     }
 
-    public void updateInsert(Bplustree btp) {
+    public void updateInsert(Bplustree bpt) {
+        validate(this, bpt);
 
+        if (children.size() > bpt.getOrder()) {
+            Node left = new Node(false);
+            Node right = new Node(false);
+
+            //左右俩子字节的长度
+            int leftSize = (bpt.getOrder() + 1) / 2 + (bpt.getOrder() + 1) % 2;
+            int rightSize = (bpt.getOrder() + 1) / 2;
+
+            for (int i = 0; i < leftSize; i++) {
+                left.getChildren().add(children.get(i));
+                Comparable key = children.get(i).getEntries().get(0).getKey();
+                left.getEntries().add(new SimpleEntry<Comparable, Object>(key));
+                children.get(i).setParent(left);
+            }
+
+            for (int i = 0; i < rightSize;i++) {
+                right.getChildren().add(children.get(i));
+                Comparable key = children.get(leftSize + i).getEntries().get(0).getKey();
+                right.getEntries().add(new SimpleEntry<Comparable, Object>(key));
+                children.get(leftSize + i).setParent(right);
+            }
+
+            if (parent != null) {
+                int index = parent.getChildren().indexOf(this);
+                parent.getChildren().remove(this);
+                left.setParent(parent);
+                right.setParent(parent);
+
+                parent.getChildren().add(index, left);
+                parent.getChildren().add(index + 1, right);
+
+                setEntries(null);
+                setChildren(null);
+
+                parent.updateInsert(bpt);
+                setParent(null);
+            } else {
+                root = false;
+                Node parent = new Node(false, true);
+                bpt.setRoot(parent);
+                left.setParent(parent);
+                right.setParent(parent);
+                parent.getChildren().add(left);
+                parent.getChildren().add(right);
+                setEntries(null);
+                setChildren(null);
+
+                parent.updateInsert(bpt);
+            }
+        }
     }
 
     /**
@@ -146,9 +205,38 @@ public class Node {
                 if (node.getEntries().get(i).getKey().compareTo(key) != 0) {
                     node.getEntries().remove(i);
                     node.getEntries().add(i, new SimpleEntry<Comparable, Object>(key));
+                    if (!node.root) {
+                        validate(node.getParent(), bpt);
+                    }
+                }
+            }
+            //若子节点数不等于关键字个数但仍大于M/2并且小于M，并且大于2
+        } else if (node.root && node.getChildren().size() >= 2 ||
+                node.getChildren().size() >= bpt.getOrder() / 2 &&
+                node.getChildren().size() <= bpt.getOrder() &&
+                node.getChildren().size() >= 2) {
+            node.getEntries().clear();
+            for (int i = 0; i < node.getChildren().size();i++) {
+                Comparable key = node.getChildren().get(i).getEntries().get(0).getKey();
+                node.getEntries().add(new SimpleEntry<Comparable, Object>(key));
+                if (!node.root) {
+                    validate(node.getParent(), bpt);
                 }
             }
         }
     }
 
+    /**
+     * 当前结点是否包含该关键字
+     * @param key
+     * @return
+     */
+    protected boolean contains(Comparable key) {
+        for (Map.Entry<Comparable, Object> entry : entries) {
+            if (entry.getKey().compareTo(key) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
