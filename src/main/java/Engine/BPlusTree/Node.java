@@ -5,6 +5,9 @@ import Engine.Bplustree;
 import java.util.*;
 
 /**
+ * comparable res < 0  this < value
+ *            res = 0  this = value
+ *            res > 0  this > value
  * Created by rx on 2017/8/21.
  */
 public class Node {
@@ -114,10 +117,44 @@ public class Node {
         return null;
     }
 
+    public void remove(Comparable key, Bplustree bpt) {
+        if (leaf) {
+            if (!contains(key)) {
+                return;
+            }
+
+            //即是叶子节点又是根节点，直接删除
+            if (root) {
+                remove(key);
+            } else {
+                if (entries.size() > bpt.getOrder() / 2 &&
+                        entries.size() > 2) {
+                    remove(key);
+                } else {
+                    //若本节点关键字数量小于M / 2,并且前驱节点字数大于M / 2，则从其借补
+                    if (previous != null &&
+                            previous.getEntries().size() > bpt.getOrder() / 2 &&
+                            previous.getEntries().size() > 2 &&
+                            previous.getParent() == parent) {
+                        int preSize = previous.getEntries().size();
+                        Map.Entry<Comparable, Object> entry = previous.getEntries().get(preSize - 1);
+                        previous.getEntries().remove(entry);
+
+                    }
+                }
+            }
+        }
+    }
     public void remove(Comparable key) {
 
     }
 
+    /**
+     * 找到需要插入的位置
+     * @param key
+     * @param obj
+     * @param bpt
+     */
     public void insert(Comparable key, Object obj, Bplustree bpt) {
         if (leaf) {
             //叶子结点
@@ -219,11 +256,9 @@ public class Node {
         }
 
         for (int i = 0; i < entries.size();i++) {
-            if (entries.get(i).getKey().compareTo(key) == 0) {
+            if (entries.get(i).getKey().compareTo(key) >= 0) {
                 entries.add(i, entry);
                 return;
-            } else if (entries.get(i).getKey().compareTo(key) > 0) {
-                entries.add(0, entry);
             }
         }
 
