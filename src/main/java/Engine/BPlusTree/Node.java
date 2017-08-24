@@ -120,7 +120,8 @@ public class Node {
 
     public void remove(Comparable key, Bplustree bpt) {
         if (leaf) {
-            if (!contains(key)) {
+            int index = contains(key);
+            if (index < 0) {
                 return;
             }
 
@@ -337,7 +338,8 @@ public class Node {
     public void insert(Comparable key, Object obj, Bplustree bpt) {
         if (leaf) {
             //叶子结点
-            if (contains(key) || entries.size() < bpt.getOrder()) {
+            int tmpindex = contains(key);
+            if (tmpindex >= 0 || entries.size() < bpt.getOrder()) {
                 insert(key,obj);
                 if (parent != null) {
                     //更新父结点
@@ -443,8 +445,30 @@ public class Node {
 
         entries.add(entry);
     }
-    public void update(Comparable key, Object obj, Bplustree bpt) {
-
+    public void update(Comparable key, Object obj) {
+        if (!leaf) {
+            //非叶子节点
+            if (key.compareTo(entries.get(0).getKey()) <= 0) {
+                children.get(0).update(key, obj);
+            } else if (key.compareTo(entries.get(entries.size() - 1).getKey()) >= 0) {
+                children.get(children.size() - 1).update(key, obj);
+            } else {
+                for (int i = 0; i < entries.size();i++) {
+                    if (entries.get(i).getKey().compareTo(key) <= 0 &&
+                            entries.get(i + 1).getKey().compareTo(key) > 0) {
+                        children.get(i).update(key, obj);
+                        break;
+                    }
+                }
+            }
+        } else {
+            int index = contains(key);
+            if (index < 0) {
+                return;
+            } else {
+                entries.get(index).setValue(obj);
+            }
+        }
     }
 
     public void updateInsert(Bplustree bpt) {
@@ -541,12 +565,30 @@ public class Node {
      * @param key
      * @return
      */
-    protected boolean contains(Comparable key) {
-        for (Map.Entry<Comparable, Object> entry : entries) {
-            if (entry.getKey().compareTo(key) == 0) {
-                return true;
+    protected int contains(Comparable key) {
+        for (int i = 0; i < entries.size(); i++) {
+            if (entries.get(i).getKey().compareTo(key) == 0) {
+                return i;
             }
         }
-        return false;
+        return -1;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("isRoot: ");
+        sb.append(root);
+        sb.append(", ");
+        sb.append("isLeaf: ");
+        sb.append(leaf);
+        sb.append(", ");
+        sb.append("keys: ");
+        for (Map.Entry entry : entries){
+            sb.append(entry.getKey());
+            sb.append(", ");
+        }
+        sb.append(", ");
+        return sb.toString();
+
     }
 }
