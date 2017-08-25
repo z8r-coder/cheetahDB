@@ -70,10 +70,10 @@ public class BplustreeImpl implements Bplustree {
 
     public static void main(String arg[]) {
         Node root = new Node(true,true);
-        Bplustree tree = new BplustreeImpl(6, root);
+        Bplustree tree = new BplustreeImpl(1000, root);
         Random random = new Random();
         long current = System.currentTimeMillis();
-        for (int j = 0; j < 100000; j++) {
+        for (int j = 0; j < 10000; j++) {
             for (int i = 0; i < 100; i++) {
                 int randomNumber = random.nextInt(1000);
                 tree.insert(randomNumber, randomNumber);

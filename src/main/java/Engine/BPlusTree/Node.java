@@ -410,7 +410,6 @@ public class Node {
             }
         } else {
             //非叶节点
-            System.out.println(root);
             if (key.compareTo(entries.get(0).getKey()) <= 0) {
                 children.get(0).insert(key,obj, bpt);
             } else if (key.compareTo(entries.get(entries.size() - 1).getKey()) >= 0) {
