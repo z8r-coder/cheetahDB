@@ -1,7 +1,6 @@
 package Engine.BPlusTree;
 
 import Engine.Bplustree;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 
 import java.util.*;
 
@@ -35,6 +34,9 @@ public class Node {
     public Node(boolean leaf, boolean root) {
         this.leaf = leaf;
         this.root = root;
+        if (!leaf) {
+            children = new ArrayList<Node>();
+        }
     }
 
     public void setRoot(boolean root) {
@@ -566,6 +568,9 @@ public class Node {
      * @return
      */
     protected int contains(Comparable key) {
+        if (entries == null) {
+            System.out.print(this.leaf);
+        }
         for (int i = 0; i < entries.size(); i++) {
             if (entries.get(i).getKey().compareTo(key) == 0) {
                 return i;
