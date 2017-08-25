@@ -2,6 +2,8 @@ package Engine.BPlusTree;
 
 import Engine.Bplustree;
 
+import java.util.Random;
+
 /**
  * Created by rx on 2017/8/21.
  */
@@ -20,6 +22,9 @@ public class BplustreeImpl implements Bplustree {
      */
     private Node head;
 
+    public BplustreeImpl (int order) {
+        this.order = order;
+    }
     public void setRoot(Node root) {
         this.root = root;
     }
@@ -59,11 +64,28 @@ public class BplustreeImpl implements Bplustree {
     }
 
     public void update(Comparable key, Object obj) {
-        root.update(key, obj, this);
+        root.update(key, obj);
     }
 
     public static void main(String arg[]) {
-        Bplustree bpt = new BplustreeImpl();
-        bpt.Search("b");
+        Bplustree tree = new BplustreeImpl(6);
+        Random random = new Random();
+        long current = System.currentTimeMillis();
+        for (int j = 0; j < 100000; j++) {
+            for (int i = 0; i < 100; i++) {
+                int randomNumber = random.nextInt(1000);
+                tree.insert(randomNumber, randomNumber);
+            }
+
+            for (int i = 0; i < 100; i++) {
+                int randomNumber = random.nextInt(1000);
+                tree.delete(randomNumber);
+            }
+        }
+
+        long duration = System.currentTimeMillis() - current;
+        System.out.println("time elpsed for duration: " + duration);
+        int search = 80;
+        System.out.print(tree.Search(search));
     }
 }
