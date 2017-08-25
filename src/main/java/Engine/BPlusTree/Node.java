@@ -410,6 +410,7 @@ public class Node {
             }
         } else {
             //非叶节点
+            System.out.println(root);
             if (key.compareTo(entries.get(0).getKey()) <= 0) {
                 children.get(0).insert(key,obj, bpt);
             } else if (key.compareTo(entries.get(entries.size() - 1).getKey()) >= 0) {
@@ -492,13 +493,14 @@ public class Node {
             }
 
             for (int i = 0; i < rightSize;i++) {
-                right.getChildren().add(children.get(i));
+                right.getChildren().add(children.get(leftSize + i));
                 Comparable key = children.get(leftSize + i).getEntries().get(0).getKey();
                 right.getEntries().add(new SimpleEntry<Comparable, Object>(key,null));
                 children.get(leftSize + i).setParent(right);
             }
 
             if (parent != null) {
+                //非根结点
                 int index = parent.getChildren().indexOf(this);
                 parent.getChildren().remove(this);
                 left.setParent(parent);
@@ -513,6 +515,7 @@ public class Node {
                 parent.updateInsert(bpt);
                 setParent(null);
             } else {
+                //根结点
                 root = false;
                 Node parent = new Node(false, true);
                 bpt.setRoot(parent);
@@ -535,6 +538,7 @@ public class Node {
      */
     protected static void validate(Node node, Bplustree bpt) {
         if (node.getEntries().size() == node.getChildren().size()) {
+            //关键字和子结点数目相同
             for (int i = 0; i < node.getEntries().size();i++) {
                 //取子结点
                 Comparable key = node.getChildren().get(i).getEntries().get(0).getKey();
@@ -568,9 +572,6 @@ public class Node {
      * @return
      */
     protected int contains(Comparable key) {
-        if (entries == null) {
-            System.out.print(this.leaf);
-        }
         for (int i = 0; i < entries.size(); i++) {
             if (entries.get(i).getKey().compareTo(key) == 0) {
                 return i;
@@ -594,6 +595,5 @@ public class Node {
         }
         sb.append(", ");
         return sb.toString();
-
     }
 }

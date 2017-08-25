@@ -73,16 +73,16 @@ public class BplustreeImpl implements Bplustree {
         Bplustree tree = new BplustreeImpl(6, root);
         Random random = new Random();
         long current = System.currentTimeMillis();
-        for (int j = 0; j < 36; j++) {
-//            for (int i = 0; i < 100; i++) {
+        for (int j = 0; j < 100000; j++) {
+            for (int i = 0; i < 100; i++) {
                 int randomNumber = random.nextInt(1000);
                 tree.insert(randomNumber, randomNumber);
-//            }
+            }
 
-//            for (int i = 0; i < 100; i++) {
-//                int randomNumber = random.nextInt(1000);
-//                tree.delete(randomNumber);
-//            }
+            for (int i = 0; i < 100; i++) {
+                int randomNumber = random.nextInt(1000);
+                tree.delete(randomNumber);
+            }
         }
 
         long duration = System.currentTimeMillis() - current;
