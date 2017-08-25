@@ -21,7 +21,7 @@ public class Node {
 
     private Node next;//叶子结点后继结点
 
-    private List<Map.Entry<Comparable, Object>> entries = new ArrayList<Map.Entry<Comparable, Object>>();
+    private List<Map.Entry<Comparable, Object>> entries = new ArrayList<Map.Entry<Comparable, Object>>(1024);
 
     private List<Node> children;
 

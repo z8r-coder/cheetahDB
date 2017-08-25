@@ -2,6 +2,8 @@ package Engine.BPlusTree;
 
 import Engine.Bplustree;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -68,22 +70,41 @@ public class BplustreeImpl implements Bplustree {
         root.update(key, obj);
     }
 
+    public void visitorLeaf(Node node) {
+        if (node == null) {
+            return;
+        } else {
+            if (node.getLeaf()) {
+                List<Map.Entry<Comparable, Object>> ens = node.getEntries();
+                for (int i = 0; i < ens.size();i++) {
+                    System.out.println(ens.get(i).getKey());
+                }
+            } else {
+                List<Node> child = node.getChildren();
+                for (int i = 0; i < child.size();i++) {
+                    visitorLeaf(child.get(i));
+                }
+            }
+        }
+    }
     public static void main(String arg[]) {
         Node root = new Node(true,true);
-        Bplustree tree = new BplustreeImpl(1000, root);
+        Bplustree tree = new BplustreeImpl(1024, root);
         Random random = new Random();
         long current = System.currentTimeMillis();
-        for (int j = 0; j < 10000; j++) {
+        for (int j = 0; j < 1000; j++) {
             for (int i = 0; i < 100; i++) {
                 int randomNumber = random.nextInt(1000);
                 tree.insert(randomNumber, randomNumber);
             }
 
-            for (int i = 0; i < 100; i++) {
-                int randomNumber = random.nextInt(1000);
-                tree.delete(randomNumber);
-            }
+//            for (int i = 0; i < 100; i++) {
+//                int randomNumber = random.nextInt(1000);
+//                tree.delete(randomNumber);
+//            }
         }
+
+//        tree.visitorLeaf(tree.getRoot());
 
         long duration = System.currentTimeMillis() - current;
         System.out.println("time elpsed for duration: " + duration);

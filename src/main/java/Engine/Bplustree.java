@@ -46,8 +46,20 @@ public interface Bplustree {
     public void setRoot(Node root);
 
     /**
+     * 获取根结点
+     * @return
+     */
+    public Node getRoot();
+
+    /**
      * 设置b+树叶子的头结点
      * @param head
      */
     public void setHead(Node head);
+
+    /**
+     * 访问输出叶子结点
+     * @param root
+     */
+    public void visitorLeaf(Node root);
 }
