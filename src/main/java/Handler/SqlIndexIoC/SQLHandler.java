@@ -1,4 +1,4 @@
-package IoC.SqlIndexIoC;
+package Handler.SqlIndexIoC;
 
 /**
  * Created by rx on 2017/8/25.

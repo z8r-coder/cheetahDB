@@ -14,6 +14,7 @@ public enum SQLASTType {
     //缺省和非缺省的预分类,中间态
     INSERT_DEFAULT("INSERT_DEFAULT", "缺省"),
     INSERT_NONE_DEFAULT("INSERT_NONE_DEFAULT", "非缺省"),
+    //插入四状态
     INSERT_SINGLE_DEFAULT("INSERT_SINGLE_DEFAULT","单行缺省插入"),
     INSERT_SINGLE("INSERT_SINGLE", "单行非缺省插入"),
     INSERT_MULT_DEFAULT("INSERT_MULT_DEFAULT","多行缺省插入"),
