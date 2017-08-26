@@ -1,5 +1,7 @@
 package Parser.AstGen;
 
+import Models.Relationship;
+import Models.Value;
 import Parser.AST;
 import Parser.ASTNode;
 import Parser.Visitor.SQLASTVisitor;
@@ -15,9 +17,9 @@ import java.util.Set;
 public class SQLUpdateAst implements BaseAST{
     private AST ast;
 
-    private Map<String, SchemaStatVisitor.Value> AssMap;
+    private Map<String, Value> AssMap;
 
-    private Set<SchemaStatVisitor.Relationship> rls;
+    private Set<Relationship> rls;
 
     private List<String> rs;
 
@@ -36,19 +38,19 @@ public class SQLUpdateAst implements BaseAST{
         return ast;
     }
 
-    public void setAssMap(Map<String, SchemaStatVisitor.Value> assMap) {
+    public void setAssMap(Map<String, Value> assMap) {
         AssMap = assMap;
     }
 
-    public Map<String, SchemaStatVisitor.Value> getAssMap() {
+    public Map<String, Value> getAssMap() {
         return AssMap;
     }
 
-    public void setRls(Set<SchemaStatVisitor.Relationship> rls) {
+    public void setRls(Set<Relationship> rls) {
         this.rls = rls;
     }
 
-    public Set<SchemaStatVisitor.Relationship> getRls() {
+    public Set<Relationship> getRls() {
         return rls;
     }
 

@@ -1,5 +1,6 @@
 package Parser.Builder.impl;
 
+import Models.Relationship;
 import Parser.AST;
 import Parser.AstGen.SQLDeleteAst;
 import Parser.Builder.SQLBuilder;
@@ -34,7 +35,7 @@ public class SQLDeleteBuilderImpl implements SQLDeleteBuilder {
         return deleteAst.getTableName();
     }
 
-    public Set<SchemaStatVisitor.Relationship> where() {
+    public Set<Relationship> where() {
         return deleteAst.getRls();
     }
 

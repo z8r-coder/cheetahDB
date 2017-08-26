@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class Table {
     private String tableName;
-    private List<SchemaStatVisitor.Column> list;
+    private List<Column> list;
 
 
 }

@@ -1,5 +1,7 @@
 package Parser.AstGen;
 
+import Models.Column;
+import Models.Value;
 import Parser.AST;
 import Parser.ASTNode;
 import Parser.Visitor.SQLASTVisitor;
@@ -15,9 +17,9 @@ public class SQLInsertAst implements BaseAST {
 
     private String tableName;
 
-    private List<SchemaStatVisitor.Column> columns;//插入columns
+    private List<Column> columns;//插入columns
 
-    private List<List<SchemaStatVisitor.Value>> list_values;//插入集合
+    private List<List<Value>> list_values;//插入集合
 
     public SQLInsertAst (AST ast) {
         this.ast = ast;
@@ -31,19 +33,19 @@ public class SQLInsertAst implements BaseAST {
         return ast;
     }
 
-    public void setColumns(List<SchemaStatVisitor.Column> columns) {
+    public void setColumns(List<Column> columns) {
         this.columns = columns;
     }
 
-    public List<SchemaStatVisitor.Column> getColumns() {
+    public List<Column> getColumns() {
         return columns;
     }
 
-    public void setValues(List<List<SchemaStatVisitor.Value>> list_values) {
+    public void setValues(List<List<Value>> list_values) {
         this.list_values = list_values;
     }
 
-    public List<List<SchemaStatVisitor.Value>> getValues() {
+    public List<List<Value>> getValues() {
         return list_values;
     }
 

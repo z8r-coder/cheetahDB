@@ -1,5 +1,7 @@
 package Parser.Builder.impl;
 
+import Models.Column;
+import Models.Relationship;
 import Parser.AST;
 import Parser.AstGen.SQLSelectAst;
 import Parser.Builder.SQLBuilder;
@@ -33,11 +35,11 @@ public class SQLSelectBuilderImpl implements SQLSelectBuilder {
         return selectAst.getTable_name();
     }
 
-    public List<SchemaStatVisitor.Column> columns() {
+    public List<Column> columns() {
         return selectAst.getSlt_col();
     }
 
-    public Set<SchemaStatVisitor.Relationship> where() {
+    public Set<Relationship> where() {
         return selectAst.getRls();
     }
 

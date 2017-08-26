@@ -1,5 +1,7 @@
 package Parser.Builder;
 
+import Models.Column;
+import Models.Value;
 import Parser.SQLASTType;
 import Parser.Visitor.SchemaStatVisitor;
 
@@ -20,13 +22,13 @@ public interface SQLInsertBuilder extends SQLBuilder {
      * 获取插入的行 todo此处可为string
      * @return
      */
-    public List<SchemaStatVisitor.Column> columns();
+    public List<Column> columns();
 
     /**
      * 获取插入的值
      * @return
      */
-    public List<List<SchemaStatVisitor.Value>> values();
+    public List<List<Value>> values();
 
     /**
      * 获取语句类型

@@ -1,5 +1,6 @@
 package Parser.Builder;
 
+import Models.Relationship;
 import Parser.SQLASTType;
 import Parser.Visitor.SchemaStatVisitor;
 
@@ -21,7 +22,7 @@ public interface SQLDeleteBuilder extends SQLBuilder {
      * where后筛选
      * @return
      */
-    public Set<SchemaStatVisitor.Relationship> where();
+    public Set<Relationship> where();
 
     /**
      * 筛选关系连接

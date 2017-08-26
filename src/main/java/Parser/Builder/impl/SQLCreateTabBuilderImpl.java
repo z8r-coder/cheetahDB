@@ -1,5 +1,6 @@
 package Parser.Builder.impl;
 
+import Models.Column;
 import Parser.AST;
 import Parser.AstGen.SQLCreateTabAST;
 import Parser.Builder.SQLBuilder;
@@ -33,7 +34,7 @@ public class SQLCreateTabBuilderImpl implements SQLCreateTabBuilder {
         return ast.getTableName();
     }
 
-    public List<SchemaStatVisitor.Column> Columns() {
+    public List<Column> Columns() {
         return ast.getColumns();
     }
 }

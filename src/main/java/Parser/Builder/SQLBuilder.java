@@ -1,6 +1,5 @@
 package Parser.Builder;
 
-import BPT.BPT;
 import Parser.AstGen.BaseAST;
 
 /**

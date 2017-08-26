@@ -1,5 +1,7 @@
 package Parser.Builder.impl;
 
+import Models.Relationship;
+import Models.Value;
 import Parser.AST;
 import Parser.AstGen.SQLUpdateAst;
 import Parser.Builder.SQLBuilder;
@@ -34,11 +36,11 @@ public class SQLUpdateBuilderImpl implements SQLUpdateBuilder {
         return updateAst.getTableName();
     }
 
-    public Map<String, SchemaStatVisitor.Value> AssValue() {
+    public Map<String, Value> AssValue() {
         return updateAst.getAssMap();
     }
 
-    public Set<SchemaStatVisitor.Relationship> where() {
+    public Set<Relationship> where() {
         return updateAst.getRls();
     }
 

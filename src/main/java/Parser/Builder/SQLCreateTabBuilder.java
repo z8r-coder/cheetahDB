@@ -1,5 +1,6 @@
 package Parser.Builder;
 
+import Models.Column;
 import Parser.SQLASTType;
 import Parser.Visitor.SchemaStatVisitor;
 
@@ -20,7 +21,7 @@ public interface SQLCreateTabBuilder extends SQLBuilder {
      * 获取创建的行信息
      * @return
      */
-    public List<SchemaStatVisitor.Column> Columns();
+    public List<Column> Columns();
 
     /**
      * 获取语句类型

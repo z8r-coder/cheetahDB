@@ -1,5 +1,6 @@
 package Utils;
 
+import Models.Column;
 import Parser.AST;
 import Parser.ASTNode;
 import Parser.Builder.*;
@@ -39,40 +40,40 @@ public class ASTTestUtils {
          * create语句测试
          */
         //create table语句测试,无约束语句，通过测试
-//        String sql = "CREATE TABLE Persons" +
-//                "         (" +
-//                "         Id_P integer(10)," +
-//                "         LastName varchar(255)," +
-//                "         FirstName varchar(255)," +
-//                "         Address varchar(255)," +
-//                "         City varchar(255)" +
-//                "         );";
-//        AST ast = SQLParserUtils.AssSQlASTgen(sql);
-//        ASTTestPrint(ast.getRoot());
-//        System.out.println();
-//        System.out.println(ast.getAstType());
-//        System.out.println("----------------------------------------------");
-//        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
-//        try {
-//            SQLCreateTabBuilderImpl scb = (SQLCreateTabBuilderImpl) sbw.getSQLBuilder();
-//            String tableName = scb.tableName();
-//            List<SchemaStatVisitor.Column> columns = scb.Columns();
-//            String gt = scb.grammerType().toString();
-//
-//            System.out.println("tableName: " + tableName);
-//            System.out.println("grammer type: " + gt);
-//            for (SchemaStatVisitor.Column column : columns) {
-//                System.out.println(" column table name=" + column.getTable());
-//                System.out.print(" column value=" + column.getName());
-//                System.out.print(" column type=" + column.getDataType());
-//                System.out.print(" column type length=" + column.getTypeLength());
-//                System.out.print(" column not null=" + column.getNotNull());
-//                System.out.print(" column is primaryKey=" + column.getPrimaryKey());
-//                System.out.print(" column is unique=" + column.getUnique());
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        String sql = "CREATE TABLE Persons" +
+                "         (" +
+                "         Id_P integer(10)," +
+                "         LastName varchar(255)," +
+                "         FirstName varchar(255)," +
+                "         Address varchar(255)," +
+                "         City varchar(255)" +
+                "         );";
+        AST ast = SQLParserUtils.AssSQlASTgen(sql);
+        ASTTestPrint(ast.getRoot());
+        System.out.println();
+        System.out.println(ast.getAstType());
+        System.out.println("----------------------------------------------");
+        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
+        try {
+            SQLCreateTabBuilderImpl scb = (SQLCreateTabBuilderImpl) sbw.getSQLBuilder();
+            String tableName = scb.tableName();
+            List<Column> columns = scb.Columns();
+            String gt = scb.grammerType().toString();
+
+            System.out.println("tableName: " + tableName);
+            System.out.println("grammer type: " + gt);
+            for (Column column : columns) {
+                System.out.println(" column table name=" + column.getTable());
+                System.out.print(" column value=" + column.getName());
+                System.out.print(" column type=" + column.getDataType());
+                System.out.print(" column type length=" + column.getTypeLength());
+                System.out.print(" column not null=" + column.getNotNull());
+                System.out.print(" column is primaryKey=" + column.getPrimaryKey());
+                System.out.print(" column is unique=" + column.getUnique());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
         //create table语句测试,含not null约束语句,通过测试

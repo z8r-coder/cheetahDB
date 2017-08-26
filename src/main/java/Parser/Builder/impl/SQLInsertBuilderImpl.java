@@ -1,5 +1,7 @@
 package Parser.Builder.impl;
 
+import Models.Column;
+import Models.Value;
 import Parser.AST;
 import Parser.AstGen.SQLInsertAst;
 import Parser.Builder.SQLBuilder;
@@ -32,11 +34,11 @@ public class SQLInsertBuilderImpl implements SQLInsertBuilder {
         return insertAst.getTableName();
     }
 
-    public List<SchemaStatVisitor.Column> columns() {
+    public List<Column> columns() {
         return insertAst.getColumns();
     }
 
-    public List<List<SchemaStatVisitor.Value>> values() {
+    public List<List<Value>> values() {
         return insertAst.getValues();
     }
 }

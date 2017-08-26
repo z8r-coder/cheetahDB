@@ -1,5 +1,6 @@
 package Parser.AstGen;
 
+import Models.Column;
 import Parser.AST;
 import Parser.ASTNode;
 import Parser.Visitor.SQLASTVisitor;
@@ -14,7 +15,7 @@ public class SQLCreateTabAST implements BaseAST{
     private AST ast;
 
     // TODO: 2017/8/13 column是否应该放在visitor内，再考虑
-    private List<SchemaStatVisitor.Column> columns;
+    private List<Column> columns;
 
     private String tableName;
     public SQLCreateTabAST(AST ast) {
@@ -29,11 +30,11 @@ public class SQLCreateTabAST implements BaseAST{
         this.ast = ast;
     }
 
-    public void setColumns(List<SchemaStatVisitor.Column> columns) {
+    public void setColumns(List<Column> columns) {
         this.columns = columns;
     }
 
-    public List<SchemaStatVisitor.Column> getColumns() {
+    public List<Column> getColumns() {
         return columns;
     }
 

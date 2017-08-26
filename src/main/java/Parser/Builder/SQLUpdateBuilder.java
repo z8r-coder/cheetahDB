@@ -1,5 +1,7 @@
 package Parser.Builder;
 
+import Models.Relationship;
+import Models.Value;
 import Parser.SQLASTType;
 import Parser.Visitor.SchemaStatVisitor;
 
@@ -21,13 +23,13 @@ public interface SQLUpdateBuilder extends SQLBuilder {
      * 获取赋值语句
      * @return
      */
-    public Map<String, SchemaStatVisitor.Value> AssValue();
+    public Map<String, Value> AssValue();
 
     /**
      * 筛选
      * @return
      */
-    public Set<SchemaStatVisitor.Relationship> where();
+    public Set<Relationship> where();
 
     /**
      * 筛选条件

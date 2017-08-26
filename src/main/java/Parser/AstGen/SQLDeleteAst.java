@@ -1,5 +1,6 @@
 package Parser.AstGen;
 
+import Models.Relationship;
 import Parser.AST;
 import Parser.ASTNode;
 import Parser.Visitor.SQLASTVisitor;
@@ -14,7 +15,7 @@ import java.util.Set;
 public class SQLDeleteAst implements BaseAST {
     private AST ast;
 
-    private Set<SchemaStatVisitor.Relationship> rls;
+    private Set<Relationship> rls;
 
     private List<String> rs;
 
@@ -47,11 +48,11 @@ public class SQLDeleteAst implements BaseAST {
         return rs;
     }
 
-    public void setRls(Set<SchemaStatVisitor.Relationship> rls) {
+    public void setRls(Set<Relationship> rls) {
         this.rls = rls;
     }
 
-    public Set<SchemaStatVisitor.Relationship> getRls() {
+    public Set<Relationship> getRls() {
         return rls;
     }
 
