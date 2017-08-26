@@ -18,16 +18,19 @@ public class Table {
     /**
      * 主键
      */
-    private List<Column> PRIMARY_KEY;
+    private List<Column> PRIMARY_KEY = new ArrayList<Column>(4);
     /**
      * 索引
      */
-    private List<Column> INDEX;
+    private List<Column> INDEX = new ArrayList<Column>(4);
     /**
      * 列
      */
     private List<Column> list = new ArrayList<Column>();
 
+    public Table(String tableName) {
+        this.tableName = tableName;
+    }
 
     public void setList(List<Column> list) {
         this.list = list;
