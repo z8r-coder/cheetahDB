@@ -1,5 +1,7 @@
 package Models;
 
+import Utils.StringUtils;
+
 /**
  * Created by rx on 2017/8/26.
  */
@@ -48,5 +50,26 @@ public class Value {
 
     public String getDataType() {
         return dataType;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        Value value = (Value) object;
+        if (!StringUtils.equals(val, value.getVal())) {
+            return false;
+        }
+
+        if (!StringUtils.equals(dataType, value.getDataType())) {
+            return false;
+        }
+
+        if (in != value.getIsIn()) {
+            return false;
+        }
+
+        if (insert != value.getIsInsert()) {
+            return false;
+        }
+        return true;
     }
 }

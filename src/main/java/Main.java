@@ -1,3 +1,5 @@
+import Models.Column;
+
 import java.util.Scanner;
 
 /**
@@ -5,6 +7,7 @@ import java.util.Scanner;
  */
 public class Main {
     public static void main(String args[]) {
-        
+        Column column = new Column();
+        System.out.println(column.getNotNull());
     }
 }

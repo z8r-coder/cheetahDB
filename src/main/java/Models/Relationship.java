@@ -97,4 +97,6 @@ public class Relationship {
     public String toString() {
         return left + " " + operator + right;
     }
+
+
 }

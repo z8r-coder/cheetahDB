@@ -1,7 +1,9 @@
 package Handler.SqlIndexIoC;
 
+import Models.Table;
 import Parser.AST;
 import Parser.Builder.SQLBuilderWraper;
+import Parser.Builder.SQLCreateTabBuilder;
 import Parser.SQLASTType;
 import Parser.SQLParserUtils;
 import Support.Logging.Log;
@@ -10,6 +12,7 @@ import Utils.ASTTestUtils;
 
 /**
  * Created by rx on 2017/8/25.
+ * 语句handler
  */
 public class SQLBptHandler implements SQLHandler {
 
@@ -58,7 +61,13 @@ public class SQLBptHandler implements SQLHandler {
     }
 
     public void executeCreateTab(SQLBuilderWraper builderWraper) {
-
+        try {
+            SQLCreateTabBuilder createTabBuilder = (SQLCreateTabBuilder) builderWraper.getSQLBuilder();
+            Table table = new Table();
+            String tableName = createTabBuilder.tableName();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void executeInsert(SQLBuilderWraper builderWraper) {

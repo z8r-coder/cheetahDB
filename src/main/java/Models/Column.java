@@ -3,6 +3,7 @@ package Models;
 import Parser.SQLDataType;
 import Parser.Token;
 import Utils.StringUtils;
+import Utils.TokenUtils;
 
 /**
  * Created by rx on 2017/8/26.
@@ -109,6 +110,14 @@ public class Column {
         return insert;
     }
 
+    public void setToken(Token token) {
+        this.token = token;
+    }
+
+    public Token getToken() {
+        return token;
+    }
+
     @Override
     public int hashCode() {
         int tableHashCode = table != null ? StringUtils.lowerHashCode(table) : 0;
@@ -123,5 +132,54 @@ public class Column {
             return table + "." + name;
         }
         return name;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        Column column = (Column) object;
+        if (!StringUtils.equals(column.getTable(), table)) {
+            return false;
+        }
+        if (!StringUtils.equals(column.getName(), name)) {
+            return false;
+        }
+        if (!TokenUtils.equals(token, column.getToken())) {
+            return false;
+        }
+        if (where != column.getWhere()) {
+            return false;
+        }
+        if (select != column.getSelect()) {
+            return false;
+        }
+
+        if (insert != column.getInsert()) {
+            return false;
+        }
+
+        if (primaryKey != column.getPrimaryKey()) {
+            return false;
+        }
+
+        if (notNull != column.getNotNull()) {
+            return false;
+        }
+
+        if (unique != column.getUnique()) {
+            return false;
+        }
+
+        if (dataType == null) {
+            return column.dataType == null;
+        }
+
+        if (dataType != column.getDataType()) {
+            return false;
+        }
+
+        if (typeLength != column.getTypeLength()) {
+            return false;
+        }
+        return true;
     }
 }
