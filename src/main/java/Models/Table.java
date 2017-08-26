@@ -1,8 +1,11 @@
 package Models;
 
+import Engine.Bplustree;
 import Parser.Visitor.SchemaStatVisitor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +13,7 @@ import java.util.Map;
  * Created by rx on 2017/8/19.
  * 表bean
  */
-public class Table {
+public class Table implements Serializable{
     /**
      * 表名
      */
@@ -26,18 +29,46 @@ public class Table {
     /**
      * 列
      */
-    private List<Column> list = new ArrayList<Column>();
+    private List<Column> columns = new ArrayList<Column>();
 
-    public Table(String tableName) {
+    /**
+     * 行
+     */
+    private List<Row> rows = new ArrayList<Row>();
+    /**
+     * 不可空的列
+     */
+    private List<Column> notNull = new ArrayList<Column>();
+
+    /**
+     * 唯一的列
+     */
+    private List<Column> unique = new ArrayList<Column>();
+    /**
+     * 索引树
+     */
+    private Map<String, Bplustree> INDEX_TREE = new HashMap<String, Bplustree>();
+
+    /**
+     * 名字映射对应的列
+     */
+    private Map<String, Column> columnMap = new HashMap<String, Column>();
+
+    public Table(String tableName, List<Column> columns) {
         this.tableName = tableName;
+        this.columns = columns;
+
+        for (Column column : columns) {
+            columnMap.put(column.getName(), column);
+        }
     }
 
-    public void setList(List<Column> list) {
-        this.list = list;
+    public void setColumns(List<Column> columns) {
+        this.columns = columns;
     }
 
-    public List<Column> getList() {
-        return list;
+    public List<Column> getColumns() {
+        return columns;
     }
 
     public void setTableName(String tableName) {
@@ -62,6 +93,44 @@ public class Table {
 
     public List<Column> getPRIMARY_KEY() {
         return PRIMARY_KEY;
+    }
+
+    public void setINDEX_TREE(Map<String, Bplustree> INDEX_TREE) {
+        this.INDEX_TREE = INDEX_TREE;
+    }
+
+    public void setNotNull(List<Column> notNull) {
+        this.notNull = notNull;
+    }
+
+    public List<Column> getNotNull() {
+        return notNull;
+    }
+
+    public Map<String, Bplustree> getINDEX_TREE() {
+        return INDEX_TREE;
+    }
+
+    public void setUnique(List<Column> unique) {
+        this.unique = unique;
+    }
+
+    public List<Column> getUnique() {
+        return unique;
+    }
+
+    /**
+     * 主键集合中是否包含该列
+     * @param column
+     * @return
+     */
+    public boolean primaryContain(Column column) {
+        for (Column col : PRIMARY_KEY) {
+            if (col.equals(column)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -95,5 +164,35 @@ public class Table {
         INDEX.remove(index);
     }
 
+    /**
+     * 添加索引树
+     * @param bplustree
+     */
+    public void putIndexTree(String name,Bplustree bplustree) {
+        INDEX_TREE.put(name, bplustree);
+    }
 
+    /**
+     * 添加不可空的列
+     * @param column
+     */
+    public void addNotNull (Column column) {
+        notNull.add(column);
+    }
+
+    /**
+     * 添加行空间
+     * @param row
+     */
+    public void addRow(Row row) {
+        rows.add(row);
+    }
+
+    /**
+     * 添加唯一约束的列
+     * @param column
+     */
+    public void addUnique(Column column) {
+        unique.add(column);
+    }
 }

@@ -1,5 +1,11 @@
 package Handler.SqlIndexIoC;
 
+import Engine.BPlusTree.BplustreeImpl;
+import Engine.BPlusTree.Node;
+import Engine.Bplustree;
+import Models.Column;
+import Models.DataBase;
+import Models.Row;
 import Models.Table;
 import Parser.AST;
 import Parser.Builder.SQLBuilderWraper;
@@ -10,14 +16,19 @@ import Support.Logging.Log;
 import Support.Logging.LogFactory;
 import Utils.ASTTestUtils;
 
+import java.util.List;
+
 /**
  * Created by rx on 2017/8/25.
  * 语句handler
  */
 public class SQLBptHandler implements SQLHandler {
-
+    private DataBase db;
     private final static Log LOG = LogFactory.getLog(ASTTestUtils.class);
 
+    public SQLBptHandler(DataBase db) {
+        this.db = db;
+    }
     public void execute(String sql) {
         AST ast = SQLParserUtils.AssSQlASTgen(sql);
         SQLBuilderWraper builderWraper = new SQLBuilderWraper(sql);
@@ -63,8 +74,32 @@ public class SQLBptHandler implements SQLHandler {
     public void executeCreateTab(SQLBuilderWraper builderWraper) {
         try {
             SQLCreateTabBuilder createTabBuilder = (SQLCreateTabBuilder) builderWraper.getSQLBuilder();
-            Table table = new Table();
             String tableName = createTabBuilder.tableName();
+            List<Column> columns = createTabBuilder.Columns();
+            //生成表空间
+            Table table = new Table(tableName, columns);
+
+            for (Column column : columns) {
+                if (column.getPrimaryKey()) {
+                    //主键默认不可空，默认唯一，目前支持一个主键
+                    table.addPrimaryKey(column);
+                    table.addIndex(column);
+                } else if (column.getNotNull()) {
+                    //保持列和主键的唯一不重复
+                    if (!table.primaryContain(column)) {
+                        table.addNotNull(column);
+                    }
+
+                } else if (column.getUnique()) {
+                    if (!table.primaryContain(column)) {
+                        table.addUnique(column);
+                    }
+                }
+            }
+            //建立主键索引树
+            Node<List<Row>> root = new Node(true, true);
+            Bplustree bpt = new BplustreeImpl(6, root);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

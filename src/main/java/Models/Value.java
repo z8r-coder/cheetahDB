@@ -5,9 +5,15 @@ import Utils.StringUtils;
 /**
  * Created by rx on 2017/8/26.
  */
-public class Value {
+public class Value implements Comparable {
+    /**
+     * 值
+     */
     private String          val;
-    private String          dataType;
+    /**
+     * 对应的列名
+     */
+    private String          columName;
     private boolean         in;
     private boolean         insert;
 
@@ -15,9 +21,9 @@ public class Value {
 
     }
 
-    public Value(String val, String dataType) {
+    public Value(String val, String columName) {
         this.val = val;
-        this.dataType = dataType;
+        this.columName = columName;
     }
 
     public void setIsIn(boolean in) {
@@ -44,12 +50,12 @@ public class Value {
         return insert;
     }
 
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
+    public void setColumName(String columName) {
+        this.columName = columName;
     }
 
-    public String getDataType() {
-        return dataType;
+    public String getColumName() {
+        return columName;
     }
 
     @Override
@@ -59,7 +65,7 @@ public class Value {
             return false;
         }
 
-        if (!StringUtils.equals(dataType, value.getDataType())) {
+        if (!StringUtils.equals(columName, value.getColumName())) {
             return false;
         }
 
@@ -71,5 +77,10 @@ public class Value {
             return false;
         }
         return true;
+    }
+
+    public int compareTo(Object object) {
+        Value value = (Value) object;
+        return val.compareTo(value.getVal());
     }
 }

@@ -10,32 +10,32 @@ import java.util.*;
  *            res > 0  this > value
  * Created by rx on 2017/8/21.
  */
-public class Node {
+public class Node<T> {
     private boolean leaf;
 
     private boolean root;
 
-    private Node parent;
+    private Node<T> parent;
 
-    private Node previous;//叶子结点的前驱结点
+    private Node<T> previous;//叶子结点的前驱结点
 
-    private Node next;//叶子结点后继结点
+    private Node<T> next;//叶子结点后继结点
 
-    private List<Map.Entry<Comparable, Object>> entries = new ArrayList<Map.Entry<Comparable, Object>>(1024);
+    private List<Map.Entry<Comparable, T>> entries = new ArrayList<Map.Entry<Comparable, T>>(1024);
 
-    private List<Node> children;
+    private List<Node<T>> children;
 
     public Node(boolean leaf) {
         this.leaf = leaf;
         if (!leaf) {
-            children = new ArrayList<Node>();
+            children = new ArrayList<Node<T>>();
         }
     }
     public Node(boolean leaf, boolean root) {
         this.leaf = leaf;
         this.root = root;
         if (!leaf) {
-            children = new ArrayList<Node>();
+            children = new ArrayList<Node<T>>();
         }
     }
 
@@ -47,11 +47,11 @@ public class Node {
         return root;
     }
 
-    public void setChildren(List<Node> children) {
+    public void setChildren(List<Node<T>> children) {
         this.children = children;
     }
 
-    public List<Node> getChildren() {
+    public List<Node<T>> getChildren() {
         return children;
     }
 
@@ -63,11 +63,11 @@ public class Node {
         return leaf;
     }
 
-    public void setEntries(List<Map.Entry<Comparable, Object>> entries) {
+    public void setEntries(List<Map.Entry<Comparable, T>> entries) {
         this.entries = entries;
     }
 
-    public List<Map.Entry<Comparable, Object>> getEntries() {
+    public List<Map.Entry<Comparable, T>> getEntries() {
         return entries;
     }
 
@@ -97,7 +97,7 @@ public class Node {
 
     public Object search(Comparable key) {
         if (leaf) {
-            for (Map.Entry<Comparable, Object> entry : entries) {
+            for (Map.Entry<Comparable, T> entry : entries) {
                 if (entry.getKey().compareTo(key) == 0) {
                     return entry.getValue();
                 }
@@ -141,7 +141,7 @@ public class Node {
                             previous.getEntries().size() > 2 &&
                             previous.getParent() == parent) {
                         int preSize = previous.getEntries().size();
-                        Map.Entry<Comparable, Object> entry = previous.getEntries().get(preSize - 1);
+                        Map.Entry<Comparable, T> entry = previous.getEntries().get(preSize - 1);
                         previous.getEntries().remove(entry);
 
                         entries.add(0, entry);
@@ -150,7 +150,7 @@ public class Node {
                             next.getEntries().size() > bpt.getOrder() / 2 &&
                             next.getEntries().size() > 2 &&
                             next.getParent() == parent) {
-                        Map.Entry<Comparable, Object> entry = next.getEntries().get(0);
+                        Map.Entry<Comparable, T> entry = next.getEntries().get(0);
                         next.getEntries().remove(entry);
 
                         entries.add(entry);
@@ -251,7 +251,7 @@ public class Node {
                 int currentIndex = parent.getChildren().indexOf(this);
                 int preIndex = currentIndex - 1;
                 int nextIndex = currentIndex + 1;
-                Node previous = null, next = null;
+                Node<T> previous = null, next = null;
 
                 if (preIndex >= 0) {
                     previous = parent.getChildren().get(preIndex);
@@ -264,7 +264,7 @@ public class Node {
                         previous.getChildren().size() > bpt.getOrder() / 2 &&
                         previous.getChildren().size() > 2) {
                     int idx = previous.getChildren().size() - 1;
-                    Node borrow =previous.getChildren().get(idx);
+                    Node<T> borrow =previous.getChildren().get(idx);
                     previous.getChildren().remove(idx);
                     borrow.setParent(this);
                     children.add(0, borrow);
@@ -337,7 +337,7 @@ public class Node {
      * @param obj
      * @param bpt
      */
-    public void insert(Comparable key, Object obj, Bplustree bpt) {
+    public void insert(Comparable key, T obj, Bplustree bpt) {
         if (leaf) {
             //叶子结点
             int tmpindex = contains(key);
@@ -349,8 +349,8 @@ public class Node {
                 }
             } else {
                 //需要分裂
-                Node left = new Node(true);
-                Node right = new Node(true);
+                Node<T> left = new Node(true);
+                Node<T> right = new Node(true);
 
                 if (previous != null) {
                     previous.setNext(left);
@@ -431,8 +431,8 @@ public class Node {
      * @param key
      * @param obj
      */
-    public void insert(Comparable key, Object obj) {
-        Map.Entry<Comparable, Object> entry = new SimpleEntry<Comparable, Object>(key, obj);
+    public void insert(Comparable key, T obj) {
+        Map.Entry<Comparable, T> entry = new SimpleEntry<Comparable, T>(key, obj);
         if (entries.size() == 0) {
             entries.add(entry);
             return;
@@ -447,7 +447,7 @@ public class Node {
 
         entries.add(entry);
     }
-    public void update(Comparable key, Object obj) {
+    public void update(Comparable key, T obj) {
         if (!leaf) {
             //非叶子节点
             if (key.compareTo(entries.get(0).getKey()) <= 0) {
@@ -535,7 +535,7 @@ public class Node {
      * @param node
      * @param bpt
      */
-    protected static void validate(Node node, Bplustree bpt) {
+    protected void validate(Node<T> node, Bplustree bpt) {
         if (node.getEntries().size() == node.getChildren().size()) {
             //关键字和子结点数目相同
             for (int i = 0; i < node.getEntries().size();i++) {
@@ -543,7 +543,7 @@ public class Node {
                 Comparable key = node.getChildren().get(i).getEntries().get(0).getKey();
                 if (node.getEntries().get(i).getKey().compareTo(key) != 0) {
                     node.getEntries().remove(i);
-                    node.getEntries().add(i, new SimpleEntry<Comparable, Object>(key, null));
+                    node.getEntries().add(i, new SimpleEntry<Comparable, T>(key, null));
                     if (!node.root) {
                         validate(node.getParent(), bpt);
                     }
@@ -557,7 +557,7 @@ public class Node {
             node.getEntries().clear();
             for (int i = 0; i < node.getChildren().size();i++) {
                 Comparable key = node.getChildren().get(i).getEntries().get(0).getKey();
-                node.getEntries().add(new SimpleEntry<Comparable, Object>(key, null));
+                node.getEntries().add(new SimpleEntry<Comparable, T>(key, null));
                 if (!node.root) {
                     validate(node.getParent(), bpt);
                 }

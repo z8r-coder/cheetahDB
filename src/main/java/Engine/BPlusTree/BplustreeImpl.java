@@ -88,7 +88,7 @@ public class BplustreeImpl implements Bplustree {
         }
     }
     public static void main(String arg[]) {
-        Node root = new Node(true,true);
+        Node<Integer> root = new Node(true,true);
         Bplustree tree = new BplustreeImpl(1024, root);
         Random random = new Random();
         long current = System.currentTimeMillis();
@@ -98,10 +98,10 @@ public class BplustreeImpl implements Bplustree {
                 tree.insert(randomNumber, randomNumber);
             }
 
-//            for (int i = 0; i < 100; i++) {
-//                int randomNumber = random.nextInt(1000);
-//                tree.delete(randomNumber);
-//            }
+            for (int i = 0; i < 100; i++) {
+                int randomNumber = random.nextInt(1000);
+                tree.delete(randomNumber);
+            }
         }
 
 //        tree.visitorLeaf(tree.getRoot());
