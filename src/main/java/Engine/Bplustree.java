@@ -11,7 +11,7 @@ public interface Bplustree {
      * @param key
      * @return
      */
-    public Object Search(Comparable key);
+    public Object search(Comparable key);
 
     /**
      * 移除

@@ -53,7 +53,7 @@ public class BplustreeImpl implements Bplustree {
         return order;
     }
 
-    public Object Search(Comparable key) {
+    public Object search(Comparable key) {
         //0 true 1 false
 
         return root.search(key);
@@ -99,10 +99,10 @@ public class BplustreeImpl implements Bplustree {
                 tree.insert(randomNumber, randomNumber);
             }
 
-            for (int i = 0; i < 100; i++) {
-                int randomNumber = random.nextInt(1000);
-                tree.delete(randomNumber);
-            }
+//            for (int i = 0; i < 100; i++) {
+//                int randomNumber = random.nextInt(1000);
+//                tree.delete(randomNumber);
+//            }
         }
 
 //        tree.visitorLeaf(tree.getRoot());
@@ -110,6 +110,6 @@ public class BplustreeImpl implements Bplustree {
         long duration = System.currentTimeMillis() - current;
         System.out.println("time elpsed for duration: " + duration);
         int search = 80;
-        System.out.print(tree.Search(search));
+        System.out.print(tree.search(search));
     }
 }

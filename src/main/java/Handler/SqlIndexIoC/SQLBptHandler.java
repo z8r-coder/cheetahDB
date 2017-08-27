@@ -130,7 +130,7 @@ public class SQLBptHandler implements SQLHandler {
             }
             //建立主键索引树
             for (Column column : table.getINDEX()) {
-                Node<List<Row>> root = new Node(true, true);
+                Node<Row> root = new Node(true, true);
                 Bplustree bpt = new BplustreeImpl(6, root);
 
                 table.putIndexTree(column.getName(), bpt);

@@ -1,7 +1,6 @@
 package Service.SQLBptService.InsertService;
 
 import Constants.SQLErrorCode;
-import Engine.BPlusTree.Node;
 import Engine.Bplustree;
 import Models.Column;
 import Models.Row;
@@ -60,15 +59,17 @@ public class InsertSingleService implements InsertService{
                 //设置该行的主键value
                 row.setPRIMARY_KEY(singleValues.get(i));
             }
+
+            if (row.getPRIMARY_KEY() == null) {
+                throw new InsertException(SQLErrorCode.SQL00006);
+            }
+
             String colName = column.getName();
             Value val = singleValues.get(i);
 
             val.setColumName(colName);
             //若存在插入列相同的，则以最后门面列的值为准
             valueMap.put(colName, val);
-        }
-        if (row.getPRIMARY_KEY() == null) {
-            throw new InsertException(SQLErrorCode.SQL00006);
         }
 
         List<Value> insertValue = new ArrayList<Value>();
@@ -79,13 +80,27 @@ public class InsertSingleService implements InsertService{
                     //若不允许为空
                     throw new InsertException(SQLErrorCode.SQL00008);
                 }
+                //unique约束的column可以插入多个列
                 Value value = new Value("NULL", SQLDataType.NULL);
+                value.setColumName(column.getName());
                 insertValue.add(value);
             } else {
-
+                Value value = valueMap.get(column.getName());
+                insertValue.add(value);
             }
         }
 
+        row.setValues(insertValue);
+        //索引值
+        Value indexValue = row.getPRIMARY_KEY();
+        Bplustree bpt = table.getIndexTree(indexValue.getColumName());
+
+        //维护索引树
+        if (bpt.search(indexValue) != null) {
+            //主键冲突
+            throw new InsertException(SQLErrorCode.SQL00009);
+        }
+        bpt.insert(indexValue, row);
         //将该行添加到表空间
         table.addRow(row);
     }
