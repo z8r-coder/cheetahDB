@@ -34,8 +34,8 @@ public class SQLInsertBuilderImpl implements SQLInsertBuilder {
         return insertAst.getTableName();
     }
 
-    public List<Column> columns() {
-        return insertAst.getColumns();
+    public List<String> columnName() {
+        return insertAst.getColumnNames();
     }
 
     public List<List<Value>> values() {

@@ -118,6 +118,10 @@ public class Table implements Serializable{
     public List<Column> getUnique() {
         return unique;
     }
+
+    public Map<String, Column> getColumnMap() {
+        return columnMap;
+    }
     /**
      * 添加索引
      * @param index

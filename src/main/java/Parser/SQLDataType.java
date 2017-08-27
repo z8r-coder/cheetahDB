@@ -7,6 +7,7 @@ package Parser;
 public enum SQLDataType {
     VARCHAR("VARCHAR","变长字符串"),
     INTEGER("INTEGER","整型"),
+    NULL("NULL", "空类型"),
     ;
     /**
      * 类型

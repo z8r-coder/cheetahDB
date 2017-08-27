@@ -163,7 +163,7 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
                 ASTNode column_list_node = i_node.getChildSet().get(4);
                 logger.info("INSERT_SINGLE,insert column_list_node:" + column_list_node.getValue());
 
-                List<Column> columns = visitInsertColumn(column_list_node, "INSERT", table_name);
+                List<String> columnName = visitInsertColumn(column_list_node, "INSERT", table_name);
 
                 ASTNode value_list_node = i_node.getChildSet().get(8);
 
@@ -173,14 +173,14 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
 
                 ast.setTableName(table_name);
                 ast.setValues(mutil_list);
-                ast.setColumns(columns);
+                ast.setColumnNames(columnName);
                 break;
             case INSERT_MULT:
                 //多行非缺省插入
                 ASTNode column_list_node_mult = i_node.getChildSet().get(4);
                 logger.info("INSERT_MULT,insert column_list_node:" + column_list_node_mult.getValue());
 
-                List<Column> columns_mult = visitInsertColumn(column_list_node_mult, "INSERT", table_name);
+                List<String> mult_columnName = visitInsertColumn(column_list_node_mult, "INSERT", table_name);
 
                 List<List<Value>> mults_values = new ArrayList<List<Value>>();
                 List<ASTNode> nodes = i_node.getChildSet();
@@ -191,7 +191,7 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
                         mults_values.add(values);
                     }
                 }
-                ast.setColumns(columns_mult);
+                ast.setColumnNames(mult_columnName);
                 ast.setValues(mults_values);
                 ast.setTableName(table_name);
                 break;
@@ -215,21 +215,19 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
         }
 
     }
-    private List<Column> visitInsertColumn(ASTNode astNode, String opname, String tableName) {
+    private List<String> visitInsertColumn(ASTNode astNode, String opname, String tableName) {
         List<ASTNode> nodes = astNode.getChildSet();
 
-        List<Column> columns = new ArrayList<Column>();
+        List<String> columnName = new ArrayList<String>();
         for (ASTNode node : nodes) {
             if (node.getSortCode() == SortCode.IDENTIFIED) {
                 //column name
                 if (StringUtils.equals(opname, "INSERT")) {
-                    Column column = new Column(tableName, node.getValue());
-                    column.setInsert(true);
-                    columns.add(column);
+                    columnName.add(node.getValue());
                 }
             }
         }
-        return columns;
+        return columnName;
     }
     private List<Value> visitValue(ASTNode astNode, String opname) {
         List<ASTNode> nodes = astNode.getChildSet();

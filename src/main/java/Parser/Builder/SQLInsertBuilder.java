@@ -22,7 +22,7 @@ public interface SQLInsertBuilder extends SQLBuilder {
      * 获取插入的行 todo此处可为string
      * @return
      */
-    public List<Column> columns();
+    public List<String> columnName();
 
     /**
      * 获取插入的值

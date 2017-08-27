@@ -1,7 +1,9 @@
 package Models;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 行描述
@@ -12,6 +14,10 @@ public class Row {
      * 该行的主键
      */
     private Value PRIMARY_KEY;
+    /**
+     * 名-值映射
+     */
+    private Map<String, Value> valueMap = new HashMap<String, Value>();
     /**
      * 该行的所有值
      */
@@ -38,5 +44,17 @@ public class Row {
 
     public List<Value> getValues() {
         return values;
+    }
+
+    public Value getValue(String name) {
+        return valueMap.get(name);
+    }
+
+    public void putValue(String name, Value value) {
+        valueMap.put(name, value);
+    }
+
+    public void putAllValue(List<Value> values) {
+
     }
 }

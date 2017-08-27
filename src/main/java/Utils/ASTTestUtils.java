@@ -1,6 +1,7 @@
 package Utils;
 
 import Models.Column;
+import Models.Value;
 import Parser.AST;
 import Parser.ASTNode;
 import Parser.Builder.*;
@@ -40,40 +41,40 @@ public class ASTTestUtils {
          * create语句测试
          */
         //create table语句测试,无约束语句，通过测试
-        String sql = "CREATE TABLE Persons" +
-                "         (" +
-                "         Id_P integer(10)," +
-                "         LastName varchar(255)," +
-                "         FirstName varchar(255)," +
-                "         Address varchar(255)," +
-                "         City varchar(255)" +
-                "         );";
-        AST ast = SQLParserUtils.AssSQlASTgen(sql);
-        ASTTestPrint(ast.getRoot());
-        System.out.println();
-        System.out.println(ast.getAstType());
-        System.out.println("----------------------------------------------");
-        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
-        try {
-            SQLCreateTabBuilderImpl scb = (SQLCreateTabBuilderImpl) sbw.getSQLBuilder();
-            String tableName = scb.tableName();
-            List<Column> columns = scb.Columns();
-            String gt = scb.grammerType().toString();
-
-            System.out.println("tableName: " + tableName);
-            System.out.println("grammer type: " + gt);
-            for (Column column : columns) {
-                System.out.println(" column table name=" + column.getTable());
-                System.out.print(" column value=" + column.getName());
-                System.out.print(" column type=" + column.getDataType());
-                System.out.print(" column type length=" + column.getTypeLength());
-                System.out.print(" column not null=" + column.getNotNull());
-                System.out.print(" column is primaryKey=" + column.getPrimaryKey());
-                System.out.print(" column is unique=" + column.getUnique());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        String sql = "CREATE TABLE Persons" +
+//                "         (" +
+//                "         Id_P integer(10)," +
+//                "         LastName varchar(255)," +
+//                "         FirstName varchar(255)," +
+//                "         Address varchar(255)," +
+//                "         City varchar(255)" +
+//                "         );";
+//        AST ast = SQLParserUtils.AssSQlASTgen(sql);
+//        ASTTestPrint(ast.getRoot());
+//        System.out.println();
+//        System.out.println(ast.getAstType());
+//        System.out.println("----------------------------------------------");
+//        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
+//        try {
+//            SQLCreateTabBuilderImpl scb = (SQLCreateTabBuilderImpl) sbw.getSQLBuilder();
+//            String tableName = scb.tableName();
+//            List<Column> columns = scb.Columns();
+//            String gt = scb.grammerType().toString();
+//
+//            System.out.println("tableName: " + tableName);
+//            System.out.println("grammer type: " + gt);
+//            for (Column column : columns) {
+//                System.out.println(" column table name=" + column.getTable());
+//                System.out.print(" column value=" + column.getName());
+//                System.out.print(" column type=" + column.getDataType());
+//                System.out.print(" column type length=" + column.getTypeLength());
+//                System.out.print(" column not null=" + column.getNotNull());
+//                System.out.print(" column is primaryKey=" + column.getPrimaryKey());
+//                System.out.print(" column is unique=" + column.getUnique());
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
 
         //create table语句测试,含not null约束语句,通过测试
@@ -309,15 +310,15 @@ public class ASTTestUtils {
 //        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
 //        try {
 //            SQLInsertBuilderImpl sib = (SQLInsertBuilderImpl) sbw.getSQLBuilder();
-//            List<List<SchemaStatVisitor.Value>> values = sib.values();
+//            List<List<Value>> values = sib.values();
 //            String tableName = sib.from();
-//            List<SchemaStatVisitor.Column> columns = sib.columns();
-//            for (SchemaStatVisitor.Column column : columns) {
-//                System.out.print("column name = " + column.getName() + "  ");
+//            List<String> columnNames = sib.columnName();
+//            for (String str : columnNames) {
+//                System.out.print("column name = " + str + "  ");
 //            }
 //            System.out.println();
-//            for (List<SchemaStatVisitor.Value> list_value : values) {
-//                for (SchemaStatVisitor.Value value : list_value) {
+//            for (List<Value> list_value : values) {
+//                for (Value value : list_value) {
 //                    System.out.print("value = " + value.getVal() + "  ");
 //                }
 //                System.out.println();
@@ -329,38 +330,38 @@ public class ASTTestUtils {
 //        }
 
         //多行插入非缺省值测试通过
-//        String sql = "insert into persons" +
-//                "(id_p, lastname , firstName, city )" +
-//                "values" +
-//                "(200,'haha' , 'deng' , 'shenzhen')," +
-//                "(201,'haha2' , 'deng' , 'GD')," +
-//                "(202,'haha3' , 'deng' , 'Beijing');";
-//        AST ast = SQLParserUtils.AssSQlASTgen(sql);
-//        ASTTestPrint(ast.getRoot());
-//        System.out.println();
-//        System.out.println(ast.getAstType());
-//        System.out.println("----------------------------------------------");
-//        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
-//        try {
-//            SQLInsertBuilderImpl sib = (SQLInsertBuilderImpl) sbw.getSQLBuilder();
-//            List<List<SchemaStatVisitor.Value>> values = sib.values();
-//            String tableName = sib.from();
-//            List<SchemaStatVisitor.Column> columns = sib.columns();
-//            for (SchemaStatVisitor.Column column : columns) {
-//                System.out.print("column name = " + column.getName() + "  ");
-//            }
-//            System.out.println();
-//            for (List<SchemaStatVisitor.Value> list_value : values) {
-//                for (SchemaStatVisitor.Value value : list_value) {
-//                    System.out.print("value = " + value.getVal() + "  ");
-//                }
-//                System.out.println();
-//            }
-//            System.out.println("tableName=" + tableName);
-//            System.out.println("sql type:" + sib.grammerType());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        String sql = "insert into persons" +
+                "(id_p, lastname , firstName, city )" +
+                "values" +
+                "(200,'haha' , 'deng' , 'shenzhen')," +
+                "(201,'haha2' , 'deng' , 'GD')," +
+                "(202,'haha3' , 'deng' , 'Beijing');";
+        AST ast = SQLParserUtils.AssSQlASTgen(sql);
+        ASTTestPrint(ast.getRoot());
+        System.out.println();
+        System.out.println(ast.getAstType());
+        System.out.println("----------------------------------------------");
+        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
+        try {
+            SQLInsertBuilderImpl sib = (SQLInsertBuilderImpl) sbw.getSQLBuilder();
+            List<List<Value>> values = sib.values();
+            String tableName = sib.from();
+            List<String> columnName = sib.columnName();
+            for (String str : columnName) {
+                System.out.print("column name = " + str + "  ");
+            }
+            System.out.println();
+            for (List<Value> list_value : values) {
+                for (Value value : list_value) {
+                    System.out.print("value = " + value.getVal() + "  ");
+                }
+                System.out.println();
+            }
+            System.out.println("tableName=" + tableName);
+            System.out.println("sql type:" + sib.grammerType());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //多行插入缺省值测试通过
 //        String sql = "insert into persons " +

@@ -17,7 +17,7 @@ public class SQLInsertAst implements BaseAST {
 
     private String tableName;
 
-    private List<Column> columns;//插入columns
+    private List<String> columnNames;//插入column名
 
     private List<List<Value>> list_values;//插入集合
 
@@ -33,12 +33,12 @@ public class SQLInsertAst implements BaseAST {
         return ast;
     }
 
-    public void setColumns(List<Column> columns) {
-        this.columns = columns;
+    public void setColumnNames(List<String> columnNames) {
+        this.columnNames = columnNames;
     }
 
-    public List<Column> getColumns() {
-        return columns;
+    public List<String> getColumnNames() {
+        return columnNames;
     }
 
     public void setValues(List<List<Value>> list_values) {
