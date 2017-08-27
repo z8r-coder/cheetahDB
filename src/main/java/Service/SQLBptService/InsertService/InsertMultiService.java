@@ -69,14 +69,16 @@ public class InsertMultiService implements InsertService{
                     rows.get(j).setPRIMARY_KEY(vv.get(i));
                 }
 
-                for (Row row : rows) {
-                    if (row.getPRIMARY_KEY() == null) {
-                        throw new InsertException(SQLErrorCode.SQL00006);
-                    }
-                }
                 Value value = vv.get(i);
                 value.setColumName(colName);
                 valueMaps.get(j).put(colName, value);
+            }
+        }
+
+        //检查是否有主键
+        for (Row row : rows) {
+            if (row.getPRIMARY_KEY() == null) {
+                throw new InsertException(SQLErrorCode.SQL00006);
             }
         }
 

@@ -60,16 +60,16 @@ public class InsertSingleService implements InsertService{
                 row.setPRIMARY_KEY(singleValues.get(i));
             }
 
-            if (row.getPRIMARY_KEY() == null) {
-                throw new InsertException(SQLErrorCode.SQL00006);
-            }
-
             String colName = column.getName();
             Value val = singleValues.get(i);
 
             val.setColumName(colName);
             //若存在插入列相同的，则以最后门面列的值为准
             valueMap.put(colName, val);
+        }
+
+        if (row.getPRIMARY_KEY() == null) {
+            throw new InsertException(SQLErrorCode.SQL00006);
         }
 
         List<Value> insertValue = new ArrayList<Value>();

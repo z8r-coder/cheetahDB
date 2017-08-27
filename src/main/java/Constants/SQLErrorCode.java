@@ -15,6 +15,7 @@ public enum SQLErrorCode {
     SQL00007("SQL00007", "插入的列不存在"),
     SQL00008("SQL00008", "违反NotNull约束"),
     SQL00009("SQL00009", "主键冲突"),
+    SQL00010("SQL00010", "插入值多于列"),
 
     SQL000015("SQL000015", "带where的更新失败"),
     SQL000016("SQL000016", "不带where的更新失败"),
