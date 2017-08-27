@@ -19,9 +19,9 @@ public class Table implements Serializable{
      */
     private String tableName;
     /**
-     * 主键
+     * 主键, 暂时使用单主键模式
      */
-    private List<Column> PRIMARY_KEY = new ArrayList<Column>(4);
+    private Column PRIMARY_KEY;
     /**
      * 索引
      */
@@ -87,11 +87,11 @@ public class Table implements Serializable{
         return INDEX;
     }
 
-    public void setPRIMARY_KEY(List<Column> PRIMARY_KEY) {
+    public void setPRIMARY_KEY(Column PRIMARY_KEY) {
         this.PRIMARY_KEY = PRIMARY_KEY;
     }
 
-    public List<Column> getPRIMARY_KEY() {
+    public Column getPRIMARY_KEY() {
         return PRIMARY_KEY;
     }
 
@@ -118,36 +118,6 @@ public class Table implements Serializable{
     public List<Column> getUnique() {
         return unique;
     }
-
-    /**
-     * 主键集合中是否包含该列
-     * @param column
-     * @return
-     */
-    public boolean primaryContain(Column column) {
-        for (Column col : PRIMARY_KEY) {
-            if (col.equals(column)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 添加主键
-     * @param pri_key
-     */
-    public void addPrimaryKey(Column pri_key) {
-        PRIMARY_KEY.add(pri_key);
-    }
-
-    /**
-     * 删除主键
-     */
-    public void removePrimaryKey(Column pri_key) {
-        PRIMARY_KEY.remove(pri_key);
-    }
-
     /**
      * 添加索引
      * @param index
@@ -202,5 +172,9 @@ public class Table implements Serializable{
      */
     public void addUnique(Column column) {
         unique.add(column);
+    }
+
+    public Column getColumnByName(String name) {
+        return columnMap.get(name);
     }
 }

@@ -13,10 +13,13 @@ public class Row {
      */
     private Value PRIMARY_KEY;
     /**
-     *
+     * 该行的所有值
      */
     private List<Value> values;
 
+    public Row() {
+
+    }
     public Row(Value PRIMARY_KEY) {
         this.PRIMARY_KEY = PRIMARY_KEY;
     }
@@ -27,5 +30,13 @@ public class Row {
 
     public Value getPRIMARY_KEY() {
         return PRIMARY_KEY;
+    }
+
+    public void setValues(List<Value> values) {
+        this.values = values;
+    }
+
+    public List<Value> getValues() {
+        return values;
     }
 }

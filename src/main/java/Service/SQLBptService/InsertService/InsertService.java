@@ -11,5 +11,5 @@ public interface InsertService {
     /**
      * 执行插入操作
      */
-    public void invoke(Table table, SQLInsertBuilder insertBuilder);
+    public void invoke(Table table, SQLInsertBuilder insertBuilder) throws Exception;
 }

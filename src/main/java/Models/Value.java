@@ -1,5 +1,6 @@
 package Models;
 
+import Parser.SQLDataType;
 import Utils.StringUtils;
 
 /**
@@ -11,6 +12,10 @@ public class Value implements Comparable {
      */
     private String          val;
     /**
+     * 数据类型
+     */
+    private SQLDataType     dataType;
+    /**
      * 对应的列名
      */
     private String          columName;
@@ -21,9 +26,9 @@ public class Value implements Comparable {
 
     }
 
-    public Value(String val, String columName) {
+    public Value(String val, SQLDataType dataType) {
         this.val = val;
-        this.columName = columName;
+        this.dataType = dataType;
     }
 
     public void setIsIn(boolean in) {
@@ -56,6 +61,14 @@ public class Value implements Comparable {
 
     public String getColumName() {
         return columName;
+    }
+
+    public void setDataType(SQLDataType dataType) {
+        this.dataType = dataType;
+    }
+
+    public SQLDataType getDataType() {
+        return dataType;
     }
 
     @Override

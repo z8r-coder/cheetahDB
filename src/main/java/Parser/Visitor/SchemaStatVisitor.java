@@ -15,6 +15,7 @@ import Exception.SytaxErrorsException;
 import java.util.*;
 
 /**
+ * 解析语法树
  * Created by ruanxin on 2017/8/12.
  */
 public class SchemaStatVisitor extends BaseASTVisitorAdapter {
@@ -101,9 +102,9 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
             ASTNode value_node = assList.get(++i);
             Value value;
             if (value_node.getSortCode() == SortCode.NUMBER) {
-                value = new Value(value_node.getValue(), "NUMBER");
+                value = new Value(value_node.getValue(), SQLDataType.INTEGER);
             } else if (value_node.getSortCode() == SortCode.STRING) {
-                value = new Value(value_node.getValue(), "STRING");
+                value = new Value(value_node.getValue(), SQLDataType.VARCHAR);
             } else {
                 logger.error("visitAss don't support the data type " + value_node.getSortCode().toString());
                 return;
@@ -236,7 +237,7 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
         List<Value> values = new ArrayList<Value>();
         for (ASTNode node : nodes) {
             if (node.getSortCode() == SortCode.NUMBER) {
-                Value value = new Value(node.getValue(), "NUMBER");
+                Value value = new Value(node.getValue(), SQLDataType.INTEGER);
                 if (StringUtils.equals(opname, "INSERT")) {
                     value.setIsInsert(true);
                 } else if (StringUtils.equals(opname, "IN")){
@@ -244,7 +245,7 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
                 }
                 values.add(value);
             } else if (node.getSortCode() == SortCode.STRING) {
-                Value value = new Value(node.getValue(), "STRING");
+                Value value = new Value(node.getValue(), SQLDataType.VARCHAR);
                 values.add(value);
             }
         }

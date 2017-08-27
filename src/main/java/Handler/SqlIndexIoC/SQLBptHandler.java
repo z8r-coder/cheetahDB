@@ -113,25 +113,23 @@ public class SQLBptHandler implements SQLHandler {
             //生成表空间
             Table table = new Table(tableName, columns);
 
+
             for (Column column : columns) {
                 if (column.getPrimaryKey()) {
                     //主键默认不可空，默认唯一，目前支持一个主键
-                    table.addPrimaryKey(column);
-                    table.addIndex(column);
-                } else if (column.getNotNull()) {
-                    //保持列和主键的唯一不重复
-                    if (!table.primaryContain(column)) {
-                        table.addNotNull(column);
+                    if (table.getPRIMARY_KEY() == null) {
+                        table.setPRIMARY_KEY(column);
+                        table.addIndex(column);
                     }
-
-                } else if (column.getUnique()) {
-                    if (!table.primaryContain(column)) {
-                        table.addUnique(column);
-                    }
+                } else if (column.getNotNull() && !column.getPrimaryKey()) {
+                    //保持不可空列和主键的唯一不重复
+                    table.addNotNull(column);
+                } else if (column.getUnique() && !column.getPrimaryKey()) {
+                    table.addUnique(column);
                 }
             }
             //建立主键索引树
-            for (Column column : table.getPRIMARY_KEY()) {
+            for (Column column : table.getINDEX()) {
                 Node<List<Row>> root = new Node(true, true);
                 Bplustree bpt = new BplustreeImpl(6, root);
 

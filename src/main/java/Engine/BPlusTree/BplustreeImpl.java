@@ -28,6 +28,7 @@ public class BplustreeImpl implements Bplustree {
         this.order = order;
         this.root = root;
     }
+
     public void setRoot(Node root) {
         this.root = root;
     }
