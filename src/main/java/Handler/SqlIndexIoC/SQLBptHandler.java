@@ -62,6 +62,7 @@ public class SQLBptHandler implements SQLHandler {
     public SQLBptHandler(DataBase db) {
         this.db = db;
     }
+
     public void execute(String sql) {
         AST ast = SQLParserUtils.AssSQlASTgen(sql);
         SQLBuilderWraper builderWraper = new SQLBuilderWraper(sql);

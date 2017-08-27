@@ -173,6 +173,14 @@ public class Table implements Serializable{
     }
 
     /**
+     * 获取索引树
+     * @param name
+     * @return
+     */
+    public Bplustree getIndexTree(String name) {
+        return INDEX_TREE.get(name);
+    }
+    /**
      * 添加不可空的列
      * @param column
      */
