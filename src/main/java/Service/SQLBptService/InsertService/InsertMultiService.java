@@ -83,7 +83,10 @@ public class InsertMultiService implements InsertService{
         }
 
         List<List<Value>> insertValues = new ArrayList<List<Value>>();
-
+        //初始化
+        for (int i = 0; i < rowCount;i++) {
+            insertValues.add(new ArrayList<Value>());
+        }
         for (int i = 0; i < valueMaps.size();i++) {
             for (Column column : stanterCol) {
                 if (valueMaps.get(i).get(column.getName()) == null) {
