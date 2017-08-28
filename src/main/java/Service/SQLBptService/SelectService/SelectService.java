@@ -2,6 +2,7 @@ package Service.SQLBptService.SelectService;
 
 import Models.Table;
 import Parser.Builder.SQLSelectBuilder;
+import Exception.SelectException;
 
 /**
  * 查询基础服务类
@@ -13,5 +14,5 @@ public interface SelectService {
      * @param table
      * @param selectBuilder
      */
-    public void invoke (Table table, SQLSelectBuilder selectBuilder);
+    public void invoke (Table table, SQLSelectBuilder selectBuilder) throws SelectException;
 }

@@ -22,7 +22,8 @@ public enum SQLErrorCode {
     SQL000027("SQL000027", "删除所有行失败"),
     SQL000028("SQL000028", "带where的删除失败"),
     SQL00040("SQL00040", "不带where的查询失败"),
-    SQL00041("SQL00041", "带where的查询失败")
+    SQL00041("SQL00041", "带where的查询失败"),
+    SQL00042("SQL00042", "查询的列不存在")
     ;
 
     /**
