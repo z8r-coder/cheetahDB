@@ -157,27 +157,27 @@ public class ASTTestUtils {
          * select暂时只支持简单select和带where的简单select
          */
         //简单select语句测试，不带where,通过测试
-//        String sql = "select * from table_a;";
-//        AST ast = SQLParserUtils.AssSQlASTgen(sql);
-//        ASTTestPrint(ast.getRoot());
-//        System.out.println();
-//        System.out.println(ast.getAstType());
-//        System.out.println("----------------------------------------------");
-//        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
-//        try {
-//            SQLSelectBuilderImpl scb = (SQLSelectBuilderImpl) sbw.getSQLBuilder();
-//            List<SchemaStatVisitor.Column> columns = scb.columns();
-//            String tableName = scb.from();
-//            System.out.println("tableName=" + tableName);
-//            for (SchemaStatVisitor.Column column : columns) {
-//                System.out.print("ColumnName=" + column.getName());
-//            }
-//            System.out.println();
-//            System.out.println(scb.grammerType());
-//
-//        }catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        String sql = "select A,B from table_a;";
+        AST ast = SQLParserUtils.AssSQlASTgen(sql);
+        ASTTestPrint(ast.getRoot());
+        System.out.println();
+        System.out.println(ast.getAstType());
+        System.out.println("----------------------------------------------");
+        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
+        try {
+            SQLSelectBuilderImpl scb = (SQLSelectBuilderImpl) sbw.getSQLBuilder();
+            List<Column> columns = scb.columns();
+            String tableName = scb.from();
+            System.out.println("tableName=" + tableName);
+            for (Column column : columns) {
+                System.out.print("ColumnName=" + column.getName());
+            }
+            System.out.println();
+            System.out.println(scb.grammerType());
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //简单select语句测试，带where,不带in,通过测试
 //        String sql = "select a,b from table_a where A = '123' AND B = '321';";
@@ -330,38 +330,38 @@ public class ASTTestUtils {
 //        }
 
         //多行插入非缺省值测试通过
-        String sql = "insert into persons" +
-                "(id_p, lastname , firstName, city )" +
-                "values" +
-                "(200,'haha' , 'deng' , 'shenzhen')," +
-                "(201,'haha2' , 'deng' , 'GD')," +
-                "(202,'haha3' , 'deng' , 'Beijing');";
-        AST ast = SQLParserUtils.AssSQlASTgen(sql);
-        ASTTestPrint(ast.getRoot());
-        System.out.println();
-        System.out.println(ast.getAstType());
-        System.out.println("----------------------------------------------");
-        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
-        try {
-            SQLInsertBuilderImpl sib = (SQLInsertBuilderImpl) sbw.getSQLBuilder();
-            List<List<Value>> values = sib.values();
-            String tableName = sib.from();
-            List<String> columnName = sib.columnName();
-            for (String str : columnName) {
-                System.out.print("column name = " + str + "  ");
-            }
-            System.out.println();
-            for (List<Value> list_value : values) {
-                for (Value value : list_value) {
-                    System.out.print("value = " + value.getVal() + "  ");
-                }
-                System.out.println();
-            }
-            System.out.println("tableName=" + tableName);
-            System.out.println("sql type:" + sib.grammerType());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        String sql = "insert into persons" +
+//                "(id_p, lastname , firstName, city )" +
+//                "values" +
+//                "(200,'haha' , 'deng' , 'shenzhen')," +
+//                "(201,'haha2' , 'deng' , 'GD')," +
+//                "(202,'haha3' , 'deng' , 'Beijing');";
+//        AST ast = SQLParserUtils.AssSQlASTgen(sql);
+//        ASTTestPrint(ast.getRoot());
+//        System.out.println();
+//        System.out.println(ast.getAstType());
+//        System.out.println("----------------------------------------------");
+//        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
+//        try {
+//            SQLInsertBuilderImpl sib = (SQLInsertBuilderImpl) sbw.getSQLBuilder();
+//            List<List<Value>> values = sib.values();
+//            String tableName = sib.from();
+//            List<String> columnName = sib.columnName();
+//            for (String str : columnName) {
+//                System.out.print("column name = " + str + "  ");
+//            }
+//            System.out.println();
+//            for (List<Value> list_value : values) {
+//                for (Value value : list_value) {
+//                    System.out.print("value = " + value.getVal() + "  ");
+//                }
+//                System.out.println();
+//            }
+//            System.out.println("tableName=" + tableName);
+//            System.out.println("sql type:" + sib.grammerType());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         //多行插入缺省值测试通过
 //        String sql = "insert into persons " +

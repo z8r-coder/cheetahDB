@@ -1,7 +1,12 @@
 package Service.SQLBptService.SelectService;
 
+import Models.Column;
+import Models.Row;
 import Models.Table;
 import Parser.Builder.SQLSelectBuilder;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 不带where的查询
@@ -10,6 +15,8 @@ import Parser.Builder.SQLSelectBuilder;
 public class SelectOnly implements SelectService {
 
     public void invoke(Table table, SQLSelectBuilder selectBuilder) {
-
+        List<Column> columns = selectBuilder.columns();
+        
+        List<Row> rows = table.getRows();
     }
 }

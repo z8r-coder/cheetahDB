@@ -122,6 +122,11 @@ public class Table implements Serializable{
     public Map<String, Column> getColumnMap() {
         return columnMap;
     }
+
+    public List<Row> getRows() {
+        return rows;
+    }
+
     /**
      * 添加索引
      * @param index
