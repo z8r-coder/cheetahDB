@@ -1,6 +1,7 @@
 package Utils;
 
 import Models.Column;
+import Models.Relationship;
 import Models.Value;
 import Parser.AST;
 import Parser.ASTNode;
@@ -157,30 +158,7 @@ public class ASTTestUtils {
          * select暂时只支持简单select和带where的简单select
          */
         //简单select语句测试，不带where,通过测试
-        String sql = "select A,B from table_a;";
-        AST ast = SQLParserUtils.AssSQlASTgen(sql);
-        ASTTestPrint(ast.getRoot());
-        System.out.println();
-        System.out.println(ast.getAstType());
-        System.out.println("----------------------------------------------");
-        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
-        try {
-            SQLSelectBuilderImpl scb = (SQLSelectBuilderImpl) sbw.getSQLBuilder();
-            List<Column> columns = scb.columns();
-            String tableName = scb.from();
-            System.out.println("tableName=" + tableName);
-            for (Column column : columns) {
-                System.out.print("ColumnName=" + column.getName());
-            }
-            System.out.println();
-            System.out.println(scb.grammerType());
-
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //简单select语句测试，带where,不带in,通过测试
-//        String sql = "select a,b from table_a where A = '123' AND B = '321';";
+//        String sql = "select A,B from table_a;";
 //        AST ast = SQLParserUtils.AssSQlASTgen(sql);
 //        ASTTestPrint(ast.getRoot());
 //        System.out.println();
@@ -189,27 +167,50 @@ public class ASTTestUtils {
 //        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
 //        try {
 //            SQLSelectBuilderImpl scb = (SQLSelectBuilderImpl) sbw.getSQLBuilder();
-//            List<SchemaStatVisitor.Column> columns = scb.columns();
+//            List<String> columns = scb.columns();
 //            String tableName = scb.from();
-//            Set<SchemaStatVisitor.Relationship> rls = scb.where();
-//            List<String> AndOr = scb.AndOr();
 //            System.out.println("tableName=" + tableName);
-//            for (SchemaStatVisitor.Column column : columns) {
-//                System.out.print("  ColumnName=" + column.getName());
+//            for (String column : columns) {
+//                System.out.println("ColumnName=" + column);
 //            }
 //            System.out.println();
-//            for (SchemaStatVisitor.Relationship rs : rls) {
-//                System.out.println(rs.getLeft().getName() + rs.getOperator() + rs.getRight().getValue());
-//            }
-//
-//            for (String str: AndOr) {
-//                System.out.print(str + "  ");
-//            }
 //            System.out.println(scb.grammerType());
 //
 //        }catch (Exception e) {
 //            e.printStackTrace();
 //        }
+
+        //简单select语句测试，带where,不带in,通过测试
+        String sql = "select a,b from table_a where A = '123' AND B = '321';";
+        AST ast = SQLParserUtils.AssSQlASTgen(sql);
+        ASTTestPrint(ast.getRoot());
+        System.out.println();
+        System.out.println(ast.getAstType());
+        System.out.println("----------------------------------------------");
+        SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
+        try {
+            SQLSelectBuilderImpl scb = (SQLSelectBuilderImpl) sbw.getSQLBuilder();
+            List<String> columns = scb.columns();
+            String tableName = scb.from();
+            Set<Relationship> rls = scb.where();
+            List<String> AndOr = scb.AndOr();
+            System.out.println("tableName=" + tableName);
+            for (String column : columns) {
+                System.out.println("  ColumnName=" + column);
+            }
+            System.out.println();
+            for (Relationship rs : rls) {
+                System.out.println(rs.getLeft().getName() + rs.getOperator() + rs.getRight().getValue());
+            }
+
+            for (String str: AndOr) {
+                System.out.print(str + "  ");
+            }
+            System.out.println(scb.grammerType());
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
 
 //        create database语句测试通过
 //        String sql = "CREATE DATABASE my_db;";

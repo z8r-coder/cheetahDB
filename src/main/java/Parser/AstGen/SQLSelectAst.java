@@ -20,7 +20,7 @@ import java.util.Set;
 public class SQLSelectAst implements BaseAST{
     private AST ast;
     //查询的column
-    private List<Column> slt_col;
+    private List<String> slt_col;
     //按顺序结合
     private Set<Relationship> rls;
     //and or
@@ -43,11 +43,11 @@ public class SQLSelectAst implements BaseAST{
         visitor.visit(this);
     }
 
-    public void setSlt_col(List<Column> slt_col) {
+    public void setSlt_col(List<String> slt_col) {
         this.slt_col = slt_col;
     }
 
-    public List<Column> getSlt_col() {
+    public List<String> getSlt_col() {
         return slt_col;
     }
 

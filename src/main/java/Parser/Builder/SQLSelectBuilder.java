@@ -22,7 +22,7 @@ public interface SQLSelectBuilder extends SQLBuilder {
      * 查询的列 todo 此处类型可用String
      * @return
      */
-    public List<Column> columns();
+    public List<String> columns();
 
     /**
      * 筛选条件

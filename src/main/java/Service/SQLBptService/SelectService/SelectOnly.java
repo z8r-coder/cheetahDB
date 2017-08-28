@@ -15,8 +15,8 @@ import java.util.Map;
 public class SelectOnly implements SelectService {
 
     public void invoke(Table table, SQLSelectBuilder selectBuilder) {
-        List<Column> columns = selectBuilder.columns();
-        
+        List<String> columns = selectBuilder.columns();
+
         List<Row> rows = table.getRows();
     }
 }

@@ -281,19 +281,15 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
 
         String table_name = slt_node.getChildSet().get(3).getValue();
 
-        List<Column> columns = new ArrayList<Column>();
+        List<String> columns = new ArrayList<String>();
 
         //select * pat,单表插入
         if (slt_list.size() == 1 && slt_list.get(0).getValue().equals("*")) {
-            Column column = new Column(table_name, "*");
-            column.setIsSelect(true);
-            columns.add(column);
+            columns.add("*");
         } else {
             for (ASTNode node : slt_list) {
                 if (node.getSortCode() == SortCode.IDENTIFIED) {
-                    Column column = new Column(table_name, node.getValue());
-                    column.setIsSelect(true);
-                    columns.add(column);
+                    columns.add(node.getValue());
                 }
             }
         }

@@ -35,7 +35,7 @@ public class SQLSelectBuilderImpl implements SQLSelectBuilder {
         return selectAst.getTable_name();
     }
 
-    public List<Column> columns() {
+    public List<String> columns() {
         return selectAst.getSlt_col();
     }
 
