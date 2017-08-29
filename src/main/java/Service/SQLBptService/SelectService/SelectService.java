@@ -1,5 +1,6 @@
 package Service.SQLBptService.SelectService;
 
+import Models.SimpleTable;
 import Models.Table;
 import Parser.Builder.SQLSelectBuilder;
 import Exception.SelectException;
@@ -14,5 +15,5 @@ public interface SelectService {
      * @param table
      * @param selectBuilder
      */
-    public void invoke (Table table, SQLSelectBuilder selectBuilder) throws SelectException;
+    public SimpleTable invoke (Table table, SQLSelectBuilder selectBuilder) throws SelectException;
 }

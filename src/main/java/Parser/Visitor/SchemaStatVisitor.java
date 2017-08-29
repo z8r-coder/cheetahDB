@@ -281,7 +281,8 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
 
         String table_name = slt_node.getChildSet().get(3).getValue();
 
-        List<String> columns = new ArrayList<String>();
+        //列不允许重复
+        Set<String> columns = new HashSet<String>();
 
         //select * pat,单表插入
         if (slt_list.size() == 1 && slt_list.get(0).getValue().equals("*")) {

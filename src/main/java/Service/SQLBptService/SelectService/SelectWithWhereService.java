@@ -1,5 +1,6 @@
 package Service.SQLBptService.SelectService;
 
+import Models.SimpleTable;
 import Models.Table;
 import Parser.Builder.SQLSelectBuilder;
 
@@ -9,7 +10,8 @@ import Parser.Builder.SQLSelectBuilder;
  */
 public class SelectWithWhereService implements SelectService {
 
-    public void invoke(Table table, SQLSelectBuilder selectBuilder) {
+    public SimpleTable invoke(Table table, SQLSelectBuilder selectBuilder) {
 
+        return null;
     }
 }

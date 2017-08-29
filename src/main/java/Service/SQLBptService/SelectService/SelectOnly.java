@@ -1,19 +1,13 @@
 package Service.SQLBptService.SelectService;
 
 import Constants.SQLErrorCode;
-import Models.Column;
-import Models.Row;
-import Models.Table;
-import Models.Value;
+import Models.*;
 import Parser.Builder.SQLSelectBuilder;
 import Utils.ServiceUtils;
 import Exception.SelectException;
 import Utils.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 不带where的查询
@@ -21,13 +15,11 @@ import java.util.Map;
  */
 public class SelectOnly implements SelectService {
 
-    public void invoke(Table table, SQLSelectBuilder selectBuilder) throws SelectException {
+    public SimpleTable invoke(Table table, SQLSelectBuilder selectBuilder) throws SelectException {
         //列名
-        List<String> columns = selectBuilder.columns();
+        Set<String> columns = selectBuilder.columns();
 
         List<Column> standerCol = table.getColumns();
-
-        Map<String, List<Value>> valuesMap = new HashMap<String, List<Value>>();
 
         if (!ServiceUtils.checkColumn(columns, standerCol)) {
             throw new SelectException(SQLErrorCode.SQL00042);
@@ -44,15 +36,21 @@ public class SelectOnly implements SelectService {
                     break;
                 }
             }
-            valuesMap.put(column, new ArrayList<Value>());
         }
+        SimpleTable simpleTable = new SimpleTable(columns);
 
         for (Row row : rows) {
+            //所有值
             List<Value> values = row.getValues();
+            SimpleRow simpleRow = new SimpleRow();
+            //选出来的值
+            List<Value> selectValue = new ArrayList<Value>();
             for (Integer integer : indexList) {
-                String colName = values.get(integer).getColumName();
-
+                selectValue.add(values.get(integer));
             }
+            simpleRow.setValues(values);
+            simpleTable.addSimpleRow(simpleRow);
         }
+        return simpleTable;
     }
 }

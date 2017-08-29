@@ -190,7 +190,7 @@ public class ASTTestUtils {
         SQLBuilderWraper sbw = new SQLBuilderWraper(sql);
         try {
             SQLSelectBuilderImpl scb = (SQLSelectBuilderImpl) sbw.getSQLBuilder();
-            List<String> columns = scb.columns();
+            Set<String> columns = scb.columns();
             String tableName = scb.from();
             Set<Relationship> rls = scb.where();
             List<String> AndOr = scb.AndOr();
