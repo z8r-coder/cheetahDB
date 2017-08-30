@@ -64,4 +64,11 @@ public class EngineConfig {
     public String getPageSize() {
         return pageSize;
     }
+
+    public static void main(String args[]) {
+        //加载配置文件
+        EngineConfig.getConfig().loadPropertiesFromSrc();
+
+        System.out.println(EngineConfig.getConfig().getPageSize());
+    }
 }
