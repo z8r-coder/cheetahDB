@@ -1,8 +1,10 @@
 package Engine.BPlusTree;
 
+import Constants.SQLErrorCode;
 import Engine.Bplustree;
 
 import java.util.*;
+import Exception.SelectException;
 
 /**
  * comparable res < 0  this < value
@@ -96,7 +98,7 @@ public class Node<T> {
     }
 
     /**
-     * 当个查询接口
+     * 单个查询接口
      * @param key
      * @return
      */
@@ -126,13 +128,137 @@ public class Node<T> {
     }
 
     /**
-     * 多对象查询数组
+     * 辅助查询，获取子节点
      * @param key
      * @return
      */
-    public List<T> searchForList(Comparable key) {
-        
+    public Node<T> searchAuxiliary(Comparable key) {
+        if (leaf) {
+            return this;
+        } else {
+            if (key.compareTo(entries.get(0).getKey()) < 0) {
+                return children.get(0).searchAuxiliary(key);
+            } else if (key.compareTo(entries.get(entries.size() - 1).getKey()) >= 0) {
+                return children.get(children.size() - 1).searchAuxiliary(key);
+            } else {
+                for (int i = 0; i < entries.size();i++) {
+                    if (entries.get(i).getKey().compareTo(key) <= 0 &&
+                            entries.get(i + 1).getKey().compareTo(key) >0) {
+                        return children.get(0).searchAuxiliary(key);
+                    }
+                }
+            }
+        }
+        return null;
     }
+
+    /**
+     * 多对象查询数组
+     * @param key 索引
+     * @Param rp  关系
+     * @return
+     */
+    public List<T> searchForList(Comparable key, String rp) throws SelectException {
+        List<T> resList = new ArrayList<T>();
+        Node<T> curNode = searchAuxiliary(key);
+        if (curNode == null) {
+            return null;
+        }
+
+        if (rp.equals("<")) {
+            //获取第一个大于等于key的值
+            int index = searchFirstBiggerEq(entries, key, ">=");
+            for (int i = 0; i < index;i++) {
+                resList.add(entries.get(i).getValue());
+            }
+            addPrevious2List(resList);
+        } else if (rp.equals("<=")) {
+            //获取第一个大于key的值
+            int index = searchFirstBiggerEq(entries, key, ">");
+            for (int i = 0; i < index;i++) {
+                resList.add(entries.get(i).getValue());
+            }
+            addPrevious2List(resList);
+        } else if (rp.equals(">")) {
+            int index = searchFirstBiggerEq(entries, key, ">");
+            for (int i = index; i < entries.size();i++) {
+                resList.add(entries.get(i).getValue());
+            }
+            addNext2List(resList);
+        } else if (rp.equals(">=")) {
+            int index = searchFirstBiggerEq(entries, key, ">=");
+            for (int i = index; i < entries.size();i++) {
+                resList.add(entries.get(i).getValue());
+            }
+            addNext2List(resList);
+        }
+        return resList;
+    }
+
+    /**
+     * 将当前结点后面的结点的所有entry全部放入resEntries
+     * @param resEntries
+     * @return
+     */
+    private List<T> addNext2List(List<T> resEntries) {
+        Node<T> node = next;
+        while (node != null) {
+            List<Map.Entry<Comparable, T>> tmpEntries = node.getEntries();
+            for (int i = 0; i < tmpEntries.size();i++) {
+                resEntries.add(tmpEntries.get(i).getValue());
+            }
+            node = node.getNext();
+        }
+        return resEntries;
+    }
+    /**
+     * 将当前结点前面结点的所有entry全部放入resEntries
+     * @param resEntries
+     * @return
+     */
+    private List<T> addPrevious2List(List<T> resEntries) {
+        Node<T> node = previous;
+        while (node != null) {
+            List<Map.Entry<Comparable, T>> tmpEntries = node.getEntries();
+            for (int i = 0; i < tmpEntries.size();i++) {
+                resEntries.add(tmpEntries.get(i).getValue());
+            }
+            node = node.getPrevious();
+        }
+        return resEntries;
+    }
+    /**
+     * 查询第一个与key相等，比key大
+     * @param entries
+     * @param key
+     * @param op
+     * @return
+     */
+    private int searchFirstBiggerEq(List<Map.Entry<Comparable, T>> entries,
+                                 Comparable key, String op) throws SelectException {
+        if (op.equals(">=")) {
+            for (int i = 0; i < entries.size();i++) {
+                //找到第一个大于或等于key的位置
+                if (entries.get(i).getKey().compareTo(key) >= 0) {
+                    return i;
+                }
+            }
+            //若不存在相等的则返回-1
+            return entries.size();
+        } else if (op.equals(">")) {
+            //找到第一个比key大的位置
+            for (int i = 0; i < entries.size();i++) {
+                if (entries.get(i).getKey().compareTo(key) > 0) {
+                    return i;
+                }
+            }
+            //若key为该entries中最大的则返回-1
+            return entries.size();
+        } else {
+            throw new SelectException(SQLErrorCode.SQL00043);
+        }
+    }
+
     public void remove(Comparable key, Bplustree bpt) {
         if (leaf) {
             int index = contains(key);
@@ -607,5 +733,11 @@ public class Node<T> {
         }
         sb.append(", ");
         return sb.toString();
+    }
+
+    public static void main(String arg[]) {
+        for (int i = 0; i < 0;i++) {
+            System.out.println(11);
+        }
     }
 }
