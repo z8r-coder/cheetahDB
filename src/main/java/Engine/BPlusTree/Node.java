@@ -95,7 +95,12 @@ public class Node<T> {
         return parent;
     }
 
-    public Object search(Comparable key) {
+    /**
+     * 当个查询接口
+     * @param key
+     * @return
+     */
+    public T search(Comparable key) {
         if (leaf) {
             for (Map.Entry<Comparable, T> entry : entries) {
                 if (entry.getKey().compareTo(key) == 0) {
@@ -120,6 +125,14 @@ public class Node<T> {
         return null;
     }
 
+    /**
+     * 多对象查询数组
+     * @param key
+     * @return
+     */
+    public List<T> searchForList(Comparable key) {
+        
+    }
     public void remove(Comparable key, Bplustree bpt) {
         if (leaf) {
             int index = contains(key);
