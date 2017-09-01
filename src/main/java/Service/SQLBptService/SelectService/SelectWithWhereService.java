@@ -30,7 +30,7 @@ public class SelectWithWhereService implements SelectService {
         if (!SelectUtils.checkDataType(relations)) {
             throw new SelectException(SQLErrorCode.SQL00044);
         }
-        //筛选出来的集合
+        //筛选出来的行集合
         List<List<Row>> rowSet = new ArrayList<List<Row>>();
 
         for (Relationship rs : relations) {
@@ -44,11 +44,54 @@ public class SelectWithWhereService implements SelectService {
                 value = new Value(indexValue, SQLDataType.INTEGER);
             }
             Bplustree bpt = table.getIndexTree(columnName);
+            List<Row> resList = null;
             if (bpt != null) {
                 //命中索引
-                List<Row> resList = bpt.searchForList(value, rs.getOperator());
+                resList = bpt.searchForList(value, rs.getOperator());
+                rowSet.add(resList);
+            } else {
+                //未命中索引
+                resList = rowFilter(rows, value, rs.getOperator());
             }
         }
+
         return null;
+    }
+
+    private List<Row> rowFilter(List<Row> rows, Value value, String op) {
+        List<Row> filterRows = new ArrayList<Row>();
+
+        if (op.equals("<")) {
+            for (Row row : rows) {
+                if (value.compareTo(row.getValue(value.getColumName())) > 0) {
+                    filterRows.add(row);
+                }
+            }
+        } else if (op.equals(">")) {
+            for (Row row : rows) {
+                if (value.compareTo(row.getValue(value.getColumName())) < 0) {
+                    filterRows.add(row);
+                }
+            }
+        } else if (op.equals(">=")) {
+            for (Row row : rows) {
+                if (value.compareTo(row.getValue(value.getColumName())) <= 0) {
+                    filterRows.add(row);
+                }
+            }
+        } else if (op.equals("<=")) {
+            for (Row row : rows) {
+                if (value.compareTo(row.getValue(value.getColumName())) >= 0) {
+                    filterRows.add(row);
+                }
+            }
+        } else if (op.equals("=")) {
+            for (Row row : rows) {
+                if (value.compareTo(row.getValue(value.getColumName())) == 0) {
+                    filterRows.add(row);
+                }
+            }
+        }
+        return filterRows;
     }
 }
