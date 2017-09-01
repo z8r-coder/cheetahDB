@@ -235,7 +235,7 @@ public class SchemaStatVisitor extends BaseASTVisitorAdapter {
         List<Value> values = new ArrayList<Value>();
         for (ASTNode node : nodes) {
             if (node.getSortCode() == SortCode.NUMBER) {
-                Value value = new Value(node.getValue(), SQLDataType.INTEGER);
+                Value value = new Value(Integer.parseInt(node.getValue()), SQLDataType.INTEGER);
                 if (StringUtils.equals(opname, "INSERT")) {
                     value.setIsInsert(true);
                 } else if (StringUtils.equals(opname, "IN")){

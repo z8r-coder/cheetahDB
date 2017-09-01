@@ -1,4 +1,4 @@
-package Service.SQLBptService.InsertService;
+package Service.SQLBptService.SelectService;
 
 import Models.Column;
 import Models.Relationship;
@@ -12,14 +12,14 @@ import java.util.Set;
 /**
  * Created by rx on 2017/9/1.
  */
-public class InsertUtils {
+public class SelectUtils {
 
     /**
      * 检查比较参数是否匹配
      * @param rps
      * @return
      */
-    public boolean checkDataType(Set<Relationship> rps) {
+    public static boolean checkDataType(Set<Relationship> rps) {
         for (Relationship rp : rps) {
             Column left = rp.getLeft();
             Token right = rp.getRight();

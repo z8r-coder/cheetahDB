@@ -3,7 +3,9 @@ package Utils;
 import Support.Logging.Log;
 import Support.Logging.LogFactory;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by ruanxin on 2017/8/16.
@@ -60,5 +62,25 @@ public class ListUtils {
         for (;start <= end;start++) {
             target.add(list.get(start));
         }
+    }
+
+    /**
+     * for example list = [0,0,2,4,8,4];
+     * List2Set(0,5)
+     * set = [0,2,4,8]
+     * @param list
+     * @param start
+     * @param end
+     * @return
+     */
+    public static Set List2Set(List list, int start, int end) {
+        if (start < 0 || end >= list.size()) {
+            return null;
+        }
+        Set set = new HashSet();
+        for (int i = start; i <= end;i++) {
+            set.add(list.get(i));
+        }
+        return set;
     }
 }

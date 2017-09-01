@@ -8,9 +8,13 @@ import Utils.StringUtils;
  */
 public class Value implements Comparable {
     /**
-     * 值
+     * 字符串值
      */
     private String          val;
+    /**
+     * 整形值
+     */
+    private Integer         intVal;
     /**
      * 数据类型
      */
@@ -26,8 +30,15 @@ public class Value implements Comparable {
 
     }
 
+    //字符串类型构造
     public Value(String val, SQLDataType dataType) {
         this.val = val;
+        this.dataType = dataType;
+    }
+
+    //整数类型构造
+    public Value(Integer intVal, SQLDataType dataType) {
+        this.intVal = intVal;
         this.dataType = dataType;
     }
 
@@ -71,6 +82,14 @@ public class Value implements Comparable {
         return dataType;
     }
 
+    public void setIntVal(Integer intVal) {
+        this.intVal = intVal;
+    }
+
+    public Integer getIntVal() {
+        return intVal;
+    }
+
     @Override
     public boolean equals(Object object) {
         Value value = (Value) object;
@@ -94,6 +113,11 @@ public class Value implements Comparable {
 
     public int compareTo(Object object) {
         Value value = (Value) object;
-        return val.compareTo(value.getVal());
+        if (dataType == SQLDataType.INTEGER) {
+            //此处默认比较类型相同,并且默认只有integer和string两种类型
+            return intVal.compareTo(value.getIntVal());
+        } else {
+            return val.compareTo(value.getVal());
+        }
     }
 }

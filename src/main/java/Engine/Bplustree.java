@@ -8,13 +8,13 @@ import Exception.SelectException;
 /**
  * Created by rx on 2017/8/21.
  */
-public interface Bplustree {
+public interface Bplustree<T> {
     /**
      * 查询
      * @param key
      * @return
      */
-    public Object search(Comparable key);
+    public T search(Comparable key);
 
     /**
      * 区域查询
@@ -22,7 +22,7 @@ public interface Bplustree {
      * @param rp
      * @return
      */
-    public List<Object> searchForList(Comparable key, String rp) throws SelectException;
+    public List<T> searchForList(Comparable key, String rp) throws SelectException;
     /**
      * 移除
      * @param key
@@ -34,14 +34,14 @@ public interface Bplustree {
      * @param key
      * @param obj
      */
-    public void insert(Comparable key, Object obj);
+    public void insert(Comparable key, T obj);
 
     /**
      * 更新结点
      * @param key
      * @param obj
      */
-    public void update(Comparable key, Object obj);
+    public void update(Comparable key, T obj);
 
     /**
      * 获取B+树的阶数

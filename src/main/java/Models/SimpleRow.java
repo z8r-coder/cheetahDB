@@ -16,6 +16,10 @@ public class SimpleRow {
 
     }
 
+    public SimpleRow(List<Value> values) {
+        this.values = values;
+    }
+
     public void setValues(List<Value> values) {
         this.values = values;
     }

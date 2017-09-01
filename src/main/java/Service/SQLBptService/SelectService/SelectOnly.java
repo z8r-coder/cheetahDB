@@ -3,6 +3,7 @@ package Service.SQLBptService.SelectService;
 import Constants.SQLErrorCode;
 import Models.*;
 import Parser.Builder.SQLSelectBuilder;
+import Utils.ListUtils;
 import Utils.ServiceUtils;
 import Exception.SelectException;
 import Utils.StringUtils;
@@ -21,11 +22,26 @@ public class SelectOnly implements SelectService {
 
         List<Column> standerCol = table.getColumns();
 
+        List<Row> rows = table.getRows();
+        //"*"
+        if (columns.size() == 0) {
+            Iterator it = columns.iterator();
+            String column = (String) it.next();
+            if (column.equals("*")) {
+                SimpleTable simpleTable = new SimpleTable(ListUtils.List2Set(standerCol,0,standerCol.size() - 1));
+                List<SimpleRow> simpleRows = new ArrayList<SimpleRow>();
+
+                for (Row row : rows) {
+                    simpleRows.add(new SimpleRow(row.getValues()));
+                }
+                simpleTable.setSimpleRows(simpleRows);
+                return simpleTable;
+            }
+        }
+        
         if (!ServiceUtils.checkColumn(columns, standerCol)) {
             throw new SelectException(SQLErrorCode.SQL00042);
         }
-
-        List<Row> rows = table.getRows();
 
         List<Integer> indexList = new ArrayList<Integer>();
         //获取串值的index

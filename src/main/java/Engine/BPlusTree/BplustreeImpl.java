@@ -14,7 +14,7 @@ public class BplustreeImpl<T> implements Bplustree {
     /**
      * 根结点
      */
-    private Node root;
+    private Node<T> root;
     /**
      * 阶数
      */
@@ -54,13 +54,13 @@ public class BplustreeImpl<T> implements Bplustree {
         return order;
     }
 
-    public Object search(Comparable key) {
+    public T search(Comparable key) {
         //0 true 1 false
 
         return root.search(key);
     }
 
-    public List<Object> searchForList(Comparable key, String rp) throws SelectException {
+    public List<T> searchForList(Comparable key, String rp) throws SelectException {
         return root.searchForList(key, rp);
     }
 
@@ -69,11 +69,11 @@ public class BplustreeImpl<T> implements Bplustree {
     }
 
     public void insert(Comparable key, Object obj) {
-        root.insert(key, obj, this);
+        root.insert(key, (T) obj, this);
     }
 
     public void update(Comparable key, Object obj) {
-        root.update(key, obj);
+        root.update(key, (T) obj);
     }
 
     public void visitorLeaf(Node node) {
@@ -95,7 +95,7 @@ public class BplustreeImpl<T> implements Bplustree {
     }
     public static void main(String arg[]) {
         Node<Integer> root = new Node(true,true);
-        Bplustree tree = new BplustreeImpl(1024, root);
+        Bplustree<Integer> tree = new BplustreeImpl(1024, root);
         Random random = new Random();
         long current = System.currentTimeMillis();
         for (int j = 0; j < 1000; j++) {
