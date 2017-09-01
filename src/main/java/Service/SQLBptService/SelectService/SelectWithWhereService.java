@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * 具有索引的列一定得非空
  * 带where的查询
  * Created by rx on 2017/8/26.
  */
@@ -46,52 +47,152 @@ public class SelectWithWhereService implements SelectService {
             Bplustree bpt = table.getIndexTree(columnName);
             List<Row> resList = null;
             if (bpt != null) {
-                //命中索引
+                //命中索引,索引不能为空
                 resList = bpt.searchForList(value, rs.getOperator());
                 rowSet.add(resList);
             } else {
                 //未命中索引
                 resList = rowFilter(rows, value, rs.getOperator());
+                if (AndOr.size() != 0) {
+                    //若存在多个集合，则需要排序
+                    qsort(resList,0, resList.size() - 1, value.getColumName());
+                }
+                rowSet.add(resList);
             }
         }
 
         return null;
     }
 
+    /**
+     * 快排找pivote
+     * @param start
+     * @param end
+     * @return
+     */
+    private int pivote(int start, int end) {
+        return (start + end) / 2;
+    }
+
+    /**
+     * 递归排，根据筛选的value来对row进行排序
+     * @param rows
+     * @param low
+     * @param high
+     * @param columnName 依赖排序的列
+     * @return
+     */
+    public int partition(List<Row> rows, int low, int high, String columnName) {
+        int hi = high;
+        Row keyRow = rows.get(pivote(low, high));
+        rows.set(pivote(low,high), rows.get(high));
+        rows.set(high, keyRow);
+        while (high > low) {
+            Value lowValue = rows.get(low).getValue(columnName);
+            Value keyValue = keyRow.getValue(columnName);
+            while (lowValue.compareTo(keyValue) <= 0 && high > low) {
+                low++;
+                lowValue = rows.get(low).getValue(columnName);
+            }
+
+            Value highValue = rows.get(high).getValue(columnName);
+            while (highValue.compareTo(keyValue) >= 0 && high > low) {
+                high--;
+                highValue = rows.get(high).getValue(columnName);
+            }
+
+            if (low < high) {
+                Row tmp = rows.get(low);
+                rows.set(low, rows.get(high));
+                rows.set(high, tmp);
+            }
+        }
+        rows.set(hi, rows.get(high));
+        rows.set(high, keyRow);
+        return high;
+    }
+
+    public void qsort(List<Row> rows, int low, int high, String columnName) {
+        if (low >= high) {
+            return;
+        }
+        int index = partition(rows, low, high,columnName);
+        qsort(rows, low, index - 1,columnName);
+        qsort(rows, index + 1, high,columnName);
+    }
+
+    /**
+     * 获取筛选后的列表，NULL类型的不参与筛选
+     * @param rows
+     * @param value
+     * @param op
+     * @return
+     */
     private List<Row> rowFilter(List<Row> rows, Value value, String op) {
         List<Row> filterRows = new ArrayList<Row>();
 
         if (op.equals("<")) {
             for (Row row : rows) {
-                if (value.compareTo(row.getValue(value.getColumName())) > 0) {
+                Value compareValue = row.getValue(value.getColumName());
+                if (compareValue.getDataType() == SQLDataType.NULL) {
+                    //NULL类型不参与筛选
+                    continue;
+                }
+                if (value.compareTo(compareValue) > 0) {
                     filterRows.add(row);
                 }
             }
         } else if (op.equals(">")) {
             for (Row row : rows) {
+                Value compareValue = row.getValue(value.getColumName());
+                if (compareValue.getDataType() == SQLDataType.NULL) {
+                    continue;
+                }
                 if (value.compareTo(row.getValue(value.getColumName())) < 0) {
                     filterRows.add(row);
                 }
             }
         } else if (op.equals(">=")) {
             for (Row row : rows) {
+                Value compareValue = row.getValue(value.getColumName());
+                if (compareValue.getDataType() == SQLDataType.NULL) {
+                    continue;
+                }
                 if (value.compareTo(row.getValue(value.getColumName())) <= 0) {
                     filterRows.add(row);
                 }
             }
         } else if (op.equals("<=")) {
             for (Row row : rows) {
+                Value compareValue = row.getValue(value.getColumName());
+                if (compareValue.getDataType() == SQLDataType.NULL) {
+                    continue;
+                }
                 if (value.compareTo(row.getValue(value.getColumName())) >= 0) {
                     filterRows.add(row);
                 }
             }
         } else if (op.equals("=")) {
             for (Row row : rows) {
+                Value compareValue = row.getValue(value.getColumName());
+                if (compareValue.getDataType() == SQLDataType.NULL) {
+                    continue;
+                }
                 if (value.compareTo(row.getValue(value.getColumName())) == 0) {
                     filterRows.add(row);
                 }
             }
         }
         return filterRows;
+    }
+
+    public static void main(String args[]) {
+        Row a = new Row(new Value("a",SQLDataType.VARCHAR));
+        Row b = new Row(new Value("b", SQLDataType.VARCHAR));
+        Row tmp = a;
+        a = b;
+        b = tmp;
+        System.out.println(a.getPRIMARY_KEY().getVal());
+        System.out.println(b.getPRIMARY_KEY().getVal());
     }
 }

@@ -9,7 +9,6 @@ import Models.Value;
 import Parser.Builder.SQLInsertBuilder;
 import Exception.InsertException;
 import Parser.SQLDataType;
-import Utils.InsertUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,17 +75,18 @@ public class InsertSingleService implements InsertService{
         for (Column column : standerCol) {
             if (valueMap.get(column.getName()) == null) {
                 //若插入行中，不存在该行，先判断该列是否允许空
-                if (column.getNotNull()) {
+                if (column.getNotNull() || column.getPrimaryKey()) {
                     //若不允许为空
                     throw new InsertException(SQLErrorCode.SQL00008);
                 }
-                //unique约束的column可以插入多个列
+                //unique约束的column NULL可以插入多个行
                 Value value = new Value("NULL", SQLDataType.NULL);
                 value.setColumName(column.getName());
                 insertValue.add(value);
             } else {
                 Value value = valueMap.get(column.getName());
                 insertValue.add(value);
+                row.putValue(column.getName(), value);
             }
         }
 

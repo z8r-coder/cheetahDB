@@ -15,7 +15,7 @@ public class Row {
      */
     private Value PRIMARY_KEY;
     /**
-     * 名-值映射
+     * 列名与值映射
      */
     private Map<String, Value> valueMap = new HashMap<String, Value>();
     /**

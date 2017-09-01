@@ -9,7 +9,6 @@ import Models.Value;
 import Parser.Builder.SQLInsertBuilder;
 import Exception.InsertException;
 import Parser.SQLDataType;
-import Utils.InsertUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,6 +95,7 @@ public class InsertMultiService implements InsertService{
                 } else {
                     Value value = valueMaps.get(i).get(column.getName());
                     insertValues.get(i).add(value);
+                    rows.get(i).putValue(column.getName(), value);
                 }
             }
         }
@@ -108,15 +108,6 @@ public class InsertMultiService implements InsertService{
         Column primaryKey = table.getPRIMARY_KEY();
         Bplustree bpt = table.getIndexTree(primaryKey.getName());
 
-        for (Row row : rows) {
-            Value indexValue = row.getPRIMARY_KEY();
-            if (bpt.search(indexValue) != null) {
-                //主键冲突
-                throw new InsertException(SQLErrorCode.SQL00009);
-            }
-            bpt.insert(indexValue, row);
-            //将该行添加到表空间
-            table.addRow(row);
-        }
+        InsertUtils.addTableSpace(rows, bpt, table);
     }
 }

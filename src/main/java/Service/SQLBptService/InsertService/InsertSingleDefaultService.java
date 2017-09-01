@@ -38,12 +38,14 @@ public class InsertSingleDefaultService implements InsertService {
         Row row = new Row();
 
         for (int i = 0; i < singleValues.size();i++) {
+            //检查数据类型是否一致
             if (standerCol.get(i).getDataType() != singleValues.get(i).getDataType()) {
                 throw new InsertException(SQLErrorCode.SQL00005);
             }
 
+            //主键是否为空
             if (standerCol.get(i).getPrimaryKey()) {
-                if (singleValues.get(i) == null) {
+                if (InsertUtils.checkValueIsEmpty(singleValues.get(i))) {
                     throw new InsertException(SQLErrorCode.SQL00006);
                 }
                 row.setPRIMARY_KEY(singleValues.get(i));
@@ -55,6 +57,7 @@ public class InsertSingleDefaultService implements InsertService {
             value.setColumName(columnName);
         }
 
+        //是否设置主键
         if (row.getPRIMARY_KEY() == null) {
             throw new InsertException(SQLErrorCode.SQL00006);
         }
@@ -62,13 +65,16 @@ public class InsertSingleDefaultService implements InsertService {
         List<Value> insertValues = new ArrayList<Value>();
         int length = singleValues.size();
         for (int i = 0; i < length;i++) {
-            insertValues.add(singleValues.get(i));
+            Value value = singleValues.get(i);
+            insertValues.add(value);
+            row.putValue(value.getColumName(), value);
         }
 
         for (int i = length; i < standerCol.size();i++) {
             insertValues.add(new Value("NULL", SQLDataType.NULL));
         }
 
+        //设置行的全部值信息
         row.setValues(insertValues);
 
         //维护索引树

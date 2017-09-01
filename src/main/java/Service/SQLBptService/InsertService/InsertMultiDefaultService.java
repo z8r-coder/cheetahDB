@@ -79,6 +79,8 @@ public class InsertMultiDefaultService implements InsertService {
             List<Value> singleValue = values.get(i);
             for (int j = 0; j < singleValue.size(); j++) {
                 insertValues.get(i).add(singleValue.get(j));
+                //设置每行对应的列-值map
+                rows.get(i).putValue(singleValue.get(j).getColumName(), singleValue.get(j));
             }
             for (int j = singleValue.size(); j < standerCol.size();j++) {
                 insertValues.get(i).add(new Value("NULL", SQLDataType.NULL));
@@ -90,14 +92,6 @@ public class InsertMultiDefaultService implements InsertService {
         Column primaryKey = table.getPRIMARY_KEY();
         Bplustree bpt = table.getIndexTree(primaryKey.getName());
 
-        for (Row row : rows) {
-            Value indexValue = row.getPRIMARY_KEY();
-            if (bpt.search(indexValue) != null) {
-                throw new InsertException(SQLErrorCode.SQL00009);
-            }
-            bpt.insert(indexValue, row);
-            //添加到表空间
-            table.addRow(row);
-        }
+        InsertUtils.addTableSpace(rows, bpt, table);
     }
 }

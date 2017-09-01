@@ -114,10 +114,13 @@ public class Value implements Comparable {
     public int compareTo(Object object) {
         Value value = (Value) object;
         if (dataType == SQLDataType.INTEGER) {
-            //此处默认比较类型相同,并且默认只有integer和string两种类型
+            //此处默认比较类型相同
             return intVal.compareTo(value.getIntVal());
-        } else {
+        } else if (dataType == SQLDataType.VARCHAR){
             return val.compareTo(value.getVal());
+        } else {
+            //null类型,null默认最小
+            return 1;
         }
     }
 }
