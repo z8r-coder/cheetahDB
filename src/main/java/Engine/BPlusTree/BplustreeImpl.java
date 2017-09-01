@@ -5,11 +5,12 @@ import Engine.Bplustree;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import Exception.SelectException;
 
 /**
  * Created by rx on 2017/8/21.
  */
-public class BplustreeImpl implements Bplustree {
+public class BplustreeImpl<T> implements Bplustree {
     /**
      * 根结点
      */
@@ -57,6 +58,10 @@ public class BplustreeImpl implements Bplustree {
         //0 true 1 false
 
         return root.search(key);
+    }
+
+    public List<Object> searchForList(Comparable key, String rp) throws SelectException {
+        return root.searchForList(key, rp);
     }
 
     public void delete(Comparable key) {

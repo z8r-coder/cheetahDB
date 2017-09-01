@@ -2,6 +2,9 @@ package Engine;
 
 import Engine.BPlusTree.Node;
 
+import java.util.List;
+import Exception.SelectException;
+
 /**
  * Created by rx on 2017/8/21.
  */
@@ -13,6 +16,13 @@ public interface Bplustree {
      */
     public Object search(Comparable key);
 
+    /**
+     * 区域查询
+     * @param key
+     * @param rp
+     * @return
+     */
+    public List<Object> searchForList(Comparable key, String rp) throws SelectException;
     /**
      * 移除
      * @param key
