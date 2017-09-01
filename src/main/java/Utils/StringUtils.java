@@ -150,6 +150,40 @@ public class StringUtils {
         return true;
     }
 
+    /**
+     * 删除字符串中所有字符
+     * <pre>
+     * StringUtils.deleteWhitespace(null)         = null
+     * StringUtils.deleteWhitespace("")           = ""
+     * StringUtils.deleteWhitespace("abc")        = "abc"
+     * StringUtils.deleteWhitespace("   ab  c  ") = "abc"
+     * </pre>
+     * @param str
+     * @return
+     */
+    public static String deleteWhiteSpace(final String str) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        final int sz = str.length();
+        final char[] chs = new char[sz];
+        int count = 0;
+        for (int i = 0; i < sz;i++) {
+            if (!Character.isWhitespace(str.charAt(i))) {
+                chs[count++] = str.charAt(i);
+            }
+        }
+
+        if (count == sz) {
+            return str;
+        }
+        return new String(chs,0,count);
+    }
+    /**
+     * 是否是数字
+     * @param str
+     * @return
+     */
     public static boolean isNumber(String str) {
         if (isEmpty(str)) {
             return false;
