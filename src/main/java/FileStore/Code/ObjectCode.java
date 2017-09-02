@@ -8,10 +8,12 @@ import java.nio.ByteBuffer;
 public class ObjectCode implements StoreCode<Object> {
 
     public void encode(ByteBuffer buffer, Object value) {
-
+        CodeUtils.encode(value, buffer);
     }
 
     public Object decode(ByteBuffer buffer) {
-        return null;
+        Object obj = CodeUtils.decode(buffer);
+
+        return obj;
     }
 }
