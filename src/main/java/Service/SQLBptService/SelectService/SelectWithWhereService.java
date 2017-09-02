@@ -13,6 +13,7 @@ import Utils.ServiceUtils;
 import java.util.*;
 
 /**
+ * todo 暂时搁置
  * 具有索引的列一定得非空
  * 带where的查询
  * Created by rx on 2017/8/26.
@@ -57,9 +58,9 @@ public class SelectWithWhereService implements SelectService {
         if (!SelectUtils.checkDataType(relations)) {
             throw new SelectException(SQLErrorCode.SQL00044);
         }
-        //筛选出来的行集合
-        List<List<Row>> rowSet = new ArrayList<List<Row>>();
+        //筛选出来的行集合,先只能选行集合
 
+        List<Row> resList = null;
         for (Relationship rs : relations) {
             String columnName = rs.getLeft().getName();
             Value value = null;
@@ -71,18 +72,20 @@ public class SelectWithWhereService implements SelectService {
                 value = new Value(indexValue, SQLDataType.INTEGER);
             }
             Bplustree bpt = table.getIndexTree(columnName);
-            List<Row> resList = null;
+
             if (bpt != null) {
                 //命中索引,索引不能为空
-                resList = bpt.searchForList(value, rs.getOperator());
-                rowSet.add(resList);
+                if(resList == null) {
+                    //第一次查找
+                    resList = bpt.searchForList(value, rs.getOperator());
+                    continue;
+                }
+
             } else {
                 //未命中索引
                 resList = rowFilter(rows, value, rs.getOperator());
                 //若存在多个集合，则需要排序，按主键排序
-                String primaryName = resList
-                qsort(resList,0, resList.size() - 1, value.getColumName());
-                rowSet.add(resList);
+                qsort(resList,0, resList.size() - 1, primaryKey);
             }
         }
 
@@ -105,19 +108,11 @@ public class SelectWithWhereService implements SelectService {
         int pointerNext = 0;
 
         while (pointerPrev <prevList.size() && pointerNext < nextList.size()) {
-            if (prevList.get(pointerPrev).equals())
+
         }
+        return null;
     }
 
-    /**
-     * 求两个集合的交集
-     * @param prevList
-     * @param nextList
-     * @return
-     */
-    private List<Row> orList(List<Row> prevList, List<Row> nextList) {
-
-    }
     /**
      * 快排找pivote
      * @param start
