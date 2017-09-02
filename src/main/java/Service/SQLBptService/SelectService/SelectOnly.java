@@ -17,14 +17,14 @@ import java.util.*;
 public class SelectOnly implements SelectService {
 
     public SimpleTable invoke(Table table, SQLSelectBuilder selectBuilder) throws SelectException {
-        //列名
+        //被选出的列名
         Set<String> columns = selectBuilder.columns();
 
         List<Column> standerCol = table.getColumns();
 
         List<Row> rows = table.getRows();
         //"*"
-        if (columns.size() == 0) {
+        if (columns.size() == 1) {
             Iterator it = columns.iterator();
             String column = (String) it.next();
             if (column.equals("*")) {

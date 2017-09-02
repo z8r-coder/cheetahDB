@@ -100,14 +100,6 @@ public class Value implements Comparable {
         if (!StringUtils.equals(columName, value.getColumName())) {
             return false;
         }
-
-        if (in != value.getIsIn()) {
-            return false;
-        }
-
-        if (insert != value.getIsInsert()) {
-            return false;
-        }
         return true;
     }
 

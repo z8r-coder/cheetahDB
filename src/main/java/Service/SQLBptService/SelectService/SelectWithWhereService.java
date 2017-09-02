@@ -7,10 +7,10 @@ import Parser.Builder.SQLSelectBuilder;
 import Parser.SQLDataType;
 import Parser.SortCode;
 import Exception.SelectException;
+import Utils.ListUtils;
+import Utils.ServiceUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 具有索引的列一定得非空
@@ -20,14 +20,40 @@ import java.util.Set;
 public class SelectWithWhereService implements SelectService {
 
     public SimpleTable invoke(Table table, SQLSelectBuilder selectBuilder) throws SelectException {
-        Set<String> column = selectBuilder.columns();
-
+        //选中的列名
+        Set<String> columns = selectBuilder.columns();
+        //where关系筛选
         Set<Relationship> relations = selectBuilder.where();
-
+        //关系集合
         List<String> AndOr = selectBuilder.AndOr();
-
+        //所有的行
         List<Row> rows = table.getRows();
+        //标准行
+        List<Column> standerCol = table.getColumns();
 
+        //需要返回的simpleTable
+        SimpleTable simpleTable = new SimpleTable();
+        //若该表中还不存在行
+        if (rows.size() == 0) {
+            if (columns.size() == 1) {
+                Iterator it = columns.iterator();
+                String column = (String) it.next();
+                if (column.equals("*")) {
+                    simpleTable.setColumns(ListUtils.List2Set(standerCol,0,standerCol.size() - 1));
+                    simpleTable.setSimpleRows(new ArrayList<SimpleRow>());
+                    return simpleTable;
+                }
+            }
+            simpleTable.setColumns(columns);
+            simpleTable.setSimpleRows(new ArrayList<SimpleRow>());
+            return simpleTable;
+        }
+
+        //获取主键的列名，并根据此来排序
+        String primaryKey = rows.get(0).getPRIMARY_KEY().getColumName();
+        if (!ServiceUtils.checkColumn(columns, standerCol)) {
+            throw new SelectException(SQLErrorCode.SQL00042);
+        }
         if (!SelectUtils.checkDataType(relations)) {
             throw new SelectException(SQLErrorCode.SQL00044);
         }
@@ -53,10 +79,9 @@ public class SelectWithWhereService implements SelectService {
             } else {
                 //未命中索引
                 resList = rowFilter(rows, value, rs.getOperator());
-                if (AndOr.size() != 0) {
-                    //若存在多个集合，则需要排序
-                    qsort(resList,0, resList.size() - 1, value.getColumName());
-                }
+                //若存在多个集合，则需要排序，按主键排序
+                String primaryName = resList
+                qsort(resList,0, resList.size() - 1, value.getColumName());
                 rowSet.add(resList);
             }
         }
@@ -64,6 +89,35 @@ public class SelectWithWhereService implements SelectService {
         return null;
     }
 
+    /**
+     * 求两个集合的并集
+     * @param prevList
+     * @param nextList
+     * @return
+     */
+    private List<Row> andList(List<Row> prevList, List<Row> nextList) {
+        if (prevList == null || nextList == null
+                || prevList.size() == 0 || nextList.size() == 0) {
+            return new ArrayList<Row>();
+        }
+        List<Row> resList = new ArrayList<Row>();
+        int pointerPrev = 0;
+        int pointerNext = 0;
+
+        while (pointerPrev <prevList.size() && pointerNext < nextList.size()) {
+            if (prevList.get(pointerPrev).equals())
+        }
+    }
+
+    /**
+     * 求两个集合的交集
+     * @param prevList
+     * @param nextList
+     * @return
+     */
+    private List<Row> orList(List<Row> prevList, List<Row> nextList) {
+
+    }
     /**
      * 快排找pivote
      * @param start

@@ -57,4 +57,23 @@ public class Row {
     public void putAllValue(List<Value> values) {
 
     }
+
+    /**
+     * 通过比较某一列的值
+     * @param row
+     * @param columnName
+     * @return
+     */
+    public int compareTo(Row row, String columnName) {
+        return valueMap.get(columnName).compareTo(row.getValue(columnName));
+    }
+
+    /**
+     * 比较两行的主键是否相同
+     * @param row
+     * @return
+     */
+    public boolean equals(Row row) {
+        return PRIMARY_KEY.equals(row.getPRIMARY_KEY());
+    }
 }
