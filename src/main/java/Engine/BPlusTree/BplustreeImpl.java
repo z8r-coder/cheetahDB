@@ -2,6 +2,7 @@ package Engine.BPlusTree;
 
 import Engine.Bplustree;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -10,7 +11,7 @@ import Exception.SelectException;
 /**
  * Created by rx on 2017/8/21.
  */
-public class BplustreeImpl<T> implements Bplustree {
+public class BplustreeImpl<T> implements Bplustree, Serializable {
     /**
      * 根结点
      */

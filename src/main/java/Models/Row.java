@@ -1,5 +1,6 @@
 package Models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.Map;
  * 行描述
  * Created by rx on 2017/8/26.
  */
-public class Row {
+public class Row implements Serializable {
     /**
      * 该行的主键
      */

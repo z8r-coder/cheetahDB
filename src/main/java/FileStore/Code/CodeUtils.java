@@ -277,7 +277,8 @@ public class CodeUtils {
      * @return
      */
     public static Object decode(ByteBuffer buf) {
-        //获取ordinary
+        //获取ordinary,并且切换成读模式
+        buf.flip();
         byte kindCode = buf.get();
 
         TypeKind kind = TypeKind.values()[kindCode];

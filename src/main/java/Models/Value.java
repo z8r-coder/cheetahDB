@@ -3,10 +3,12 @@ package Models;
 import Parser.SQLDataType;
 import Utils.StringUtils;
 
+import java.io.Serializable;
+
 /**
  * Created by rx on 2017/8/26.
  */
-public class Value implements Comparable {
+public class Value implements Comparable, Serializable {
     /**
      * 字符串值
      */

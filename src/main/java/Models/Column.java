@@ -5,10 +5,12 @@ import Parser.Token;
 import Utils.StringUtils;
 import Utils.TokenUtils;
 
+import java.io.Serializable;
+
 /**
  * Created by rx on 2017/8/26.
  */
-public class Column {
+public class Column implements Serializable {
     private String          table;
     private String          name;
     private Token token;//需要知道类型时候，注入token
@@ -134,52 +136,52 @@ public class Column {
         return name;
     }
 
-    @Override
-    public boolean equals(Object object) {
-        Column column = (Column) object;
-        if (!StringUtils.equals(column.getTable(), table)) {
-            return false;
-        }
-        if (!StringUtils.equals(column.getName(), name)) {
-            return false;
-        }
-        if (!TokenUtils.equals(token, column.getToken())) {
-            return false;
-        }
-        if (where != column.getWhere()) {
-            return false;
-        }
-        if (select != column.getSelect()) {
-            return false;
-        }
-
-        if (insert != column.getInsert()) {
-            return false;
-        }
-
-        if (primaryKey != column.getPrimaryKey()) {
-            return false;
-        }
-
-        if (notNull != column.getNotNull()) {
-            return false;
-        }
-
-        if (unique != column.getUnique()) {
-            return false;
-        }
-
-        if (dataType == null) {
-            return column.dataType == null;
-        }
-
-        if (dataType != column.getDataType()) {
-            return false;
-        }
-
-        if (typeLength != column.getTypeLength()) {
-            return false;
-        }
-        return true;
-    }
+//    @Override
+//    public boolean equals(Object object) {
+//        Column column = (Column) object;
+//        if (!StringUtils.equals(column.getTable(), table)) {
+//            return false;
+//        }
+//        if (!StringUtils.equals(column.getName(), name)) {
+//            return false;
+//        }
+//        if (!TokenUtils.equals(token, column.getToken())) {
+//            return false;
+//        }
+//        if (where != column.getWhere()) {
+//            return false;
+//        }
+//        if (select != column.getSelect()) {
+//            return false;
+//        }
+//
+//        if (insert != column.getInsert()) {
+//            return false;
+//        }
+//
+//        if (primaryKey != column.getPrimaryKey()) {
+//            return false;
+//        }
+//
+//        if (notNull != column.getNotNull()) {
+//            return false;
+//        }
+//
+//        if (unique != column.getUnique()) {
+//            return false;
+//        }
+//
+//        if (dataType == null) {
+//            return column.dataType == null;
+//        }
+//
+//        if (dataType != column.getDataType()) {
+//            return false;
+//        }
+//
+//        if (typeLength != column.getTypeLength()) {
+//            return false;
+//        }
+//        return true;
+//    }
 }
