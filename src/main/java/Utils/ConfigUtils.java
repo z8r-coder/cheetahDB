@@ -15,6 +15,8 @@ public class ConfigUtils {
     private final static Log LOG = LogFactory.getLog(ConfigUtils.class);
     private String pageSize;
     private String bufferSize;
+    private String dataPath;
+    private String absolutePath;
 
     private static ConfigUtils config;
     private Properties properties;
@@ -60,6 +62,16 @@ public class ConfigUtils {
         if (!StringUtils.isBlank(BUFFER_SIZE)) {
             this.bufferSize = BUFFER_SIZE.trim();
         }
+
+        String DATA_PATH = pro.getProperty("data-path");
+        if (!StringUtils.isBlank(DATA_PATH)) {
+            this.dataPath = DATA_PATH.trim();
+        }
+
+        String ABSOLUTE_PATH = pro.getProperty("absolute-path");
+        if (!StringUtils.isBlank(ABSOLUTE_PATH)) {
+            this.absolutePath = ABSOLUTE_PATH.trim();
+        }
     }
 
     public void setPageSize(String pageSize) {
@@ -76,6 +88,22 @@ public class ConfigUtils {
 
     public String getBufferSize() {
         return bufferSize;
+    }
+
+    public void setDataPath(String dataPath) {
+        this.dataPath = dataPath;
+    }
+
+    public String getDataPath() {
+        return dataPath;
+    }
+
+    public void setAbsolutePath(String absolutePath) {
+        this.absolutePath = absolutePath;
+    }
+
+    public String getAbsolutePath() {
+        return absolutePath;
     }
 
     public static void main(String args[]) {
