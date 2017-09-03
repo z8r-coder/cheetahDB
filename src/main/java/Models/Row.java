@@ -54,6 +54,12 @@ public class Row {
         valueMap.put(name, value);
     }
 
+    public int getValueSize() {
+        if (values == null) {
+            return 0;
+        }
+        return values.size();
+    }
     public void putAllValue(List<Value> values) {
 
     }

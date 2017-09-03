@@ -127,6 +127,10 @@ public class Table implements Serializable{
         return rows;
     }
 
+    public int getRowSize() {
+        return rows.size();
+    }
+
     /**
      * 添加索引
      * @param index

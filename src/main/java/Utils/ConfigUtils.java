@@ -1,28 +1,28 @@
-package Engine;
+package Utils;
 
 import Support.Logging.Log;
 import Support.Logging.LogFactory;
-import Utils.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * 引擎配置文件读取
+ * 配置文件读取
  * Created by rx on 2017/8/30.
  */
-public class EngineConfig {
-    private final static Log LOG = LogFactory.getLog(EngineConfig.class);
+public class ConfigUtils {
+    private final static Log LOG = LogFactory.getLog(ConfigUtils.class);
     private String pageSize;
+    private String bufferSize;
 
-    private static EngineConfig config;
+    private static ConfigUtils config;
     private Properties properties;
 
 
-    public static EngineConfig getConfig() {
+    public static ConfigUtils getConfig() {
         if (config == null) {
-            config = new EngineConfig();
+            config = new ConfigUtils();
         }
         return config;
     }
@@ -31,7 +31,7 @@ public class EngineConfig {
         InputStream in = null;
 
         try {
-            in = EngineConfig.class.getClassLoader().getResourceAsStream("EngineConfig.properties");
+            in = ConfigUtils.class.getClassLoader().getResourceAsStream("EngineConfig.properties");
             if (in != null) {
                 this.properties = new Properties();
                 this.properties.load(in);
@@ -51,9 +51,14 @@ public class EngineConfig {
     }
 
     public void loadProperties(Properties pro) {
-        String value = pro.getProperty("page-capacity");
-        if (!StringUtils.isBlank(value)) {
-            this.pageSize = value.trim();
+        String PAGE_CAPACITY = pro.getProperty("page-capacity");
+        if (!StringUtils.isBlank(PAGE_CAPACITY)) {
+            this.pageSize = PAGE_CAPACITY.trim();
+        }
+
+        String BUFFER_SIZE = pro.getProperty("buffer-size");
+        if (!StringUtils.isBlank(BUFFER_SIZE)) {
+            this.bufferSize = BUFFER_SIZE.trim();
         }
     }
 
@@ -65,10 +70,20 @@ public class EngineConfig {
         return pageSize;
     }
 
+    public void setBufferSize(String bufferSize) {
+        this.bufferSize = bufferSize;
+    }
+
+    public String getBufferSize() {
+        return bufferSize;
+    }
+
     public static void main(String args[]) {
         //加载配置文件
-        EngineConfig.getConfig().loadPropertiesFromSrc();
+        ConfigUtils.getConfig().loadPropertiesFromSrc();
 
-        System.out.println(EngineConfig.getConfig().getPageSize());
+        System.out.println(ConfigUtils.getConfig().getPageSize());
+
+        System.out.println(ConfigUtils.getConfig().getBufferSize());
     }
 }
