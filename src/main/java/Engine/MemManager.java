@@ -4,6 +4,8 @@ import Engine.MemBPlusTree.Node;
 import Support.Manager.Manager;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * table Name    keep
@@ -19,9 +21,14 @@ public class MemManager<T> {
     private static MemManager memManager;
 
     /**
-     * 内存池
+     * 内存池,frame
      */
     private static ByteBuffer bufferPool = ByteBuffer.allocate(100000000);
+
+    /**
+     * 记录页在缓存池位置
+     */
+    private Map<Long,Position> cacheMap = new HashMap<Long, Position>();
 
     public static MemManager getMemManager() {
         if (memManager == null) {
@@ -44,6 +51,14 @@ public class MemManager<T> {
      * @return
      */
     public Node<T> getPageById(long id) {
-        
+        if (cacheMap.get(id) == null) {
+            //缓存页中没找到
+        }
+        return null;
+    }
+
+    static class Position {
+        int start;
+        int end;
     }
 }
