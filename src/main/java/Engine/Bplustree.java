@@ -1,6 +1,6 @@
 package Engine;
 
-import Engine.BPlusTree.Node;
+import Engine.MemBPlusTree.Node;
 
 import java.util.List;
 import Exception.SelectException;
@@ -8,7 +8,7 @@ import Exception.SelectException;
 /**
  * Created by rx on 2017/8/21.
  */
-public interface Bplustree<T> {
+public interface Bplustree<T,E> {
     /**
      * 查询
      * @param key
@@ -53,7 +53,7 @@ public interface Bplustree<T> {
      * 设置根结点
      * @param root
      */
-    public void setRoot(Node root);
+    public void setRoot(E root);
 
     /**
      * 获取根结点
@@ -65,11 +65,11 @@ public interface Bplustree<T> {
      * 设置b+树叶子的头结点
      * @param head
      */
-    public void setHead(Node head);
+    public void setHead(E head);
 
     /**
      * 访问输出叶子结点
      * @param root
      */
-    public void visitorLeaf(Node root);
+    public void visitorLeaf(E root);
 }

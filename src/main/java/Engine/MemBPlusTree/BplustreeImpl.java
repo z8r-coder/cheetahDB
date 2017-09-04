@@ -1,4 +1,4 @@
-package Engine.BPlusTree;
+package Engine.MemBPlusTree;
 
 import Engine.Bplustree;
 
@@ -11,7 +11,7 @@ import Exception.SelectException;
 /**
  * Created by rx on 2017/8/21.
  */
-public class BplustreeImpl<T> implements Bplustree, Serializable {
+public class BplustreeImpl<T> implements Bplustree<T,Node>, Serializable {
     /**
      * 根结点
      */
@@ -96,7 +96,7 @@ public class BplustreeImpl<T> implements Bplustree, Serializable {
     }
     public static void main(String arg[]) {
         Node<Integer> root = new Node(true,true);
-        Bplustree<Integer> tree = new BplustreeImpl(1024, root);
+        Bplustree<Integer, Node> tree = new BplustreeImpl(1024, root);
         Random random = new Random();
         long current = System.currentTimeMillis();
         for (int j = 0; j < 1000; j++) {
