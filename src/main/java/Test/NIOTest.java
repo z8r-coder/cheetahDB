@@ -38,15 +38,16 @@ public class NIOTest {
 
         try {
             RandomAccessFile afile = new RandomAccessFile(ConfigUtils.getConfig().getAbsolutePath() + "test.db","rw");
-            System.out.println(afile.length());
             FileChannel inchannel = afile.getChannel();
 
             bb.flip();
             inchannel.position(30);
-            while (bb.hasRemaining()) {
+            //无法控制写区间
+//            while (bb.hasRemaining()) {
                 //缓冲区是读模式，读缓冲区写入通道
-                inchannel.write(bb);
-            }
+                int a = inchannel.write(bb);
+                System.out.println(afile.length());
+//            }
             inchannel.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -67,11 +68,12 @@ public class NIOTest {
             //设置启示位置
             inchannel.position(30);
             //截断
-            inchannel.truncate(300);
+            //inchannel.truncate(300);
             //设置以上值，代表，从磁盘文件30-300读info写入缓冲区
             //从通道写入缓冲区，写模式
             int bytesRead = inchannel.read(buf);
             System.out.println(inchannel.position());
+            //若不存在会返回-1
             System.out.println(bytesRead);
             inchannel.close();
         } catch (FileNotFoundException e) {

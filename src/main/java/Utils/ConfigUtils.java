@@ -14,10 +14,9 @@ import java.util.Properties;
 public class ConfigUtils {
     private final static Log LOG = LogFactory.getLog(ConfigUtils.class);
     private String pageSize;
-    private String bufferSize;
     private String dataPath;
     private String absolutePath;
-    private String cachePage;
+    private String cacheSize;
 
     private static ConfigUtils config;
     private Properties properties;
@@ -59,11 +58,6 @@ public class ConfigUtils {
             this.pageSize = PAGE_CAPACITY.trim();
         }
 
-        String BUFFER_SIZE = pro.getProperty("buffer-size");
-        if (!StringUtils.isBlank(BUFFER_SIZE)) {
-            this.bufferSize = BUFFER_SIZE.trim();
-        }
-
         String DATA_PATH = pro.getProperty("data-path");
         if (!StringUtils.isBlank(DATA_PATH)) {
             this.dataPath = DATA_PATH.trim();
@@ -74,9 +68,9 @@ public class ConfigUtils {
             this.absolutePath = ABSOLUTE_PATH.trim();
         }
 
-        String CACHE_PAGE = pro.getProperty("cache-page");
-        if (!StringUtils.isBlank(CACHE_PAGE)) {
-            this.cachePage = CACHE_PAGE;
+        String CACHE_SIZE = pro.getProperty("cache-page");
+        if (!StringUtils.isBlank(CACHE_SIZE)) {
+            this.cacheSize = CACHE_SIZE;
         }
     }
 
@@ -86,14 +80,6 @@ public class ConfigUtils {
 
     public String getPageSize() {
         return pageSize;
-    }
-
-    public void setBufferSize(String bufferSize) {
-        this.bufferSize = bufferSize;
-    }
-
-    public String getBufferSize() {
-        return bufferSize;
     }
 
     public void setDataPath(String dataPath) {
@@ -112,12 +98,12 @@ public class ConfigUtils {
         return absolutePath;
     }
 
-    public void setCachePage(String cachePage) {
-        this.cachePage = cachePage;
+    public void setCacheSize(String cacheSize) {
+        this.cacheSize = cacheSize;
     }
 
-    public String getCachePage() {
-        return cachePage;
+    public String getCacheSize() {
+        return cacheSize;
     }
 
     public static void main(String args[]) {
@@ -126,8 +112,6 @@ public class ConfigUtils {
 
         System.out.println(ConfigUtils.getConfig().getPageSize());
 
-        System.out.println(ConfigUtils.getConfig().getBufferSize());
-
-        System.out.println(ConfigUtils.getConfig().getCachePage());
+        System.out.println(ConfigUtils.getConfig().getCacheSize());
     }
 }

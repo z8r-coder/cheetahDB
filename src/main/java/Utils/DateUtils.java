@@ -3,6 +3,7 @@ package Utils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
+import java.awt.datatransfer.StringSelection;
 import java.util.Date;
 
 /**
@@ -11,6 +12,8 @@ import java.util.Date;
  */
 public class DateUtils {
     public static final String TIME_CACHE_FORMAT = "yyyyMMddHHmmss";
+
+    public static final String MAX_TIME_STAMP = "99999999999999";
 
     public static String convertDate2Str(Date date, String dateFormate) {
         if (date != null && !StringUtils.isBlank(dateFormate)) {
@@ -31,6 +34,7 @@ public class DateUtils {
         long dateTime2 = Long.parseLong(DateUtils.convertDate2Str(new Date(), DateUtils.TIME_CACHE_FORMAT));
         System.out.println(dateTime);
         System.out.println(dateTime2);
+        System.out.println(Long.parseLong(DateUtils.MAX_TIME_STAMP));
         System.out.println(dateTime2 > dateTime);
     }
 }
