@@ -59,7 +59,7 @@ public interface Bplustree<T,E> {
      * 获取根结点
      * @return
      */
-    public Node getRoot();
+    public E getRoot();
 
     /**
      * 设置b+树叶子的头结点

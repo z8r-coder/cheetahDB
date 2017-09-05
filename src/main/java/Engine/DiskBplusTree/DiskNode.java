@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 一页4KB大小
  * 数据页
  * Created by rx on 2017/9/4.
  */
@@ -40,6 +41,10 @@ public class DiskNode<T> {
      */
     private long nextId;
 
+    /**
+     * 自身在磁盘中的位置
+     */
+    private long id;
     /**
      * 儿子结点在磁盘中的位置
      */
@@ -106,6 +111,14 @@ public class DiskNode<T> {
 
     public void setNextId(long nextId) {
         this.nextId = nextId;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public List<Long> getChildrenId() {

@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * 配置文件读取
+ * 配置文件读取(EngineConfig)
  * Created by rx on 2017/8/30.
  */
 public class ConfigUtils {
@@ -17,6 +17,7 @@ public class ConfigUtils {
     private String bufferSize;
     private String dataPath;
     private String absolutePath;
+    private String cachePage;
 
     private static ConfigUtils config;
     private Properties properties;
@@ -52,7 +53,7 @@ public class ConfigUtils {
         }
     }
 
-    public void loadProperties(Properties pro) {
+    private void loadProperties(Properties pro) {
         String PAGE_CAPACITY = pro.getProperty("page-capacity");
         if (!StringUtils.isBlank(PAGE_CAPACITY)) {
             this.pageSize = PAGE_CAPACITY.trim();
@@ -71,6 +72,11 @@ public class ConfigUtils {
         String ABSOLUTE_PATH = pro.getProperty("absolute-path");
         if (!StringUtils.isBlank(ABSOLUTE_PATH)) {
             this.absolutePath = ABSOLUTE_PATH.trim();
+        }
+
+        String CACHE_PAGE = pro.getProperty("cache-page");
+        if (!StringUtils.isBlank(CACHE_PAGE)) {
+            this.cachePage = CACHE_PAGE;
         }
     }
 
@@ -106,6 +112,14 @@ public class ConfigUtils {
         return absolutePath;
     }
 
+    public void setCachePage(String cachePage) {
+        this.cachePage = cachePage;
+    }
+
+    public String getCachePage() {
+        return cachePage;
+    }
+
     public static void main(String args[]) {
         //加载配置文件
         ConfigUtils.getConfig().loadPropertiesFromSrc();
@@ -113,5 +127,7 @@ public class ConfigUtils {
         System.out.println(ConfigUtils.getConfig().getPageSize());
 
         System.out.println(ConfigUtils.getConfig().getBufferSize());
+
+        System.out.println(ConfigUtils.getConfig().getCachePage());
     }
 }

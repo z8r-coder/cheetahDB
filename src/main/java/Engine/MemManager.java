@@ -3,6 +3,8 @@ package Engine;
 import Engine.DiskBplusTree.DiskNode;
 import Engine.MemBPlusTree.Node;
 import Support.Manager.Manager;
+import Utils.ConfigUtils;
+import sun.security.krb5.Config;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -22,28 +24,22 @@ public class MemManager<T> {
     private static MemManager memManager;
 
     /**
-     * 内存池,frame
+     * 页缓存
      */
-    private static ByteBuffer bufferPool = ByteBuffer.allocate(100000000);
-
-    /**
-     * 记录页在缓存池位置
-     */
-    private Map<Long,Position> cacheMap = new HashMap<Long, Position>();
+    private Map<Long,CachePage> cacheMap;
 
     public static MemManager getMemManager() {
         if (memManager == null) {
+            ConfigUtils.getConfig().loadPropertiesFromSrc();
+            String cachePageSize = ConfigUtils.getConfig().getCachePage();
+            int pageSize = Integer.parseInt(cachePageSize);
+            Map<Long, CachePage> cachePageMap = new HashMap<Long, CachePage>(pageSize);
+
             memManager = new MemManager();
+            memManager.setCacheMap(cachePageMap);
+            return memManager;
         }
         return memManager;
-    }
-
-    /**
-     * 获取缓存池
-     * @return
-     */
-    public static ByteBuffer getBufferPool() {
-        return bufferPool;
     }
 
     /**
@@ -54,12 +50,30 @@ public class MemManager<T> {
     public DiskNode<T> getPageById(long id) {
         if (cacheMap.get(id) == null) {
             //缓存页中没找到
+
         }
         return null;
     }
 
-    static class Position {
-        int start;
-        int end;
+    static class CachePage {
+        //时间戳
+        long timestamp;
+        DiskNode cacheNode;
+    }
+
+    public void setCacheMap(Map<Long, CachePage> cacheMap) {
+        this.cacheMap = cacheMap;
+    }
+
+    public Map<Long, CachePage> getCacheMap() {
+        return cacheMap;
+    }
+
+//    private Object readFromDisk(long id) {
+//
+//    }
+
+    public static void main(String arg[]) {
+        System.out.println(System.currentTimeMillis());
     }
 }
