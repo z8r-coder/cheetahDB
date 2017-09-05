@@ -1,5 +1,6 @@
 package Engine;
 
+import Engine.DiskBplusTree.DiskNode;
 import Engine.MemBPlusTree.Node;
 import Support.Manager.Manager;
 
@@ -50,7 +51,7 @@ public class MemManager<T> {
      * @param id
      * @return
      */
-    public Node<T> getPageById(long id) {
+    public DiskNode<T> getPageById(long id) {
         if (cacheMap.get(id) == null) {
             //缓存页中没找到
         }

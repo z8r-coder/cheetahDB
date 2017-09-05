@@ -1,5 +1,7 @@
 package Test;
 
+import Engine.BPlusTree.BplustreeImpl;
+import Engine.Bplustree;
 import FileStore.Code.CodeUtils;
 import Models.Column;
 import Models.Row;
@@ -23,7 +25,7 @@ import java.util.List;
  */
 public class NIOTest {
     public static void main(String args[]) {
-        ByteBuffer bb = ByteBuffer.allocate(1000000000);
+        ByteBuffer bb = ByteBuffer.allocate(100000);
         List<Column> columns = new ArrayList<Column>(32);
         for (int i = 0; i < 25; i++) {
             columns.add(new Column("aa", "1" + i));
@@ -37,9 +39,11 @@ public class NIOTest {
 
         try {
             RandomAccessFile afile = new RandomAccessFile(ConfigUtils.getConfig().getAbsolutePath() + "test.db","rw");
+            System.out.println(afile.length());
             FileChannel inchannel = afile.getChannel();
 
             bb.flip();
+            inchannel.position(30);
             while (bb.hasRemaining()) {
                 //缓冲区是读模式，读缓冲区写入通道
                 inchannel.write(bb);
