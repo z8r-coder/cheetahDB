@@ -54,14 +54,16 @@ public class DiskNode<T> {
      */
     private List<Long> childrenId;
 
-    public DiskNode(boolean leaf) {
+    public DiskNode(boolean leaf, long id) {
+        this.id = id;
         this.leaf = leaf;
         if (!leaf) {
             childrenId = new ArrayList<Long>();
         }
     }
 
-    public DiskNode(boolean leaf, boolean root) {
+    public DiskNode(boolean leaf, boolean root,long id) {
+        this.id = id;
         this.leaf = leaf;
         this.root = root;
         if (!leaf) {
@@ -164,10 +166,47 @@ public class DiskNode<T> {
 //        }
 //    }
 
-    public void insert(Comparable key, T obj, Bplustree bpt, MemManager memManager) {
+    /**
+     * 节点插入
+     * @param key
+     * @param obj
+     * @param bpt
+     * @param memManager
+     */
+    public void insert(Comparable key, T obj, Bplustree bpt, MemManager<T> memManager) {
 
     }
 
+    public void updateInsert(Bplustree bpt, MemManager<T> memManager) {
+        validate(this, bpt, memManager);
+
+        if (childrenId.size() > bpt.getOrder()) {
+            //分裂，将本身节点在磁盘中的位置给左节点，右节点看空闲页中是否有数据，若没有在添加尾后
+            DiskNode<T> left = new DiskNode<T>(false,this.id);
+            long newId;
+            if (memManager.freePageSize() != 0) {
+                //从空闲页中取
+                newId = memManager.removeFreePage();
+            } else {
+                //生成新的页
+                newId = memManager.addAndRetMaxId();
+            }
+            DiskNode<T> right = new DiskNode<T>(false, newId);
+
+            int leftSize = (bpt.getOrder() + 1) / 2 + (bpt.getOrder() + 1) % 2;
+            int rightSize = (bpt.getOrder() + 1) / 2;
+
+            //将以前一半的子节点放入左节点
+            for (int i = 0; i < leftSize; i++) {
+                left.getChildrenId().add(childrenId.get(i));
+                long childId = childrenId.get(i);
+                DiskNode<T> childDiskNode = memManager.getPageById(childId);
+                Comparable key = childDiskNode.getEntries().get(0).getKey();
+                left.getEntries().add(new SimpleEntry<Comparable, T>(key, null));
+
+            }
+        }
+    }
     /**
      * todo 此处写的不好，太多的磁盘io，后期想方法优化
      * 调整关键字节点

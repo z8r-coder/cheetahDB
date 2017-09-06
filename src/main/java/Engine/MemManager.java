@@ -8,6 +8,7 @@ import Support.Logging.LogFactory;
 import Support.Manager.Manager;
 import Utils.ConfigUtils;
 import Utils.DateUtils;
+import com.sun.org.apache.regexp.internal.RE;
 import sun.security.krb5.Config;
 
 import java.io.FileNotFoundException;
@@ -64,6 +65,11 @@ public class MemManager<T> {
      * 磁盘空间目前的最大值
      */
     private long MAX_SIZE;
+
+    /**
+     * 磁盘空间逻辑页数
+     */
+    private long MAX_ID;
 
     /**
      * 空闲页管理
@@ -253,10 +259,37 @@ public class MemManager<T> {
         return MAX_SIZE;
     }
 
+    public void setMAX_ID(long MAX_ID) {
+        this.MAX_ID = MAX_ID;
+    }
+
+    public long getMAX_ID() {
+        return MAX_ID;
+    }
+
     public static MemManager getTableMemManager(String tableName) {
         return tableMemManager.get(tableName);
     }
 
+    /**
+     * 分裂后磁盘长度添加一页
+     * 由于我们使用空闲页管理，所以不设置减少
+     */
+    public void addMaxSize() {
+        MAX_SIZE = MAX_SIZE + PAGE_SIZE;
+    }
+
+    /**
+     * 分裂后磁盘逻辑页数增加1,并返回添加后的逻辑页
+     * 该值不会减少
+     */
+    public long addAndRetMaxId() {
+        return ++MAX_ID;
+    }
+
+    public int freePageSize () {
+        return freePage.size();
+    }
     public static void main(String arg[]) {
         System.out.println(System.currentTimeMillis());
     }

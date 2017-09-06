@@ -619,7 +619,7 @@ public class Node<T> {
             Node left = new Node(false);
             Node right = new Node(false);
 
-            //左右俩子字节的长度
+            //左右俩子节点的长度
             int leftSize = (bpt.getOrder() + 1) / 2 + (bpt.getOrder() + 1) % 2;
             int rightSize = (bpt.getOrder() + 1) / 2;
 
