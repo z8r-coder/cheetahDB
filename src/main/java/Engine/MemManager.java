@@ -284,6 +284,7 @@ public class MemManager<T> {
      * 该值不会减少
      */
     public long addAndRetMaxId() {
+        addMaxSize();
         return ++MAX_ID;
     }
 

@@ -32,6 +32,7 @@ public class DiskNode<T> {
 
     /**
      * 父节点在磁盘中的位置
+     * 若该节点即为根节点，则parentId = -1
      */
     private long parentId;
 
@@ -195,7 +196,6 @@ public class DiskNode<T> {
 
             int leftSize = (bpt.getOrder() + 1) / 2 + (bpt.getOrder() + 1) % 2;
             int rightSize = (bpt.getOrder() + 1) / 2;
-
             //将以前一半的子节点放入左节点
             for (int i = 0; i < leftSize; i++) {
                 left.getChildrenId().add(childrenId.get(i));
@@ -204,9 +204,41 @@ public class DiskNode<T> {
                 Comparable key = childDiskNode.getEntries().get(0).getKey();
                 left.getEntries().add(new SimpleEntry<Comparable, T>(key, null));
 
+                childDiskNode.setParentId(this.id);
+            }
+
+            //后一半的子节点放入右节点
+            for (int i = 0; i < rightSize;i++) {
+                right.getChildrenId().add(childrenId.get(leftSize + i));
+                long childId = childrenId.get(leftSize + i);
+                DiskNode<T> childDiskNode = memManager.getPageById(childId);
+                Comparable key = childDiskNode.getEntries().get(0).getKey();
+                right.getEntries().add(new SimpleEntry<Comparable, T>(key, null));
+
+                childDiskNode.setParentId(newId);
+            }
+
+            if (parentId != -1) {
+                DiskNode<T> parentDiskNode = memManager.getPageById(parentId);
+                int index = parentDiskNode.getChildrenId().indexOf(id);
+                //此处不用移除以前的id，作为left节点的id了
+
+                left.setParentId(parentId);
+                right.setParentId(parentId);
+
+                parentDiskNode.getChildrenId().add(index + 1,newId);
+                setEntries(null);
+                setChildrenId(null);
+
+                parentDiskNode.updateInsert(bpt, memManager);
+                setParentId(-1);
+            } else {
+                //根节点
+                root = false;
             }
         }
     }
+
     /**
      * todo 此处写的不好，太多的磁盘io，后期想方法优化
      * 调整关键字节点
