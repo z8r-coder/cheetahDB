@@ -1,5 +1,6 @@
 package Engine;
 
+import Engine.DiskBplusTree.DiskBplusTree;
 import Engine.DiskBplusTree.DiskNode;
 import Engine.MemBPlusTree.Node;
 import FileStore.Code.CodeUtils;
@@ -92,11 +93,11 @@ public class MemManager<T> {
     }
 
     /**
-     * 移除最后一个空闲页
+     * 移除最后一个空闲页,并将其返回
      * 若为空，返回-1
      * @return
      */
-    public long removeFreePage() {
+    public long removeAndRetFreePage() {
         int freePageSize = freePage.size();
         if (freePageSize == 0) {
             return -1;
@@ -214,7 +215,6 @@ public class MemManager<T> {
                     outChannel.write(zeroBuffer);
                 }
             }
-            Long dateTime = Long.parseLong(DateUtils.convertDate2Str(new Date(), DateUtils.TIME_CACHE_FORMAT));
             //缓存该结点
             putNodeToCache(id, diskNode);
             return true;
@@ -228,6 +228,98 @@ public class MemManager<T> {
             }
         }
     }
+
+    public void writeBptToDisk(Bplustree<T,Long> bpt) throws Exception {
+        long position = 1;
+        long end = 1024;
+        ByteBuffer writeBuf = ByteBuffer.allocate(1024);
+        FileChannel outchannel = null;
+
+        try {
+            RandomAccessFile afile = new RandomAccessFile(FILE_PATH
+                    + tableName + "_indexFile.db", "rw");
+            outchannel = afile.getChannel();
+            outchannel.position(position);
+
+            writeBuf.flip();
+            while(writeBuf.hasRemaining()) {
+                outchannel.write(writeBuf);
+            }
+
+            //不足的0补齐
+            if (outchannel.position() < end) {
+                int startPos = (int) (end - outchannel.position());
+                ByteBuffer zeroBuffer = ByteBuffer.allocate(startPos);
+                outchannel.position(startPos + 1);
+                for (int i = 0; i <= zeroBuffer.capacity();i++) {
+                    zeroBuffer.put((byte) 0);
+                }
+                //将补齐的零写入磁盘
+                while (zeroBuffer.hasRemaining()) {
+                    outchannel.write(zeroBuffer);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            throw new Exception(e);
+        } catch (IOException e) {
+            throw new Exception(e);
+        } finally {
+            if (outchannel != null) {
+                try {
+                    outchannel.close();
+                } catch (IOException e) {
+                    throw new Exception(e);
+                }
+            }
+        }
+    }
+    /**
+     * 从磁盘中读取b+树
+     * @return
+     * @throws Exception
+     */
+    public Bplustree<T, Long> readBptFromDisk() throws Exception {
+        long positon = 1;
+        long end = 1024;
+        ByteBuffer readBuf = ByteBuffer.allocate(1024);
+        FileChannel inchannel = null;
+
+        try {
+            RandomAccessFile afile = new RandomAccessFile(FILE_PATH
+                    + tableName + "_indexFile.db", "rw");
+            inchannel = afile.getChannel();
+            inchannel.position(positon);
+            inchannel.truncate(end);
+            int bytesRead = inchannel.read(readBuf);
+
+            if (bytesRead < 0) {
+                //啥都没读到
+                log.error("start:" + positon + "end:" + (positon + PAGE_SIZE - 1));
+                throw new Exception("nothing read");
+            }
+        } catch (FileNotFoundException e) {
+            throw new Exception(e);
+        } catch (IOException e) {
+            throw new Exception(e);
+        } finally {
+            if (inchannel != null) {
+                try {
+                    inchannel.close();
+                } catch (IOException e) {
+                    throw new Exception(e);
+                }
+            }
+        }
+        Bplustree<T, Long> diskBpt = (DiskBplusTree<T>)CodeUtils.decode(readBuf);
+        return diskBpt;
+    }
+
+    /**
+     * 从磁盘中读取节点
+     * @param id
+     * @return
+     * @throws Exception
+     */
     private DiskNode<T> readFromDisk(long id) throws Exception {
         //该结点的起始位置,1开始
         long positon = 1025 + id * PAGE_SIZE;
@@ -299,6 +391,19 @@ public class MemManager<T> {
         return ++MAX_ID;
     }
 
+    /**
+     * 获取一个新或空间的叶
+     * @return
+     */
+    public long getNewOrFreeId() {
+        if (freePageSize() > 0) {
+            //还有空间页
+            return removeAndRetFreePage();
+        } else {
+            //增加id
+            return addAndRetMaxId();
+        }
+    }
     /**
      * 返回空闲页的数量
      * @return

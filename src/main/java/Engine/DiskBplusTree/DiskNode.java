@@ -1,8 +1,11 @@
 package Engine.DiskBplusTree;
 
 import Engine.Bplustree;
+import Engine.MemBPlusTree.Node;
 import Engine.MemBPlusTree.SimpleEntry;
 import Engine.MemManager;
+import Support.Logging.Log;
+import Support.Logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,11 +41,13 @@ public class DiskNode<T> {
 
     /**
      * 前驱节点在磁盘中的位置
+     * 若前驱节点不存在，则为-1
      */
     private long prevId;
 
     /**
      * 后继节点在磁盘中的位置
+     * 若后继节点不存在，则为-1
      */
     private long nextId;
 
@@ -54,6 +59,8 @@ public class DiskNode<T> {
      * 儿子结点在磁盘中的位置
      */
     private List<Long> childrenId;
+
+    private transient Log log = LogFactory.getLog(DiskNode.class);
 
     public DiskNode(boolean leaf, long id) {
         this.id = id;
@@ -176,7 +183,132 @@ public class DiskNode<T> {
      */
     public void insert(Comparable key, T obj, Bplustree bpt, MemManager<T> memManager) {
         if (leaf) {
+            //叶子结点
+            int tmpIndex = contain(key);
+            if (tmpIndex >= 0 || entries.size() < bpt.getOrder()) {
+                insert(key, obj,bpt, memManager);
+                if (parentId != -1) {
+                    DiskNode<T> diskParentNode = memManager.getPageById(parentId);
+                    diskParentNode.updateInsert(bpt, memManager);
+                }
+            } else {
+                //分裂
+                Long rightId = memManager.getNewOrFreeId();
+                //左结点的id用本node的id
+                DiskNode<T> left = new DiskNode<T>(true,id);
+                DiskNode<T> right = new DiskNode<T>(true, rightId);
 
+                if (prevId != -1) {
+                    DiskNode<T> prevNode = memManager.getPageById(prevId);
+                    prevNode.setNextId(id);
+                    left.setPrevId(prevId);
+                }
+
+                if (nextId != -1) {
+                    DiskNode<T> nextNode = memManager.getPageById(nextId);
+                    nextNode.setPrevId(rightId);
+                    right.setNextId(nextId);
+                }
+
+                if (prevId == -1) {
+                    bpt.setHead(id);
+                    try {
+                        memManager.writeBptToDisk(bpt);
+                    } catch (Exception e) {
+                        log.error("write bpt to disk error!", e);
+                    }
+                }
+                left.setNextId(rightId);
+                right.setPrevId(id);
+
+                int leftSize = (bpt.getOrder() + 1) / 2 + (bpt.getOrder() + 1) % 2;
+                int rightSize = (bpt.getOrder() + 1) / 2;
+
+                insert(key, obj, bpt, memManager);
+                for (int i = 0; i < leftSize; i++) {
+                    left.getEntries().add(entries.get(i));
+                }
+                for (int i = 0; i < rightSize; i++) {
+                    right.getEntries().add(entries.get(leftSize + i));
+                }
+
+                //非根结点
+                if (parentId != -1) {
+                    DiskNode<T> diskParentNode = memManager.getPageById(parentId);
+                    int index = diskParentNode.getChildrenId().indexOf(id);
+
+                    //不用移除本结点，作为左结点的位置
+                    left.setParentId(parentId);
+                    right.setParentId(parentId);
+                    diskParentNode.getChildrenId().add(index + 1,rightId);
+
+                    setEntries(null);
+                    setChildrenId(null);
+
+                    diskParentNode.updateInsert(bpt, memManager);
+                    setParentId(-1);
+
+                    try {
+                        //将原节点的位置更新为left
+                        memManager.writeToDisk(left.getId(), left);
+                        //写入右结点
+                        memManager.writeToDisk(right.getId(), right);
+                    } catch (Exception e) {
+                        log.error("updateInsert write node to disk error!", e);
+                    }
+                } else {
+                    //根节点
+                    root = false;
+
+                    long newParentId = memManager.getNewOrFreeId();
+
+                    DiskNode<T> diskParentNode = new DiskNode<T>(false, true, newParentId);
+                    left.setParentId(newParentId);
+                    right.setParentId(newParentId);
+
+                    //b+树设置新的根结点
+                    bpt.setRoot(newParentId);
+
+                    diskParentNode.getChildrenId().add(left.getId());
+                    diskParentNode.getChildrenId().add(right.getId());
+
+                    setEntries(null);
+                    setChildrenId(null);
+
+                    try {
+                        //将新产生的结点和改变的写入磁盘
+                        memManager.writeToDisk(newParentId, diskParentNode);
+                        memManager.writeToDisk(left.getId(), left);
+                        memManager.writeToDisk(right.getId(), right);
+
+                        //将改变后的bpt写入磁盘
+                        memManager.writeBptToDisk(bpt);
+                    } catch (Exception e) {
+                        log.error("updateInsert write node to disk error!", e);
+                    }
+                }
+            }
+        } else {
+            //非叶结点
+            if (key.compareTo(entries.get(0).getKey()) <= 0) {
+                long childId = childrenId.get(0);
+                DiskNode<T> childNode = memManager.getPageById(childId);
+                childNode.insert(key, obj, bpt, memManager);
+            } else if (key.compareTo(entries.get(entries.size() - 1).getKey()) >= 0) {
+                long childId = childrenId.get(0);
+                DiskNode<T> childNode = memManager.getPageById(childId);
+                childNode.insert(key, obj, bpt, memManager);
+            } else {
+                for (int i = 0; i < entries.size();i++) {
+                    if (entries.get(i).getKey().compareTo(key) <= 0
+                            && entries.get(i + 1).getKey().compareTo(key) > 0) {
+                        long childId = childrenId.get(i);
+                        DiskNode<T> childNode = memManager.getPageById(childId);
+                        childNode.insert(key, obj, bpt, memManager);
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -186,20 +318,15 @@ public class DiskNode<T> {
      * @param memManager
      * @throws Exception
      */
-    public void updateInsert(Bplustree bpt, MemManager<T> memManager) throws Exception {
+    public void updateInsert(Bplustree bpt, MemManager<T> memManager) {
         validate(this, bpt, memManager);
 
         if (childrenId.size() > bpt.getOrder()) {
             //分裂，将本身节点在磁盘中的位置给左节点，右节点看空闲页中是否有数据，若没有在添加尾后
             DiskNode<T> left = new DiskNode<T>(false,this.id);
-            long newId;
-            if (memManager.freePageSize() != 0) {
-                //从空闲页中取
-                newId = memManager.removeFreePage();
-            } else {
-                //生成新的页
-                newId = memManager.addAndRetMaxId();
-            }
+            //获取新的id
+            long newId = memManager.getNewOrFreeId();
+
             DiskNode<T> right = new DiskNode<T>(false, newId);
 
             int leftSize = (bpt.getOrder() + 1) / 2 + (bpt.getOrder() + 1) % 2;
@@ -240,20 +367,21 @@ public class DiskNode<T> {
 
                 parentDiskNode.updateInsert(bpt, memManager);
                 setParentId(-1);
-                //将源节点的位置更新为left
-                memManager.writeToDisk(left.getId(), left);
-                //写入右结点
-                memManager.writeToDisk(right.getId(), right);
+
+                try {
+                    //将新增加的结点写入磁盘
+                    memManager.writeToDisk(left.getId(), left);
+                    memManager.writeToDisk(right.getId(), right);
+                    //将改变的父结点写入磁盘
+                    memManager.writeToDisk(parentDiskNode.getId(), parentDiskNode);
+                } catch (Exception e) {
+                    log.error("updateInsert write node to disk error!", e);
+                }
             } else {
                 //根节点
                 root = false;
 
-                long newParentId;
-                if (memManager.freePageSize() != 0) {
-                    newParentId = memManager.removeFreePage();
-                } else {
-                    newParentId = memManager.addAndRetMaxId();
-                }
+                long newParentId = memManager.getNewOrFreeId();
 
                 DiskNode<T> diskParentNode = new DiskNode<T>(false, true, newParentId);
                 left.setParentId(newParentId);
@@ -267,9 +395,18 @@ public class DiskNode<T> {
 
                 setEntries(null);
                 setChildrenId(null);
-                //将新产生的结点写入磁盘
-                memManager.writeToDisk(newParentId, diskParentNode);
-                memManager.writeToDisk(right.getId(), right);
+
+                try {
+                    //将新产生的结点和改变的结点写入磁盘
+                    memManager.writeToDisk(newParentId, diskParentNode);
+                    memManager.writeToDisk(left.getId(), left);
+                    memManager.writeToDisk(right.getId(), right);
+                    //将更新后的bpt写入磁盘
+                    memManager.writeBptToDisk(bpt);
+                } catch (Exception e) {
+                    log.error("updateInsert write node to disk error!", e);
+                }
+
             }
         }
     }
@@ -280,7 +417,7 @@ public class DiskNode<T> {
      * @param diskNode
      * @param bpt
      */
-    public void validate(DiskNode<T> diskNode, Bplustree bpt, MemManager<T> memManager) throws Exception {
+    public void validate(DiskNode<T> diskNode, Bplustree bpt, MemManager<T> memManager) {
         if (diskNode.getEntries().size() == diskNode.getChildrenId().size()) {
             //关键字节点和节点数目相同
             List<Map.Entry<Comparable, T>> entries = diskNode.getEntries();
@@ -295,7 +432,11 @@ public class DiskNode<T> {
                 }
             }
             //将修改后的结点插入磁盘
-            memManager.writeToDisk(diskNode.getId(), diskNode);
+            try {
+                memManager.writeToDisk(diskNode.getId(), diskNode);
+            } catch (Exception e) {
+                log.error("validate write to disk error!", e);
+            }
             if (!diskNode.root){
                 long parentId = diskNode.getParentId();
                 DiskNode<T> parentNode = memManager.getPageById(parentId);
@@ -315,7 +456,11 @@ public class DiskNode<T> {
                 diskNode.getEntries().add(new SimpleEntry<Comparable, T>(key,null));
             }
 
-            memManager.writeToDisk(diskNode.getId(), diskNode);
+            try {
+                memManager.writeToDisk(diskNode.getId(), diskNode);
+            } catch (Exception e) {
+                log.error("validate write node to disk error!", e);
+            }
             if (!diskNode.root) {
                 long parentId = diskNode.getParentId();
                 DiskNode<T> parentNode = memManager.getPageById(parentId);
