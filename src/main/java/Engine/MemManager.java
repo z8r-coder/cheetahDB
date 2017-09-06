@@ -19,8 +19,8 @@ import java.nio.channels.FileChannel;
 import java.util.*;
 
 /**
- * table Name    keep
- * |---20b---|----10b---|----pageSize----|more
+ *      B+tree
+ * |----1024-------|----pageSize----|more
  * 内存管理器,不同表对应不同的内存管理器
  * Created by rx on 2017/9/4.
  */
@@ -117,30 +117,8 @@ public class MemManager<T> {
             //缓存页中没找到，从磁盘中读取
             try {
                 DiskNode diskNode = readFromDisk(id);
-                if (cacheMap.size() < CACHE_SIZE) {
-                    //缓存未满直接存入
-                    Long dateTime = Long.parseLong(DateUtils.convertDate2Str(new Date(), DateUtils.TIME_CACHE_FORMAT));
-                    CachePage cachePage = new CachePage(dateTime, diskNode);
-                    cacheMap.put(id, cachePage);
-                } else {
-                    //如果缓存满了，扔掉时间戳最小的那个
-                    // TODO: 2017/9/6 待优化，可加个负载因子
-                    long min_tm = Long.parseLong(DateUtils.MAX_TIME_STAMP);
-                    long min_id = -1;
-                    for (long removeid : cacheMap.keySet()) {
-                        CachePage cachePage = cacheMap.get(removeid);
-                        if (cachePage.timestamp < min_tm) {
-                            min_id = cachePage.cacheNode.getId();
-                            min_tm = removeid;
-                        }
-                    }
-                    //移除掉最少的
-                    cacheMap.remove(min_id);
-                    //将新的放进去
-                    Long dateTime = Long.parseLong(DateUtils.convertDate2Str(new Date(), DateUtils.TIME_CACHE_FORMAT));
-                    CachePage cachePage = new CachePage(dateTime, diskNode);
-                    cacheMap.put(id, cachePage);
-                }
+                //缓存磁盘页
+                putNodeToCache(id, diskNode);
                 return diskNode;
             } catch (Exception e) {
                 log.error("getPageById ERROR!", e);
@@ -172,10 +150,41 @@ public class MemManager<T> {
         return cacheMap;
     }
 
+    /**
+     * 缓存
+     * LRU算法
+     * @param id
+     * @param diskNode
+     */
+    public void putNodeToCache(long id, DiskNode<T> diskNode) {
+        if (cacheMap.size() < CACHE_SIZE) {
+            //缓存未满
+            Long dateTime = Long.parseLong(DateUtils.convertDate2Str(new Date(), DateUtils.TIME_CACHE_FORMAT));
+            cacheMap.put(id, new CachePage(dateTime, diskNode));
+        } else {
+            //如果缓存满了，扔掉时间戳最小的那个
+            // TODO: 2017/9/6 待优化，可加个负载因子
+            long min_tm = Long.parseLong(DateUtils.MAX_TIME_STAMP);
+            long min_id = -1;
+            for (long removeid : cacheMap.keySet()) {
+                CachePage cachePage = cacheMap.get(removeid);
+                if (cachePage.timestamp < min_tm) {
+                    min_id = cachePage.cacheNode.getId();
+                    min_tm = removeid;
+                }
+            }
+            //移除掉最少的
+            cacheMap.remove(min_id);
+            //将新的放进去
+            Long dateTime = Long.parseLong(DateUtils.convertDate2Str(new Date(), DateUtils.TIME_CACHE_FORMAT));
+            CachePage cachePage = new CachePage(dateTime, diskNode);
+            cacheMap.put(id, cachePage);
+        }
+    }
     public boolean writeToDisk(long id, DiskNode<T> diskNode) throws Exception {
-        long position = 31 + id * PAGE_SIZE;
+        long position = 1025 + id * PAGE_SIZE;
         //终止位置，不足0补齐
-        long end = 30 + (id + 1) * PAGE_SIZE;
+        long end = 1024 + (id + 1) * PAGE_SIZE;
         ByteBuffer writeBuf = ByteBuffer.allocate(PAGE_SIZE);
         //将数据页编码存入buf
         CodeUtils.encode(diskNode, writeBuf);
@@ -197,15 +206,17 @@ public class MemManager<T> {
                 int startPos = (int) (end - outChannel.position());
                 ByteBuffer zeroBuffer = ByteBuffer.allocate(startPos);
                 outChannel.position(startPos + 1);
-                for (int i = 0; i < zeroBuffer.capacity();i++) {
+                for (int i = 0; i <= zeroBuffer.capacity();i++) {
                     zeroBuffer.put((byte) 0);
                 }
                 //将补齐的零写入磁盘
-
                 while (zeroBuffer.hasRemaining()) {
                     outChannel.write(zeroBuffer);
                 }
             }
+            Long dateTime = Long.parseLong(DateUtils.convertDate2Str(new Date(), DateUtils.TIME_CACHE_FORMAT));
+            //缓存该结点
+            putNodeToCache(id, diskNode);
             return true;
         } catch (FileNotFoundException e) {
             throw new Exception(e);
@@ -219,7 +230,7 @@ public class MemManager<T> {
     }
     private DiskNode<T> readFromDisk(long id) throws Exception {
         //该结点的起始位置,1开始
-        long positon = 31 + id * PAGE_SIZE;
+        long positon = 1025 + id * PAGE_SIZE;
 
         ByteBuffer readBuf = ByteBuffer.allocate(PAGE_SIZE);
         FileChannel inchannel = null;
@@ -288,6 +299,10 @@ public class MemManager<T> {
         return ++MAX_ID;
     }
 
+    /**
+     * 返回空闲页的数量
+     * @return
+     */
     public int freePageSize () {
         return freePage.size();
     }

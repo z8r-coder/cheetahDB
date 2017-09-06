@@ -178,7 +178,7 @@ public class DiskNode<T> {
 
     }
 
-    public void updateInsert(Bplustree bpt, MemManager<T> memManager) {
+    public void updateInsert(Bplustree bpt, MemManager<T> memManager) throws Exception {
         validate(this, bpt, memManager);
 
         if (childrenId.size() > bpt.getOrder()) {
@@ -219,6 +219,7 @@ public class DiskNode<T> {
             }
 
             if (parentId != -1) {
+                //非根结点
                 DiskNode<T> parentDiskNode = memManager.getPageById(parentId);
                 int index = parentDiskNode.getChildrenId().indexOf(id);
                 //此处不用移除以前的id，作为left节点的id了
@@ -235,6 +236,22 @@ public class DiskNode<T> {
             } else {
                 //根节点
                 root = false;
+
+                long newParentId;
+                if (memManager.freePageSize() != 0) {
+                    newParentId = memManager.removeFreePage();
+                } else {
+                    newParentId = memManager.addAndRetMaxId();
+                }
+
+                DiskNode<T> diskParentNode = new DiskNode<T>(false, true, newParentId);
+                left.setParentId(newParentId);
+                right.setParentId(newParentId);
+
+                bpt.setRoot(newParentId);
+//                diskParentNode
+                memManager.writeToDisk(newParentId, diskParentNode);
+                memManager.writeToDisk(right.getId(), right);
             }
         }
     }
@@ -245,7 +262,7 @@ public class DiskNode<T> {
      * @param diskNode
      * @param bpt
      */
-    public void validate(DiskNode<T> diskNode, Bplustree bpt, MemManager<T> memManager) {
+    public void validate(DiskNode<T> diskNode, Bplustree bpt, MemManager<T> memManager) throws Exception {
         if (diskNode.getEntries().size() == diskNode.getChildrenId().size()) {
             //关键字节点和节点数目相同
             List<Map.Entry<Comparable, T>> entries = diskNode.getEntries();
@@ -257,6 +274,7 @@ public class DiskNode<T> {
                 if (diskNode.getEntries().get(i).getKey().compareTo(key) != 0) {
                     diskNode.getEntries().remove(i);
                     diskNode.getEntries().add(i, new SimpleEntry<Comparable, T>(key, null));
+
                     if (!diskNode.root){
                         long parentId = diskNode.getParentId();
                         DiskNode<T> parentNode = memManager.getPageById(parentId);
@@ -264,6 +282,8 @@ public class DiskNode<T> {
                     }
                 }
             }
+            //将
+            memManager.writeToDisk(diskNode.getId(), diskNode);
         } else if (diskNode.root && diskNode.getChildrenId().size() >= 2 ||
                 diskNode.getChildrenId().size() >= bpt.getOrder() / 2 &&
                 diskNode.getChildrenId().size() <= bpt.getOrder() &&

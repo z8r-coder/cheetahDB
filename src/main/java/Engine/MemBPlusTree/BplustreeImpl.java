@@ -99,9 +99,9 @@ public class BplustreeImpl<T> implements Bplustree<T,Node>, Serializable {
         Bplustree<Integer, Node> tree = new BplustreeImpl(1024, root);
         Random random = new Random();
         long current = System.currentTimeMillis();
-        for (int j = 0; j < 1000; j++) {
+        for (int j = 0; j < 100; j++) {
             for (int i = 0; i < 100; i++) {
-                int randomNumber = random.nextInt(1000);
+                int randomNumber = random.nextInt(10000);
                 tree.insert(randomNumber, randomNumber);
             }
 
@@ -111,7 +111,7 @@ public class BplustreeImpl<T> implements Bplustree<T,Node>, Serializable {
 //            }
         }
 
-//        tree.visitorLeaf(tree.getRoot());
+        tree.visitorLeaf(tree.getRoot());
 
         long duration = System.currentTimeMillis() - current;
         System.out.println("time elpsed for duration: " + duration);

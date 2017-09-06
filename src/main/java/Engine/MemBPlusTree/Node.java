@@ -683,10 +683,10 @@ public class Node<T> {
                 if (node.getEntries().get(i).getKey().compareTo(key) != 0) {
                     node.getEntries().remove(i);
                     node.getEntries().add(i, new SimpleEntry<Comparable, T>(key, null));
-                    if (!node.root) {
-                        validate(node.getParent(), bpt);
-                    }
                 }
+            }
+            if (!node.root) {
+                validate(node.getParent(), bpt);
             }
             //若子节点数不等于关键字个数但仍大于M/2并且小于M，并且大于2
         } else if (node.root && node.getChildren().size() >= 2 ||
@@ -697,9 +697,9 @@ public class Node<T> {
             for (int i = 0; i < node.getChildren().size();i++) {
                 Comparable key = node.getChildren().get(i).getEntries().get(0).getKey();
                 node.getEntries().add(new SimpleEntry<Comparable, T>(key, null));
-                if (!node.root) {
-                    validate(node.getParent(), bpt);
-                }
+            }
+            if (!node.root) {
+                validate(node.getParent(), bpt);
             }
         }
     }
