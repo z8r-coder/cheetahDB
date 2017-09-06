@@ -15,9 +15,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * table Name    keep
@@ -39,6 +37,11 @@ public class MemManager<T> {
      * 缓存大小，页数量
      */
     private final static int CACHE_SIZE;
+
+    /**
+     * 每个表对应的管理器
+     */
+    private static Map<String, MemManager> tableMemManager = new HashMap<String, MemManager>();
     static {
         ConfigUtils.getConfig().loadPropertiesFromSrc();
         PAGE_SIZE = Integer.parseInt(ConfigUtils.getConfig().getPageSize());
@@ -55,14 +58,48 @@ public class MemManager<T> {
     /**
      * 表名
      */
-    private static String tableName;
+    private String tableName;
+
+    /**
+     * 磁盘空间目前的最大值
+     */
+    private long MAX_SIZE;
+
+    /**
+     * 空闲页管理
+     */
+    private List<Long> freePage = new LinkedList<Long>();
 
     private Log log = LogFactory.getLog(MemManager.class);
 
     public MemManager (String tableName) {
         this.tableName = tableName;
+        tableMemManager.put(tableName, this);
     }
 
+    /**
+     * 添加一个空闲页
+     * @param freeId
+     */
+    public void addFreePage(Long freeId) {
+        freePage.add(freeId);
+    }
+
+    /**
+     * 移除最后一个空闲页
+     * 若为空，返回-1
+     * @return
+     */
+    public long removeFreePage() {
+        int freePageSize = freePage.size();
+        if (freePageSize == 0) {
+            return -1;
+        }
+        Long retId = freePage.get(freePageSize - 1);
+        freePage.remove(freePageSize - 1);
+        return retId;
+    }
+    
     /**
      * 通过id从磁盘中获取数据页
      * 缓存算法用的LRU
@@ -81,6 +118,7 @@ public class MemManager<T> {
                     cacheMap.put(id, cachePage);
                 } else {
                     //如果缓存满了，扔掉时间戳最小的那个
+                    // TODO: 2017/9/6 待优化，可加个负载因子
                     long min_tm = Long.parseLong(DateUtils.MAX_TIME_STAMP);
                     long min_id = -1;
                     for (long removeid : cacheMap.keySet()) {
@@ -205,6 +243,18 @@ public class MemManager<T> {
         DiskNode<T> diskNode = (DiskNode<T>) CodeUtils.decode(readBuf);
 
         return diskNode;
+    }
+
+    public void setMAX_SIZE(long MAX_SIZE) {
+        this.MAX_SIZE = MAX_SIZE;
+    }
+
+    public long getMAX_SIZE() {
+        return MAX_SIZE;
+    }
+
+    public static MemManager getTableMemManager(String tableName) {
+        return tableMemManager.get(tableName);
     }
 
     public static void main(String arg[]) {

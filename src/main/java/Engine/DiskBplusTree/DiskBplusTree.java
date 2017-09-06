@@ -3,6 +3,7 @@ package Engine.DiskBplusTree;
 import Engine.Bplustree;
 import Engine.MemBPlusTree.Node;
 
+import Engine.MemManager;
 import Exception.SelectException;
 import java.util.List;
 
@@ -23,9 +24,25 @@ public class DiskBplusTree<T> implements Bplustree<T,Long>{
     private int order;
 
     /**
-     * 链表头结点所在位置
+     * 叶节点链表头结点所在位置
      */
     private long headId;
+    /**
+     * 所属表名
+     */
+    private String tableName;
+
+    /**
+     * 该表的内存管理器
+     */
+    private transient MemManager<T> memManager;
+
+    public DiskBplusTree(int order, long rootId, String tableName) {
+        this.order = order;
+        this.rootId = rootId;
+        this.tableName = tableName;
+        this.memManager = MemManager.getTableMemManager(tableName);
+    }
     public T search(Comparable key) {
         return null;
     }
@@ -39,7 +56,8 @@ public class DiskBplusTree<T> implements Bplustree<T,Long>{
     }
 
     public void insert(Comparable key, T obj) {
-
+        DiskNode<T> rootNode = memManager.getPageById(rootId);
+        rootNode.insert(key, obj, this, memManager);
     }
 
     public void update(Comparable key, T obj) {
@@ -47,7 +65,7 @@ public class DiskBplusTree<T> implements Bplustree<T,Long>{
     }
 
     public int getOrder() {
-        return 0;
+        return order;
     }
 
     public void setRoot(Long root) {
@@ -60,6 +78,14 @@ public class DiskBplusTree<T> implements Bplustree<T,Long>{
 
     public void setHead(Long head) {
         this.headId = head;
+    }
+
+    public void setMemManager(MemManager<T> memManager) {
+        this.memManager = memManager;
+    }
+
+    public MemManager<T> getMemManager() {
+        return memManager;
     }
 
     public void visitorLeaf(Long root) {
