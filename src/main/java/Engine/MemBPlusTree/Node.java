@@ -612,6 +612,10 @@ public class Node<T> {
         }
     }
 
+    /**
+     * 内部结点更新
+     * @param bpt
+     */
     public void updateInsert(Bplustree bpt) {
         validate(this, bpt);
 
@@ -663,8 +667,6 @@ public class Node<T> {
                 parent.getChildren().add(right);
                 setEntries(null);
                 setChildren(null);
-
-                parent.updateInsert(bpt);
             }
         }
     }

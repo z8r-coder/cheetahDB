@@ -175,9 +175,17 @@ public class DiskNode<T> {
      * @param memManager
      */
     public void insert(Comparable key, T obj, Bplustree bpt, MemManager<T> memManager) {
+        if (leaf) {
 
+        }
     }
 
+    /**
+     * 内部页的更新
+     * @param bpt
+     * @param memManager
+     * @throws Exception
+     */
     public void updateInsert(Bplustree bpt, MemManager<T> memManager) throws Exception {
         validate(this, bpt, memManager);
 
@@ -223,7 +231,6 @@ public class DiskNode<T> {
                 DiskNode<T> parentDiskNode = memManager.getPageById(parentId);
                 int index = parentDiskNode.getChildrenId().indexOf(id);
                 //此处不用移除以前的id，作为left节点的id了
-
                 left.setParentId(parentId);
                 right.setParentId(parentId);
 
@@ -233,6 +240,10 @@ public class DiskNode<T> {
 
                 parentDiskNode.updateInsert(bpt, memManager);
                 setParentId(-1);
+                //将源节点的位置更新为left
+                memManager.writeToDisk(left.getId(), left);
+                //写入右结点
+                memManager.writeToDisk(right.getId(), right);
             } else {
                 //根节点
                 root = false;
@@ -248,8 +259,15 @@ public class DiskNode<T> {
                 left.setParentId(newParentId);
                 right.setParentId(newParentId);
 
+                //b+树设置新的根结点
                 bpt.setRoot(newParentId);
-//                diskParentNode
+
+                diskParentNode.getChildrenId().add(left.getId());
+                diskParentNode.getChildrenId().add(right.getId());
+
+                setEntries(null);
+                setChildrenId(null);
+                //将新产生的结点写入磁盘
                 memManager.writeToDisk(newParentId, diskParentNode);
                 memManager.writeToDisk(right.getId(), right);
             }
@@ -274,16 +292,15 @@ public class DiskNode<T> {
                 if (diskNode.getEntries().get(i).getKey().compareTo(key) != 0) {
                     diskNode.getEntries().remove(i);
                     diskNode.getEntries().add(i, new SimpleEntry<Comparable, T>(key, null));
-
-                    if (!diskNode.root){
-                        long parentId = diskNode.getParentId();
-                        DiskNode<T> parentNode = memManager.getPageById(parentId);
-                        validate(parentNode, bpt, memManager);
-                    }
                 }
             }
-            //将
+            //将修改后的结点插入磁盘
             memManager.writeToDisk(diskNode.getId(), diskNode);
+            if (!diskNode.root){
+                long parentId = diskNode.getParentId();
+                DiskNode<T> parentNode = memManager.getPageById(parentId);
+                validate(parentNode, bpt, memManager);
+            }
         } else if (diskNode.root && diskNode.getChildrenId().size() >= 2 ||
                 diskNode.getChildrenId().size() >= bpt.getOrder() / 2 &&
                 diskNode.getChildrenId().size() <= bpt.getOrder() &&
@@ -296,12 +313,40 @@ public class DiskNode<T> {
                 DiskNode<T> dnode = memManager.getPageById(childrenId);
                 Comparable key = dnode.getEntries().get(0).getKey();
                 diskNode.getEntries().add(new SimpleEntry<Comparable, T>(key,null));
-                if (!diskNode.root) {
-                    long parentId = diskNode.getParentId();
-                    DiskNode<T> parentNode = memManager.getPageById(parentId);
-                    validate(parentNode, bpt, memManager);
-                }
+            }
+
+            memManager.writeToDisk(diskNode.getId(), diskNode);
+            if (!diskNode.root) {
+                long parentId = diskNode.getParentId();
+                DiskNode<T> parentNode = memManager.getPageById(parentId);
+                validate(parentNode, bpt, memManager);
             }
         }
+    }
+
+    protected int contain(Comparable key) {
+        for (int i = 0; i < entries.size();i++) {
+            if (entries.get(i).getKey().compareTo(key) == 0) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("isRoot: ");
+        sb.append(root);
+        sb.append(", ");
+        sb.append("isLeaf: ");
+        sb.append(leaf);
+        sb.append(", ");
+        sb.append("keys: ");
+        for (Map.Entry entry : entries){
+            sb.append(entry.getKey());
+            sb.append(", ");
+        }
+        sb.append(", ");
+        return sb.toString();
     }
 }
