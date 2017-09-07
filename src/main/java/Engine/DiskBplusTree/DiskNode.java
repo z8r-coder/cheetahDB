@@ -237,24 +237,25 @@ public class DiskNode<T> {
                 DiskNode<T> right = new DiskNode<T>(true, rightId);
 
                 if (prevId != -1) {
-                    DiskNode<T> prevNode = memManager.getPageById(prevId);
+                    DiskNode<T> prevNode = bpt.getChangeNode(prevId);
                     prevNode.setNextId(id);
                     left.setPrevId(prevId);
+
+                    //缓存
+                    bpt.putChangeNode(prevId, prevNode);
                 }
 
                 if (nextId != -1) {
-                    DiskNode<T> nextNode = memManager.getPageById(nextId);
+                    DiskNode<T> nextNode = bpt.getChangeNode(nextId);
                     nextNode.setPrevId(rightId);
                     right.setNextId(nextId);
+
+                    //缓存
+                    bpt.putChangeNode(nextId, nextNode);
                 }
 
                 if (prevId == -1) {
                     bpt.setHead(id);
-                    try {
-                        memManager.writeBptToDisk(bpt);
-                    } catch (Exception e) {
-                        log.error("write bpt to disk error!", e);
-                    }
                 }
                 left.setNextId(rightId);
                 right.setPrevId(id);
@@ -262,7 +263,8 @@ public class DiskNode<T> {
                 int leftSize = (bpt.getOrder() + 1) / 2 + (bpt.getOrder() + 1) % 2;
                 int rightSize = (bpt.getOrder() + 1) / 2;
 
-                insert(key, obj, bpt, memManager);
+                //将节点先插入该节点，再分配给分裂的两个节点
+                insert(key, obj);
                 for (int i = 0; i < leftSize; i++) {
                     left.getEntries().add(entries.get(i));
                 }
@@ -272,7 +274,7 @@ public class DiskNode<T> {
 
                 //非根结点
                 if (parentId != -1) {
-                    DiskNode<T> diskParentNode = memManager.getPageById(parentId);
+                    DiskNode<T> diskParentNode = bpt.getChangeNode(parentId);
                     int index = diskParentNode.getChildrenId().indexOf(id);
 
                     //不用移除本结点，作为左结点的位置
@@ -283,17 +285,13 @@ public class DiskNode<T> {
                     setEntries(null);
                     setChildrenId(null);
 
+                    //分裂的俩节点缓存,并缓存其父节点
+                    bpt.putChangeNode(id, left);
+                    bpt.putChangeNode(rightId, right);
+                    bpt.putChangeNode(parentId, diskParentNode);
+
                     diskParentNode.updateInsert(bpt, memManager);
                     setParentId(-1);
-
-                    try {
-                        //将原节点的位置更新为left
-                        memManager.writeToDisk(left.getId(), left);
-                        //写入右结点
-                        memManager.writeToDisk(right.getId(), right);
-                    } catch (Exception e) {
-                        log.error("updateInsert write node to disk error!", e);
-                    }
                 } else {
                     //根节点
                     root = false;
@@ -310,38 +308,33 @@ public class DiskNode<T> {
                     diskParentNode.getChildrenId().add(left.getId());
                     diskParentNode.getChildrenId().add(right.getId());
 
+                    //分裂的俩节点和父节点缓存
+                    bpt.putChangeNode(id, left);
+                    bpt.putChangeNode(rightId, right);
+                    bpt.putChangeNode(newParentId, diskParentNode);
+
                     setEntries(null);
                     setChildrenId(null);
 
-                    try {
-                        //将新产生的结点和改变的写入磁盘
-                        memManager.writeToDisk(newParentId, diskParentNode);
-                        memManager.writeToDisk(left.getId(), left);
-                        memManager.writeToDisk(right.getId(), right);
-
-                        //将改变后的bpt写入磁盘
-                        memManager.writeBptToDisk(bpt);
-                    } catch (Exception e) {
-                        log.error("updateInsert write node to disk error!", e);
-                    }
+                    diskParentNode.updateInsert(bpt, memManager);
                 }
             }
         } else {
             //非叶结点
             if (key.compareTo(entries.get(0).getKey()) <= 0) {
                 long childId = childrenId.get(0);
-                DiskNode<T> childNode = memManager.getPageById(childId);
+                DiskNode<T> childNode = bpt.getChangeNode(childId);
                 childNode.insert(key, obj, bpt, memManager);
             } else if (key.compareTo(entries.get(entries.size() - 1).getKey()) >= 0) {
                 long childId = childrenId.get(0);
-                DiskNode<T> childNode = memManager.getPageById(childId);
+                DiskNode<T> childNode = bpt.getChangeNode(childId);
                 childNode.insert(key, obj, bpt, memManager);
             } else {
                 for (int i = 0; i < entries.size();i++) {
                     if (entries.get(i).getKey().compareTo(key) <= 0
                             && entries.get(i + 1).getKey().compareTo(key) > 0) {
                         long childId = childrenId.get(i);
-                        DiskNode<T> childNode = memManager.getPageById(childId);
+                        DiskNode<T> childNode = bpt.getChangeNode(childId);
                         childNode.insert(key, obj, bpt, memManager);
                         break;
                     }
@@ -394,27 +387,29 @@ public class DiskNode<T> {
             for (int i = 0; i < leftSize; i++) {
                 left.getChildrenId().add(childrenId.get(i));
                 long childId = childrenId.get(i);
-                DiskNode<T> childDiskNode = memManager.getPageById(childId);
+                DiskNode<T> childDiskNode = bpt.getChangeNode(childId);
                 Comparable key = childDiskNode.getEntries().get(0).getKey();
                 left.getEntries().add(new SimpleEntry<Comparable, T>(key, null));
 
                 childDiskNode.setParentId(this.id);
+                bpt.putChangeNode(childId, childDiskNode);
             }
 
             //后一半的子节点放入右节点
             for (int i = 0; i < rightSize;i++) {
                 right.getChildrenId().add(childrenId.get(leftSize + i));
                 long childId = childrenId.get(leftSize + i);
-                DiskNode<T> childDiskNode = memManager.getPageById(childId);
+                DiskNode<T> childDiskNode = bpt.getChangeNode(childId);
                 Comparable key = childDiskNode.getEntries().get(0).getKey();
                 right.getEntries().add(new SimpleEntry<Comparable, T>(key, null));
 
                 childDiskNode.setParentId(newId);
+                bpt.putChangeNode(childId, childDiskNode);
             }
 
             if (parentId != -1) {
                 //非根结点
-                DiskNode<T> parentDiskNode = memManager.getPageById(parentId);
+                DiskNode<T> parentDiskNode = bpt.getChangeNode(parentId);
                 int index = parentDiskNode.getChildrenId().indexOf(id);
                 //此处不用移除以前的id，作为left节点的id了
                 left.setParentId(parentId);
@@ -424,18 +419,13 @@ public class DiskNode<T> {
                 setEntries(null);
                 setChildrenId(null);
 
+                //将分裂后的节点和父节点缓存
+                bpt.putChangeNode(left.getId(), left);
+                bpt.putChangeNode(right.getId(), right);
+                bpt.putChangeNode(parentDiskNode.getId(), parentDiskNode);
+
                 parentDiskNode.updateInsert(bpt, memManager);
                 setParentId(-1);
-
-                try {
-                    //将新增加的结点写入磁盘
-                    memManager.writeToDisk(left.getId(), left);
-                    memManager.writeToDisk(right.getId(), right);
-                    //将改变的父结点写入磁盘
-                    memManager.writeToDisk(parentDiskNode.getId(), parentDiskNode);
-                } catch (Exception e) {
-                    log.error("updateInsert write node to disk error!", e);
-                }
             } else {
                 //根节点
                 root = false;
@@ -452,20 +442,13 @@ public class DiskNode<T> {
                 diskParentNode.getChildrenId().add(left.getId());
                 diskParentNode.getChildrenId().add(right.getId());
 
+                //将分裂后的节点和新生成的节点缓存
+                bpt.putChangeNode(newParentId, diskParentNode);
+                bpt.putChangeNode(left.getId(), left);
+                bpt.putChangeNode(right.getId(), right);
+
                 setEntries(null);
                 setChildrenId(null);
-
-                try {
-                    //将新产生的结点和改变的结点写入磁盘
-                    memManager.writeToDisk(newParentId, diskParentNode);
-                    memManager.writeToDisk(left.getId(), left);
-                    memManager.writeToDisk(right.getId(), right);
-                    //将更新后的bpt写入磁盘
-                    memManager.writeBptToDisk(bpt);
-                } catch (Exception e) {
-                    log.error("updateInsert write node to disk error!", e);
-                }
-
             }
         }
     }
@@ -483,22 +466,18 @@ public class DiskNode<T> {
             for (int i = 0; i < entries.size();i++) {
                 long childrenId = diskNode.getChildrenId().get(i);
                 //获取磁盘上的子节点
-                DiskNode<T> dnode = memManager.getPageById(childrenId);
+                DiskNode<T> dnode = bpt.getChangeNode(childrenId);
                 Comparable key = dnode.getEntries().get(0).getKey();
                 if (diskNode.getEntries().get(i).getKey().compareTo(key) != 0) {
                     diskNode.getEntries().remove(i);
                     diskNode.getEntries().add(i, new SimpleEntry<Comparable, T>(key, null));
                 }
             }
-            //将修改后的结点插入磁盘
-            try {
-                memManager.writeToDisk(diskNode.getId(), diskNode);
-            } catch (Exception e) {
-                log.error("validate write to disk error!", e);
-            }
+            bpt.putChangeNode(diskNode.getId(), diskNode);
+
             if (!diskNode.root){
                 long parentId = diskNode.getParentId();
-                DiskNode<T> parentNode = memManager.getPageById(parentId);
+                DiskNode<T> parentNode = bpt.getChangeNode(parentId);
                 validate(parentNode, bpt, memManager);
             }
         } else if (diskNode.root && diskNode.getChildrenId().size() >= 2 ||
@@ -515,14 +494,11 @@ public class DiskNode<T> {
                 diskNode.getEntries().add(new SimpleEntry<Comparable, T>(key,null));
             }
 
-            try {
-                memManager.writeToDisk(diskNode.getId(), diskNode);
-            } catch (Exception e) {
-                log.error("validate write node to disk error!", e);
-            }
+            //缓存
+            bpt.putChangeNode(diskNode.getId(), diskNode);
             if (!diskNode.root) {
                 long parentId = diskNode.getParentId();
-                DiskNode<T> parentNode = memManager.getPageById(parentId);
+                DiskNode<T> parentNode = bpt.getChangeNode(parentId);
                 validate(parentNode, bpt, memManager);
             }
         }

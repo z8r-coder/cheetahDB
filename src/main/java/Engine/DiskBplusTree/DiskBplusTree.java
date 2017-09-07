@@ -127,11 +127,37 @@ public class DiskBplusTree<T> implements Bplustree<T,Long>{
         //若有缓存，则直接读
         return changeDiskNodeCache.get(id);
     }
+
+    /**
+     * 从缓存中移除，防止无用插入和非法访问
+     * @param id
+     * @return
+     */
+    public DiskNode<T> removeChangeNode(Long id) {
+        return changeDiskNodeCache.remove(id);
+    }
+
+    /**
+     * 封装内存管理器的空闲页管理
+     * @return
+     */
+    public Long getFreeId() {
+        return memManager.getNewOrFreeId();
+    }
     /**
      * 遍历叶节点
      * @param root
      */
     public void visitorLeaf(Long root) {
 
+    }
+
+    public static void main(String arg[]) {
+        Map<Integer, String> map = new HashMap<Integer, String>();
+        map.put(2, "22");
+        System.out.println(map.get(2));
+        System.out.println(map.remove(2));
+        System.out.println(map.get(2));
+        System.out.println(map.remove(2));
     }
 }
