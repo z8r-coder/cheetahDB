@@ -182,6 +182,14 @@ public class MemManager<T> {
             cacheMap.put(id, cachePage);
         }
     }
+
+    /**
+     * 将diskNode写入磁盘
+     * @param id
+     * @param diskNode
+     * @return
+     * @throws Exception
+     */
     public boolean writeToDisk(long id, DiskNode<T> diskNode) throws Exception {
         long position = 1025 + id * PAGE_SIZE;
         //终止位置，不足0补齐
@@ -224,7 +232,11 @@ public class MemManager<T> {
             throw new Exception(e);
         } finally {
             if (outChannel != null) {
-                outChannel.close();
+                try {
+                    outChannel.close();
+                } catch (IOException e) {
+                    throw new Exception(e);
+                }
             }
         }
     }

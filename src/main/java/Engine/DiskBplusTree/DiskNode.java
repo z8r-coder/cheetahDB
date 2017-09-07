@@ -175,7 +175,40 @@ public class DiskNode<T> {
 //    }
 
     /**
-     * 节点插入
+     * entry删除
+     * @param key
+     * @param obj
+     * @param bpt
+     * @param memManager
+     */
+    public void remove(Comparable key, T obj, Bplustree bpt, MemManager<T> memManager) {
+
+    }
+
+    /**
+     * 内部节点删除
+     * @param bpt
+     * @param memManager
+     */
+    public void updateRemove(Bplustree bpt, MemManager<T> memManager) {
+        validate(this, bpt, memManager);
+
+        if (childrenId.size() < bpt.getOrder() / 2 || childrenId.size() < 2) {
+            //需要合并节点
+            if (root) {
+                //根节点
+                if (childrenId.size() >= 2) {
+                    return;
+                } else {
+
+                }
+            }
+        }
+    }
+
+
+    /**
+     * entry插入
      * @param key
      * @param obj
      * @param bpt
