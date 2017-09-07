@@ -1,4 +1,4 @@
-package Engine.InvertedIndex;
+package Engine.FullTextIndex.InvertedIndex;
 
 /**
  * 倒排索引

@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import Engine.DiskBplusTree.DiskNode;
 import Exception.SelectException;
 
 /**
@@ -94,6 +96,15 @@ public class BplustreeImpl<T> implements Bplustree<T,Node>, Serializable {
             }
         }
     }
+
+    public void putChangeNode(Node id, DiskNode<T> diskNode) {
+
+    }
+
+    public DiskNode<T> getChangeNode(Long id) {
+        return null;
+    }
+
     public static void main(String arg[]) {
         Node<Integer> root = new Node(true,true);
         Bplustree<Integer, Node> tree = new BplustreeImpl(1024, root);
@@ -110,7 +121,8 @@ public class BplustreeImpl<T> implements Bplustree<T,Node>, Serializable {
                 tree.delete(i);
             }
         }
-
+        tree.insert(1,1);
+        tree.insert(2,2);
         tree.visitorLeaf(tree.getRoot());
 
         long duration = System.currentTimeMillis() - current;

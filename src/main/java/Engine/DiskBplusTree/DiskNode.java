@@ -218,11 +218,15 @@ public class DiskNode<T> {
     public void insert(Comparable key, T obj, Bplustree bpt, MemManager<T> memManager) {
         if (leaf) {
             //叶子结点
-            int tmpIndex = contain(key);
-            if (tmpIndex >= 0 || entries.size() < bpt.getOrder()) {
-                insert(key, obj,bpt, memManager);
-                if (parentId != -1) {
-                    DiskNode<T> diskParentNode = memManager.getPageById(parentId);
+            if (entries.size() < bpt.getOrder()) {
+                //插入条目
+                int index = insert(key, obj);
+                //缓存
+                bpt.putChangeNode(id, this);
+                if (parentId != -1 && index == 0) {
+                    //非根节点,通过缓存或磁盘获取节点
+                    DiskNode<T> diskParentNode = bpt.getChangeNode(parentId);
+
                     diskParentNode.updateInsert(bpt, memManager);
                 }
             } else {
@@ -346,19 +350,26 @@ public class DiskNode<T> {
         }
     }
 
-    public void insert(Comparable key, T obj, MemManager<T> memManager) {
+    /**
+     * 插入具体节点
+     * @param key
+     * @param obj
+     */
+    public int insert(Comparable key, T obj) {
         Map.Entry<Comparable, T> entry = new SimpleEntry<Comparable, T>(key,obj);
         if (entries.size() == 0) {
             entries.add(entry);
-            return;
+            return 0;
         }
 
         for (int i = 0; i < entries.size();i++) {
             if (entries.get(i).getKey().compareTo(key) >= 0) {
                 entries.add(i, entry);
-                return;
+                return i;
             }
         }
+        entries.add(entry);
+        return entries.size();
     }
     /**
      * 内部页的更新

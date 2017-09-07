@@ -31,7 +31,7 @@ public class MemManager<T> {
      */
     private final static String FILE_PATH;
     /**
-     * 页大小
+     * 页大小,4096
      */
     private final static int PAGE_SIZE;
 
@@ -326,6 +326,23 @@ public class MemManager<T> {
         return diskBpt;
     }
 
+    /**
+     * 用于批量写入节点数据
+     * @param diskNodes
+     */
+//    public void batchWriteToDisk(List<DiskNode<T>> diskNodes) {
+//        int writeCount = diskNodes.size();
+//        ByteBuffer batchWriteBuf = ByteBuffer.allocate(PAGE_SIZE *)
+//    }
+
+    /**
+     * 用于批量读出节点数据
+     * @param ids
+     * @return
+     */
+//    public List<DiskNode<T>> batchReadFromDisk(List<Long> ids) {
+//
+//    }
     /**
      * 从磁盘中读取节点
      * @param id

@@ -1,5 +1,6 @@
 package Engine;
 
+import Engine.DiskBplusTree.DiskNode;
 import Engine.MemBPlusTree.Node;
 
 import java.util.List;
@@ -72,4 +73,17 @@ public interface Bplustree<T,E> {
      * @param root
      */
     public void visitorLeaf(E root);
+
+    /**
+     * 添加改变后的diskNode
+     * @param diskNode
+     */
+    public void putChangeNode(E id, DiskNode<T> diskNode);
+
+    /**
+     * 通过缓存或磁盘获取节点
+     * @param id
+     * @return
+     */
+    public DiskNode<T> getChangeNode(Long id);
 }

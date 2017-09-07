@@ -479,10 +479,9 @@ public class Node<T> {
     public void insert(Comparable key, T obj, Bplustree bpt) {
         if (leaf) {
             //叶子结点
-            int tmpindex = contains(key);
-            if (tmpindex >= 0 || entries.size() < bpt.getOrder()) {
-                insert(key,obj);
-                if (parent != null) {
+            if (entries.size() < bpt.getOrder()) {
+                int index = insert(key,obj);
+                if (parent != null && index == 0) {
                     //更新父结点
                     parent.updateInsert(bpt);
                 }
@@ -570,21 +569,22 @@ public class Node<T> {
      * @param key
      * @param obj
      */
-    public void insert(Comparable key, T obj) {
+    public int insert(Comparable key, T obj) {
         Map.Entry<Comparable, T> entry = new SimpleEntry<Comparable, T>(key, obj);
         if (entries.size() == 0) {
             entries.add(entry);
-            return;
+            return 0;
         }
 
         for (int i = 0; i < entries.size();i++) {
             if (entries.get(i).getKey().compareTo(key) >= 0) {
                 entries.add(i, entry);
-                return;
+                return i;
             }
         }
 
         entries.add(entry);
+        return entries.size();
     }
     public void update(Comparable key, T obj) {
         if (!leaf) {
