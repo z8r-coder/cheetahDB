@@ -346,8 +346,8 @@ public class Node<T> {
                         }
                     }
                 }
+                parent.updateRemove(bpt);
             }
-            parent.updateRemove(bpt);
         } else {
             if (key.compareTo(entries.get(0).getKey()) <= 0) {
                 children.get(0).remove(key, bpt);

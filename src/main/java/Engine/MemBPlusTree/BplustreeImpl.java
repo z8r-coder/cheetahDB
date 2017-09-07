@@ -66,7 +66,7 @@ public class BplustreeImpl<T> implements Bplustree<T,Node>, Serializable {
     }
 
     public void delete(Comparable key) {
-        root.remove(key);
+        root.remove(key,this);
     }
 
     public void insert(Comparable key, Object obj) {
@@ -105,10 +105,10 @@ public class BplustreeImpl<T> implements Bplustree<T,Node>, Serializable {
                 tree.insert(randomNumber, randomNumber);
             }
 
-//            for (int i = 0; i < 100; i++) {
-//                int randomNumber = random.nextInt(1000);
-//                tree.delete(randomNumber);
-//            }
+            for (int i = 0; i < 100; i++) {
+//                int randomNumber = random.nextInt(100);
+                tree.delete(i);
+            }
         }
 
         tree.visitorLeaf(tree.getRoot());

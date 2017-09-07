@@ -200,6 +200,7 @@ public class DiskNode<T> {
                 if (childrenId.size() >= 2) {
                     return;
                 } else {
+                    //合并
 
                 }
             }
@@ -208,7 +209,7 @@ public class DiskNode<T> {
 
 
     /**
-     * entry插入
+     * 寻找entry插入的位置
      * @param key
      * @param obj
      * @param bpt
@@ -345,6 +346,20 @@ public class DiskNode<T> {
         }
     }
 
+    public void insert(Comparable key, T obj, MemManager<T> memManager) {
+        Map.Entry<Comparable, T> entry = new SimpleEntry<Comparable, T>(key,obj);
+        if (entries.size() == 0) {
+            entries.add(entry);
+            return;
+        }
+
+        for (int i = 0; i < entries.size();i++) {
+            if (entries.get(i).getKey().compareTo(key) >= 0) {
+                entries.add(i, entry);
+                return;
+            }
+        }
+    }
     /**
      * 内部页的更新
      * @param bpt
