@@ -144,6 +144,14 @@ public class DiskBplusTree<T> implements Bplustree<T,Long>{
     public Long getFreeId() {
         return memManager.getNewOrFreeId();
     }
+
+    /**
+     * 增添空闲页
+     * @param id
+     */
+    public void addFreeId(long id) {
+        memManager.addFreePage(id);
+    }
     /**
      * 遍历叶节点
      * @param root

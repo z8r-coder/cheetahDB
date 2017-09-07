@@ -4,6 +4,8 @@ import Constants.SQLErrorCode;
 import Engine.Bplustree;
 
 import java.util.*;
+
+import Engine.SimpleEntry;
 import Exception.SelectException;
 
 /**
@@ -259,6 +261,11 @@ public class Node<T> {
         }
     }
 
+    /**
+     * 找到remove的位置
+     * @param key
+     * @param bpt
+     */
     public void remove(Comparable key, Bplustree bpt) {
         if (leaf) {
             int index = contains(key);
@@ -333,6 +340,7 @@ public class Node<T> {
                             next.setEntries(null);
                             parent.getChildren().remove(next);
 
+                            //更新链表
                             if (next.getNext() != null) {
                                 Node tmp = next;
                                 tmp.getNext().setPrevious(this);
@@ -406,6 +414,7 @@ public class Node<T> {
                     Node<T> borrow =previous.getChildren().get(idx);
                     previous.getChildren().remove(idx);
                     borrow.setParent(this);
+
                     children.add(0, borrow);
                     validate(previous, bpt);
                     validate(this, bpt);
@@ -457,6 +466,11 @@ public class Node<T> {
             }
         }
     }
+
+    /**
+     * 删除条目
+     * @param key
+     */
     public void remove(Comparable key) {
         int index = -1;
         for (int i = 0; i < entries.size();i++) {

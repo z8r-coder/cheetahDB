@@ -1,8 +1,7 @@
 package Engine.DiskBplusTree;
 
 import Engine.Bplustree;
-import Engine.MemBPlusTree.Node;
-import Engine.MemBPlusTree.SimpleEntry;
+import Engine.SimpleEntry;
 import Engine.MemManager;
 import Support.Logging.Log;
 import Support.Logging.LogFactory;
@@ -175,14 +174,155 @@ public class DiskNode<T> {
 //    }
 
     /**
-     * entry删除
+     * 找到删除entry的位置
      * @param key
-     * @param obj
      * @param bpt
      * @param memManager
      */
-    public void remove(Comparable key, T obj, Bplustree bpt, MemManager<T> memManager) {
+    public void remove(Comparable key, Bplustree bpt, MemManager<T> memManager) {
+        if (leaf) {
+            int index = contain(key);
+            if (index < 0) {
+                //无该结点，直接返回
+                return;
+            }
 
+            if (root) {
+                //即是叶节点也是根结点
+                remove(key);
+                //缓存
+                bpt.putChangeNode(id, this);
+            } else {
+                //非根结点的叶结点
+                if (entries.size() > bpt.getOrder() / 2 &&
+                        entries.size() > 2) {
+                    remove(key);
+                } else {
+                    //前驱结点
+                    DiskNode<T> prevDiskNode = null;
+                    if (prevId != -1) {
+                        prevDiskNode = bpt.getChangeNode(prevId);
+                    }
+
+                    //后继结点
+                    DiskNode<T> nextDiskNode = null;
+                    if (nextId != -1) {
+                        nextDiskNode = bpt.getChangeNode(nextId);
+                    }
+
+                    if (prevId != -1 &&
+                            prevDiskNode.getEntries().size() > bpt.getOrder() / 2 &&
+                            prevDiskNode.getEntries().size() > 2 &&
+                            prevDiskNode.getParentId() == parentId) {
+                        //若本节点关键字数量小于M / 2,并且前驱节点字数大于M / 2，则从其借补
+                        int prevSize = prevDiskNode.getEntries().size();
+                        Map.Entry<Comparable, T> entry = prevDiskNode.getEntries().get(prevSize - 1);
+                        prevDiskNode.getEntries().remove(entry);
+
+                        entries.add(0, entry);
+                        remove(key);
+
+                        //缓存更新后的结点
+                        bpt.putChangeNode(id, this);
+                        bpt.putChangeNode(prevDiskNode.getId(), prevDiskNode);
+                    } else if (nextId != -1 &&
+                            nextDiskNode.getEntries().size() > bpt.getOrder() / 2 &&
+                            nextDiskNode.getEntries().size() > 2 &&
+                            nextDiskNode.getParentId() == parentId) {
+                        //从后继结点借补
+                        Map.Entry<Comparable, T> entry = nextDiskNode.getEntries().get(0);
+                        nextDiskNode.getEntries().remove(entry);
+                        entries.add(entry);
+                        remove(key);
+
+                        //缓存更新后的结点
+                        bpt.putChangeNode(id, this);
+                        bpt.putChangeNode(nextDiskNode.getId(), nextDiskNode);
+                    } else {
+                        if (prevId != -1 &&
+                                (prevDiskNode.getEntries().size() <= bpt.getOrder() / 2 ||
+                                prevDiskNode.getEntries().size() <= 2) &&
+                                prevDiskNode.getParentId() == parentId) {
+                            //同前面的结点结合
+                            for (int i = prevDiskNode.getEntries().size() - 1;
+                                    i >= 0;i--) {
+                                entries.add(0, prevDiskNode.getEntries().get(i));
+                            }
+                            remove(key);
+                            DiskNode<T> diskParentNode = bpt.getChangeNode(parentId);
+                            //移除该结点，并在缓存中移除
+                            diskParentNode.getChildrenId().remove(prevDiskNode.getId());
+                            bpt.removeChangeNode(prevDiskNode.getId());
+                            //将其所占位置设置为空间页
+                            bpt.addFreeId(prevDiskNode.getId());
+
+                            //更新链表
+                            if (prevDiskNode.getPrevId() != -1) {
+                                long prepreid = prevDiskNode.getPrevId();
+                                DiskNode<T> prepreNode = bpt.getChangeNode(prepreid);
+                                prepreNode.setNextId(id);
+                                prevId = prepreid;
+                                bpt.putChangeNode(prepreid, prepreNode);
+                            } else {
+                                bpt.setHead(id);
+                                prevId = -1;
+                            }
+                            //缓存改变的结点
+                            bpt.putChangeNode(id, this);
+                            bpt.putChangeNode(parentId, diskParentNode);
+                        } else if (nextId != -1 &&
+                                (nextDiskNode.getEntries().size() <= bpt.getOrder() / 2||
+                                nextDiskNode.getEntries().size() <= 2) &&
+                                nextDiskNode.getParentId() == parentId) {
+                            for (int i = 0; i < nextDiskNode.getEntries().size();i++) {
+                                entries.add(nextDiskNode.getEntries().get(i));
+                            }
+                            remove(key);
+                            DiskNode<T> diskParentNode = bpt.getChangeNode(parentId);
+                            diskParentNode.getChildrenId().remove(nextId);
+                            //并将该结点在缓存中删除
+                            bpt.removeChangeNode(nextId);
+                            //并将该页加入空闲页管理
+                            bpt.addFreeId(nextId);
+
+                            //更新链表
+                            if (nextDiskNode.getNextId() != -1) {
+                                long nextnextId = nextDiskNode.getNextId();
+                                DiskNode<T> nextnextNode = bpt.getChangeNode(nextnextId);
+                                nextnextNode.setPrevId(id);
+                                nextId = nextnextId;
+                                bpt.putChangeNode(nextnextId, nextnextNode);
+                            }
+                            //缓存改变的结点
+                            bpt.putChangeNode(id, this);
+                            bpt.putChangeNode(parentId, diskParentNode);
+                        }
+                    }
+                }
+                DiskNode<T> diskParent = bpt.getChangeNode(parentId);
+                diskParent.updateRemove(bpt, memManager);
+            }
+        } else {
+            if (key.compareTo(entries.get(0).getKey()) <= 0) {
+                long childId = childrenId.get(0);
+                DiskNode<T> diskChildNode = bpt.getChangeNode(childId);
+                diskChildNode.remove(key,bpt, memManager);
+            } else if (key.compareTo(entries.get(entries.size() - 1).getKey()) >= 0) {
+                long childId = childrenId.get(childrenId.size() - 1);
+                DiskNode<T> diskChildNode = bpt.getChangeNode(childId);
+                diskChildNode.remove(key, bpt, memManager);
+            } else {
+                for (int i = 0; i < entries.size();i++) {
+                    if (entries.get(i).getKey().compareTo(key) <= 0 &&
+                            entries.get(i + 1).getKey().compareTo(key) > 0) {
+                        long childId = childrenId.get(i);
+                        DiskNode<T> diskChildNode = bpt.getChangeNode(childId);
+                        diskChildNode.remove(key, bpt, memManager);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -206,13 +346,18 @@ public class DiskNode<T> {
                     bpt.setRoot(rootId);
                     diskRoot.setParentId(-1);
                     diskRoot.setRoot(true);
+                    //并将该结点的id添加到空闲页
+                    bpt.addFreeId(id);
 
+                    //并将该结点移除缓存区
+                    bpt.removeChangeNode(id);
                     bpt.putChangeNode(diskRoot.getId(), diskRoot);
+
                     setEntries(null);
                     setChildrenId(null);
                 }
             } else {
-                //非根节点
+                //非根节点,内部结点不是双向链表，所以要做如下检查
                 DiskNode<T> diskParent = bpt.getChangeNode(parentId);
                 int currentIndex = diskParent.getChildrenId().indexOf(id);
                 int prevIndex = currentIndex - 1;
@@ -233,17 +378,113 @@ public class DiskNode<T> {
                 if (previous != null
                         && previous.getChildrenId().size() > bpt.getOrder() / 2
                         && previous.getChildrenId().size() > 2) {
+                    //若前置结点的子节点数大于二分之阶数，则旋转结点
+                    //获取借来的结点
                     int idx = previous.getChildrenId().size() - 1;
                     long borrowId = previous.getChildrenId().get(idx);
                     DiskNode<T> borrowNode = bpt.getChangeNode(borrowId);
                     previous.getChildrenId().remove(borrowId);
                     borrowNode.setParentId(id);
+
+                    childrenId.add(0,borrowId);
+                    validate(previous, bpt, memManager);
+                    validate(this, bpt, memManager);
+
+                    //缓存改变的结点
+                    bpt.putChangeNode(borrowNode.getId(), borrowNode);
+                    bpt.putChangeNode(previous.getId(), previous);
+                    bpt.putChangeNode(id, this);
+                    diskParent.updateRemove(bpt, memManager);
+                } else if (next != null
+                        && next.getChildrenId().size() > bpt.getOrder() / 2
+                        && next.getChildrenId().size() > 2) {
+                    //向后置结点借
+                    long borrowId = next.getChildrenId().get(0);
+                    DiskNode<T> borrowNode = bpt.getChangeNode(borrowId);
+                    next.getChildrenId().remove(borrowId);
+                    borrowNode.setParentId(id);
+
+                    childrenId.add(borrowId);
+                    validate(next, bpt, memManager);
+                    validate(this, bpt, memManager);
+
+                    bpt.putChangeNode(borrowNode.getId(), borrowNode);
+                    bpt.putChangeNode(next.getId(), next);
+                    bpt.putChangeNode(id, this);
+                    diskParent.updateRemove(bpt, memManager);
+                } else {
+                    //合并结点
+                    if (previous != null &&
+                            (previous.getChildrenId().size() <= bpt.getOrder() / 2
+                            && previous.getChildrenId().size() <= 2)) {
+                        //同前面的结点合并
+                        for (int i = previous.getChildrenId().size() - 1;i >= 0;i--) {
+                            long childId = previous.getChildrenId().get(i);
+                            childrenId.add(0, childId);
+                            DiskNode<T> diskChildNode = bpt.getChangeNode(childId);
+                            diskChildNode.setParentId(id);
+                            //缓存更新后的结点
+                            bpt.putChangeNode(childId, diskChildNode);
+                        }
+                        diskParent.getChildrenId().remove(previous.getId());
+
+                        //并在缓存中删除previous这个结点
+                        bpt.removeChangeNode(previous.getId());
+                        //添加到空间页
+                        bpt.addFreeId(previous.getId());
+                        //将改变的结点缓存
+                        bpt.putChangeNode(id, this);
+                        bpt.putChangeNode(diskParent.getId(), diskParent);
+
+                        validate(this, bpt,memManager);
+                        diskParent.updateRemove(bpt, memManager);
+                    } else if (previous != null &&
+                            (next.getChildrenId().size() <= bpt.getOrder() / 2 ||
+                            next.getChildrenId().size() <= 2)) {
+                        //与后继结点合并
+                        for (int i = 0; i < next.getChildrenId().size();i++) {
+                            long childId = next.getChildrenId().get(i);
+                            DiskNode<T> diskchildNode = bpt.getChangeNode(childId);
+                            childrenId.add(childId);
+                            diskchildNode.setParentId(id);
+                            //缓存更新后的儿子结点
+                            bpt.putChangeNode(childId, diskchildNode);
+                        }
+
+                        diskParent.getChildrenId().remove(nextId);
+                        //在缓存中删除next结点
+                        bpt.removeChangeNode(next.getId());
+                        //添加到空闲页
+                        bpt.addFreeId(next.getId());
+                        //缓存变化的结点
+                        bpt.putChangeNode(id, this);
+                        bpt.putChangeNode(diskParent.getId(), diskParent);
+                        validate(this, bpt, memManager);
+                        diskParent.updateRemove(bpt, memManager);
+                    }
                 }
             }
         }
     }
 
 
+    /**
+     * 删除条目
+     * @param key
+     */
+    public void remove(Comparable key) {
+        int index = -1;
+        for (int i = 0; i < entries.size();i++) {
+            if (entries.get(i).getKey().compareTo(key) == 0) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index != -1) {
+            entries.remove(index);
+        }
+    }
     /**
      * 寻找entry插入的位置
      * @param key

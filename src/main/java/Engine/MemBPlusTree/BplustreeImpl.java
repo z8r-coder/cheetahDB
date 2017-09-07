@@ -105,6 +105,18 @@ public class BplustreeImpl<T> implements Bplustree<T,Node>, Serializable {
         return null;
     }
 
+    public DiskNode<T> removeChangeNode(Long id) {
+        return null;
+    }
+
+    public Long getFreeId() {
+        return null;
+    }
+
+    public void addFreeId(long id) {
+
+    }
+
     public static void main(String arg[]) {
         Node<Integer> root = new Node(true,true);
         Bplustree<Integer, Node> tree = new BplustreeImpl(1024, root);
