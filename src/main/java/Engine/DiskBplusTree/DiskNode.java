@@ -200,8 +200,44 @@ public class DiskNode<T> {
                 if (childrenId.size() >= 2) {
                     return;
                 } else {
-                    //合并
+                    //合并,只有一个子节点
+                    long rootId = childrenId.get(0);
+                    DiskNode<T> diskRoot = bpt.getChangeNode(rootId);
+                    bpt.setRoot(rootId);
+                    diskRoot.setParentId(-1);
+                    diskRoot.setRoot(true);
 
+                    bpt.putChangeNode(diskRoot.getId(), diskRoot);
+                    setEntries(null);
+                    setChildrenId(null);
+                }
+            } else {
+                //非根节点
+                DiskNode<T> diskParent = bpt.getChangeNode(parentId);
+                int currentIndex = diskParent.getChildrenId().indexOf(id);
+                int prevIndex = currentIndex - 1;
+                int nextIndex = currentIndex + 1;
+
+                DiskNode<T> previous = null, next = null;
+
+                if (prevIndex >= 0) {
+                    long prevId = diskParent.getChildrenId().get(prevIndex);
+                    previous = bpt.getChangeNode(prevId);
+                }
+
+                if (nextIndex < diskParent.getChildrenId().size()) {
+                    long nextId = diskParent.getChildrenId().get(nextIndex);
+                    next = bpt.getChangeNode(nextId);
+                }
+
+                if (previous != null
+                        && previous.getChildrenId().size() > bpt.getOrder() / 2
+                        && previous.getChildrenId().size() > 2) {
+                    int idx = previous.getChildrenId().size() - 1;
+                    long borrowId = previous.getChildrenId().get(idx);
+                    DiskNode<T> borrowNode = bpt.getChangeNode(borrowId);
+                    previous.getChildrenId().remove(borrowId);
+                    borrowNode.setParentId(id);
                 }
             }
         }
