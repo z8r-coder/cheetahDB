@@ -472,7 +472,11 @@ public class MemManager<T> {
     public int freePageSize () {
         return freePage.size();
     }
+
     public static void main(String arg[]) {
-        System.out.println(System.currentTimeMillis());
+        //System.out.println(System.currentTimeMillis());
+        String teststr = null;
+        teststr = "0";
+        System.out.println(teststr);
     }
 }

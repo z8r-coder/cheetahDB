@@ -68,7 +68,7 @@ public class ConfigUtils {
             this.absolutePath = ABSOLUTE_PATH.trim();
         }
 
-        String CACHE_SIZE = pro.getProperty("cache-page");
+        String CACHE_SIZE = pro.getProperty("cache-size");
         if (!StringUtils.isBlank(CACHE_SIZE)) {
             this.cacheSize = CACHE_SIZE;
         }
