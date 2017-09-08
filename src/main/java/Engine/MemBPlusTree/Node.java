@@ -600,6 +600,12 @@ public class Node<T> {
         entries.add(entry);
         return entries.size();
     }
+
+    /**
+     * 更新节点
+     * @param key
+     * @param obj
+     */
     public void update(Comparable key, T obj) {
         if (!leaf) {
             //非叶子节点
@@ -617,6 +623,7 @@ public class Node<T> {
                 }
             }
         } else {
+            //根节点
             int index = contains(key);
             if (index < 0) {
                 return;

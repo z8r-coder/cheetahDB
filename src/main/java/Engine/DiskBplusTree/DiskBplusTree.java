@@ -61,7 +61,8 @@ public class DiskBplusTree<T> implements Bplustree<T,Long>{
     }
 
     public void delete(Comparable key) {
-
+        DiskNode<T> rootNode = memManager.getPageById(rootId);
+        rootNode.remove(key, this, memManager);
     }
 
     public void insert(Comparable key, T obj) {

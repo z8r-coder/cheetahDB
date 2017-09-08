@@ -148,30 +148,73 @@ public class DiskNode<T> {
      * @param key
      * @return
      */
-//    public T search(Comparable key) {
-//        if (leaf) {
-//            for (Map.Entry<Comparable, T> entry : entries) {
-//                if (entry.getKey().compareTo(key) == 0) {
-//                    return entry.getValue();
-//                }
-//            }
-//            return null;
-//        } else {
-//            if (key.compareTo(entries.get(0).getKey()) <= 0) {
-//
-//                return children.get(0).search(key);
-//            } else if (key.compareTo(entries.get(entries.size() - 1).getKey()) >= 0) {
-//                return children.get(children.size() - 1).search(key);
-//            } else {
-//                for (int i = 0; i < entries.size();i++) {
-//                    if (entries.get(i).getKey().compareTo(key) <= 0 &&
-//                            entries.get(i + 1).getKey().compareTo(key) >0) {
-//                        return children.get(i).search(key);
-//                    }
-//                }
-//            }
-//        }
-//    }
+    public T search(Comparable key, Bplustree bpt) {
+        if (leaf) {
+            for (Map.Entry<Comparable, T> entry : entries) {
+                if (entry.getKey().compareTo(key) == 0) {
+                    return entry.getValue();
+                }
+            }
+            return null;
+        } else {
+            if (key.compareTo(entries.get(0).getKey()) <= 0) {
+                long childId = childrenId.get(0);
+                DiskNode<T> diskChildNode = bpt.getChangeNode(childId);
+                return diskChildNode.search(key, bpt);
+            } else if (key.compareTo(entries.get(entries.size() - 1).getKey()) >= 0) {
+                long childId = childrenId.get(0);
+                DiskNode<T> diskChildNode = bpt.getChangeNode(childId);
+                return diskChildNode.search(key, bpt);
+            } else {
+                for (int i = 0; i < entries.size();i++) {
+                    if (entries.get(i).getKey().compareTo(key) <= 0 &&
+                            entries.get(i + 1).getKey().compareTo(key) >0) {
+                        long childId = childrenId.get(i);
+                        DiskNode<T> diskChildNode = bpt.getChangeNode(childId);
+                        return diskChildNode.search(key, bpt);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 更新该节点
+     * @param key
+     * @param obj
+     */
+    public void update(Comparable key, T obj, Bplustree bpt) {
+        if (!leaf) {
+            //非叶子节点
+            if (key.compareTo(entries.get(0).getKey()) <= 0) {
+                long childId = childrenId.get(0);
+                DiskNode<T> childDiskNode = bpt.getChangeNode(childId);
+                childDiskNode.update(key, obj, bpt);
+            } else if (key.compareTo(entries.get(entries.size() - 1).getKey()) >= 0) {
+                long childId = childrenId.get(entries.size() - 1);
+                DiskNode<T> childDiskNode = bpt.getChangeNode(childId);
+                childDiskNode.update(key, obj, bpt);
+            } else {
+                for (int i = 0; i < entries.size();i++) {
+                    if (entries.get(i).getKey().compareTo(key) <= 0 &&
+                            entries.get(i + 1).getKey().compareTo(key) > 0) {
+                        long childId = childrenId.get(i);
+                        DiskNode<T> childDiskNode = bpt.getChangeNode(childId);
+                        childDiskNode.update(key, obj, bpt);
+                        break;
+                    }
+                }
+            }
+        } else {
+            //根节点
+            int index = contain(key);
+            if (index < 0) {
+                return;
+            }
+            entries.get(index).setValue(obj);
+        }
+    }
 
     /**
      * 找到删除entry的位置
@@ -486,6 +529,7 @@ public class DiskNode<T> {
         }
     }
     /**
+     * todo 未旋转
      * 寻找entry插入的位置
      * @param key
      * @param obj
@@ -642,6 +686,7 @@ public class DiskNode<T> {
         return entries.size();
     }
     /**
+     * todo 未旋转
      * 内部页的更新
      * @param bpt
      * @param memManager
