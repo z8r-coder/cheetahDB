@@ -1,6 +1,4 @@
-import Models.Column;
-
-import java.util.Scanner;
+import models.Column;
 
 /**
  * Created by rx on 2017/8/24.
