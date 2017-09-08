@@ -213,6 +213,8 @@ public class DiskNode<T> {
                 return;
             }
             entries.get(index).setValue(obj);
+            //缓存修改的页
+            bpt.putChangeNode(id, this);
         }
     }
 

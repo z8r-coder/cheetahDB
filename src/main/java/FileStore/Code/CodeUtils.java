@@ -1,5 +1,6 @@
 package FileStore.Code;
 
+import Utils.CheckUtils;
 import Utils.Errors;
 
 import java.io.*;
@@ -174,8 +175,18 @@ public class CodeUtils {
      */
     public static void serialize(Object value, ByteBuffer buf) {
         byte[] bytes = serialize(value);
-        buf.putInt(bytes.length);
+        buf.putInt(bytes.length);//4字节
         buf.put(bytes);
+    }
+
+    /**
+     * 获取对象序列化后字节长度
+     * @param value
+     * @return
+     */
+    public static int getBytesArrLength(Object value) {
+        byte[] bytes = serialize(value);
+        return bytes.length;
     }
 
     /**
@@ -200,7 +211,7 @@ public class CodeUtils {
         int ordinal = kind.ordinal();
         assert ordinal < 128;
 
-        byte kindCode = (byte) ordinal;
+        byte kindCode = (byte) ordinal;//1字节
         buf.put(kindCode);
 
         switch (kind) {

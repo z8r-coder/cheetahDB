@@ -7,11 +7,13 @@ import FileStore.Code.CodeUtils;
 import Support.Logging.Log;
 import Support.Logging.LogFactory;
 import Support.Manager.Manager;
+import Utils.CheckUtils;
 import Utils.ConfigUtils;
 import Utils.DateUtils;
 import com.sun.org.apache.regexp.internal.RE;
 import sun.security.krb5.Config;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -183,64 +185,6 @@ public class MemManager<T> {
         }
     }
 
-    /**
-     * 将diskNode写入磁盘
-     * @param id
-     * @param diskNode
-     * @return
-     * @throws Exception
-     */
-    public boolean writeToDisk(long id, DiskNode<T> diskNode) throws Exception {
-        long position = 1025 + id * PAGE_SIZE;
-        //终止位置，不足0补齐
-        long end = 1024 + (id + 1) * PAGE_SIZE;
-        ByteBuffer writeBuf = ByteBuffer.allocate(PAGE_SIZE);
-        //将数据页编码存入buf
-        CodeUtils.encode(diskNode, writeBuf);
-
-        FileChannel outChannel = null;
-        try {
-            RandomAccessFile afile = new RandomAccessFile(FILE_PATH
-                    + tableName + "_indexFile.db", "rw");
-            outChannel = afile.getChannel();
-            outChannel.position(position);
-
-            writeBuf.flip();
-            while(writeBuf.hasRemaining()) {
-                outChannel.write(writeBuf);
-            }
-
-            //不足的0补齐
-            if (outChannel.position() < end) {
-                int startPos = (int) (end - outChannel.position());
-                ByteBuffer zeroBuffer = ByteBuffer.allocate(startPos);
-                outChannel.position(startPos + 1);
-                for (int i = 0; i <= zeroBuffer.capacity();i++) {
-                    zeroBuffer.put((byte) 0);
-                }
-                //将补齐的零写入磁盘
-                while (zeroBuffer.hasRemaining()) {
-                    outChannel.write(zeroBuffer);
-                }
-            }
-            //缓存该结点
-            putNodeToCache(id, diskNode);
-            return true;
-        } catch (FileNotFoundException e) {
-            throw new Exception(e);
-        } catch (IOException e) {
-            throw new Exception(e);
-        } finally {
-            if (outChannel != null) {
-                try {
-                    outChannel.close();
-                } catch (IOException e) {
-                    throw new Exception(e);
-                }
-            }
-        }
-    }
-
     public void writeBptToDisk(Bplustree<T,Long> bpt) throws Exception {
         long position = 1;
         long end = 1024;
@@ -327,13 +271,101 @@ public class MemManager<T> {
     }
 
     /**
-     * 用于批量写入节点数据
-     * @param diskNodes
+     * 用于批量写入磁盘，减少IO次数
+     * @param cacheMap
      */
-//    public void batchWriteToDisk(List<DiskNode<T>> diskNodes) {
-//        int writeCount = diskNodes.size();
-//        ByteBuffer batchWriteBuf = ByteBuffer.allocate(PAGE_SIZE *)
-//    }
+    public void batchWriteToDisk(Map<Long, DiskNode<T>> cacheMap) {
+        int writeCount = cacheMap.size();
+        ByteBuffer batchWriteBuf = ByteBuffer.allocate(PAGE_SIZE * writeCount);
+        FileChannel outChannel = null;
+        for (Long nodeId : cacheMap.keySet()) {
+            //将cacheMap中的缓存放入缓冲区
+//            CodeUtils.encode();
+        }
+        try {
+            RandomAccessFile afile = new RandomAccessFile(FILE_PATH
+                    + tableName + "_indexFile.db", "rw");
+            outChannel = afile.getChannel();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 将一页中不足的用0补齐
+     * @param buf
+     * @param end
+     */
+    public void fillWithZero(ByteBuffer buf, int end) {
+        buf.limit(end);
+        byte zero = 0;
+        for (int i = buf.position();i <= end;i++) {
+            buf.put(zero);
+        }
+    }
+    /**
+     * 将diskNode写入磁盘
+     * @param id
+     * @param diskNode
+     * @return
+     * @throws Exception
+     */
+    public boolean writeToDisk(long id, DiskNode<T> diskNode) throws Exception {
+        long position = 1025 + id * PAGE_SIZE;
+        //终止位置，不足0补齐
+        long end = 1024 + (id + 1) * PAGE_SIZE;
+        ByteBuffer writeBuf = ByteBuffer.allocate(PAGE_SIZE);
+
+        //检查页大小
+        int diskNodeBytesLen = CodeUtils.getBytesArrLength(diskNode);
+        CheckUtils.state(diskNodeBytesLen > 4000,
+                "the page is too big!", diskNode);
+        //将数据页编码存入buf
+        CodeUtils.encode(diskNode, writeBuf);
+
+        FileChannel outChannel = null;
+        try {
+            RandomAccessFile afile = new RandomAccessFile(FILE_PATH
+                    + tableName + "_indexFile.db", "rw");
+            outChannel = afile.getChannel();
+            outChannel.position(position);
+
+            writeBuf.flip();
+            while(writeBuf.hasRemaining()) {
+                outChannel.write(writeBuf);
+            }
+
+            //不足的0补齐
+            if (outChannel.position() < end) {
+                int startPos = (int) (end - outChannel.position());
+                ByteBuffer zeroBuffer = ByteBuffer.allocate(startPos);
+                outChannel.position(startPos + 1);
+                for (int i = 0; i <= zeroBuffer.capacity();i++) {
+                    zeroBuffer.put((byte) 0);
+                }
+                //将补齐的零写入磁盘
+                while (zeroBuffer.hasRemaining()) {
+                    outChannel.write(zeroBuffer);
+                }
+            }
+            //缓存该结点
+            putNodeToCache(id, diskNode);
+            return true;
+        } catch (FileNotFoundException e) {
+            throw new Exception(e);
+        } catch (IOException e) {
+            throw new Exception(e);
+        } finally {
+            if (outChannel != null) {
+                try {
+                    outChannel.close();
+                } catch (IOException e) {
+                    throw new Exception(e);
+                }
+            }
+        }
+    }
 
     /**
      * 用于批量读出节点数据

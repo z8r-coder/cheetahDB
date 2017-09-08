@@ -41,13 +41,16 @@ public class NIOTest {
             FileChannel inchannel = afile.getChannel();
 
             bb.flip();
-            inchannel.position(30);
-            //无法控制写区间
-//            while (bb.hasRemaining()) {
+            bb.limit(20);
+            while (bb.hasRemaining()) {
                 //缓冲区是读模式，读缓冲区写入通道
-                int a = inchannel.write(bb);
-                System.out.println(afile.length());
-//            }
+                inchannel.write(bb);
+            }
+            //分段写入的时候不要将position + 1
+            bb.limit(bb.capacity());
+            while (bb.hasRemaining()) {
+                inchannel.write(bb);
+            }
             inchannel.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -66,9 +69,9 @@ public class NIOTest {
             RandomAccessFile afile = new RandomAccessFile(ConfigUtils.getConfig().getAbsolutePath() + "test.db","rw");
             FileChannel inchannel = afile.getChannel();
             //设置启示位置
-            inchannel.position(30);
+            inchannel.position(0);
             //截断
-            //inchannel.truncate(300);
+
             //设置以上值，代表，从磁盘文件30-300读info写入缓冲区
             //从通道写入缓冲区，写模式
             int bytesRead = inchannel.read(buf);
@@ -82,10 +85,10 @@ public class NIOTest {
             e.printStackTrace();
         }
 
-//        Table cc = (Table) CodeUtils.decode(buf);
-//        for (Column column : cc.getColumns()) {
-//            System.out.println(column.getName());
-//        }
+        Table cc = (Table) CodeUtils.decode(buf);
+        for (Column column : cc.getColumns()) {
+            System.out.println(column.getName());
+        }
 //        System.out.println(bb.limit());
 //        bb.clear();//clear方法可将所有position，limit,capacity变成初始状态
 //        System.out.println("capacity=" + bb.capacity());
