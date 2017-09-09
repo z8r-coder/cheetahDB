@@ -9,13 +9,16 @@ public class QueueIntFlip {
     private int capacity = 0;
     private int writePos = 0;
     private int readPos = 0;
-    private boolean flipped = false;
+    public boolean flipped = false;
 
     public QueueIntFlip(int capacity) {
         this.capacity = capacity;
         this.elements = new int[capacity];
     }
 
+    /**
+     * 重置
+     */
     public void reset() {
         this.writePos = 0;
         this.readPos = 0;
@@ -36,6 +39,11 @@ public class QueueIntFlip {
         return readPos - writePos;
     }
 
+    /**
+     * 放入一个元素
+     * @param element
+     * @return
+     */
     public boolean put(int element) {
         if (!flipped) {
             if (writePos == capacity) {
@@ -62,6 +70,12 @@ public class QueueIntFlip {
         }
     }
 
+    /**
+     * 放入数组元素
+     * @param newElements
+     * @param length
+     * @return
+     */
     public int put(int[] newElements, int length) {
         int newElementsReadPos = 0;
         if (!flipped) {
@@ -96,7 +110,7 @@ public class QueueIntFlip {
     }
 
     /**
-     *
+     * 取出一个元素
      * @return
      */
     public int take() {
@@ -122,6 +136,12 @@ public class QueueIntFlip {
         }
     }
 
+    /**
+     * 取出固定长度数组
+     * @param into
+     * @param length
+     * @return
+     */
     public int take(int[] into, int length) {
         int intoWritePos = 0;
         if (!flipped) {
@@ -154,5 +174,29 @@ public class QueueIntFlip {
                 return intoWritePos;
             }
         }
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public int getWritePos() {
+        return writePos;
+    }
+
+    public int getReadPos() {
+        return readPos;
+    }
+
+    public void setWritePos(int writePos) {
+        this.writePos = writePos;
+    }
+
+    public void setReadPos(int readPos) {
+        this.readPos = readPos;
+    }
+
+    public static void main(String arg[]) {
+        QueueIntFlip queueIntFlip = new QueueIntFlip(100);
     }
 }
