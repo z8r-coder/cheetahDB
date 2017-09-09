@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by rx on 2017/9/9.
  */
-public class MessageWriter {
+public class MessageWriter implements IMessageWriter{
     private List<Message> writeQueue = new ArrayList<Message>();
     private Message messageInProgress;
     private int bytesWritten = 0;

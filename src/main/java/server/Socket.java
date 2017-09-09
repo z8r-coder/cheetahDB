@@ -61,4 +61,36 @@ public class Socket {
 
         return totalBytesWritten;
     }
+
+    public long getSocketId() {
+        return socketId;
+    }
+
+    public void setSocketId(long socketId) {
+        this.socketId = socketId;
+    }
+
+    public SocketChannel getSocketChannel() {
+        return socketChannel;
+    }
+
+    public void setSocketChannel(SocketChannel socketChannel) {
+        this.socketChannel = socketChannel;
+    }
+
+    public IMessageReader getMessageReader() {
+        return messageReader;
+    }
+
+    public void setMessageReader(IMessageReader messageReader) {
+        this.messageReader = messageReader;
+    }
+
+    public MessageWriter getMessageWriter() {
+        return messageWriter;
+    }
+
+    public void setMessageWriter(MessageWriter messageWriter) {
+        this.messageWriter = messageWriter;
+    }
 }
