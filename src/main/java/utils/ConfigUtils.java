@@ -26,6 +26,7 @@ public class ConfigUtils {
     private String freeBlockMedium;
     private String freeBlockLarge;
 
+    private String socketSize;
     private static ConfigUtils config;
     private Properties properties;
 
@@ -37,6 +38,7 @@ public class ConfigUtils {
         return config;
     }
 
+    // TODO: 2017/9/9 可分开配置，目前需要配置的为 engine config and server config
     public void loadPropertiesFromSrc() {
         InputStream in = null;
 
@@ -109,6 +111,11 @@ public class ConfigUtils {
         String FREE_BLOCK_LARGE = pro.getProperty("free-block-large");
         if (!StringUtils.isBlank(FREE_BLOCK_LARGE)) {
             this.freeBlockLarge = FREE_BLOCK_LARGE;
+        }
+
+        String SOCKET_SIZE = pro.getProperty("socket-size");
+        if (!StringUtils.isBlank(SOCKET_SIZE)) {
+            this.socketSize = SOCKET_SIZE;
         }
     }
 
@@ -192,6 +199,14 @@ public class ConfigUtils {
         this.freeBlockLarge = freeBlockLarge;
     }
 
+    public String getSocketSize() {
+        return socketSize;
+    }
+
+    public void setSocketSize(String socketSize) {
+        this.socketSize = socketSize;
+    }
+
     public static void main(String args[]) {
         //加载配置文件
         ConfigUtils.getConfig().loadPropertiesFromSrc();
@@ -211,5 +226,7 @@ public class ConfigUtils {
         System.out.println(ConfigUtils.getConfig().getFreeBlockMedium());
 
         System.out.println(ConfigUtils.getConfig().getFreeBlockLarge());
+
+        System.out.println(ConfigUtils.getConfig().getSocketSize());
     }
 }

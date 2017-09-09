@@ -13,15 +13,15 @@ import java.util.Queue;
  * 接受消息
  * Created by rx on 2017/9/9.
  */
-public class SocketAcceptor implements Runnable{
+public class SocketAccepter implements Runnable{
     private int tcpPort;
     private ServerSocketChannel serverSocketChannel;
 
     private Queue socketQueue;
 
-    private final static Log log = LogFactory.getLog(SocketAcceptor.class);
+    private final static Log log = LogFactory.getLog(SocketAccepter.class);
 
-    private SocketAcceptor(int tcpPort, Queue socketQueue) {
+    public SocketAccepter(int tcpPort, Queue socketQueue) {
         this.tcpPort = tcpPort;
         this.socketQueue = socketQueue;
     }
