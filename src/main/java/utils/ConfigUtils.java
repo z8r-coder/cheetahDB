@@ -27,6 +27,7 @@ public class ConfigUtils {
     private String freeBlockLarge;
 
     private String socketSize;
+    private String serverPort;
     private static ConfigUtils config;
     private Properties properties;
 
@@ -117,6 +118,11 @@ public class ConfigUtils {
         if (!StringUtils.isBlank(SOCKET_SIZE)) {
             this.socketSize = SOCKET_SIZE;
         }
+
+        String SERVER_PORT = pro.getProperty("server-port");
+        if (!StringUtils.isBlank(SERVER_PORT)) {
+            this.serverPort = SERVER_PORT;
+        }
     }
 
     public void setPageSize(String pageSize) {
@@ -205,6 +211,14 @@ public class ConfigUtils {
 
     public void setSocketSize(String socketSize) {
         this.socketSize = socketSize;
+    }
+
+    public void setServerPort(String serverPort) {
+        this.serverPort = serverPort;
+    }
+
+    public String getServerPort() {
+        return serverPort;
     }
 
     public static void main(String args[]) {

@@ -34,7 +34,7 @@ public class CheetahServer {
     }
 
     public void start() throws IOException {
-        Queue socketQueue = new ArrayBlockingQueue(1024);
+        Queue socketQueue = new ArrayBlockingQueue(SOCKET_SIZE);
 
         this.socketAccepter = new SocketAccepter(tcpPort, socketQueue);
 

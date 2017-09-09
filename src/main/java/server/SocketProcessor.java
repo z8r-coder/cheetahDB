@@ -61,11 +61,25 @@ public class SocketProcessor implements Runnable {
     }
 
     public void run() {
+        while (true) {
+            try {
+                executeCycle();
+            } catch (IOException e) {
+                log.error(Thread.currentThread().toString() + "handler message error!", e);
+            }
 
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                log.error(Thread.currentThread().toString(), e);
+            }
+        }
     }
 
-    public void executeCycle() {
-
+    public void executeCycle() throws IOException {
+        takeNewSockets();
+        readFromSockets();
+        writeToSockets();
     }
 
     public void takeNewSockets() throws IOException {
