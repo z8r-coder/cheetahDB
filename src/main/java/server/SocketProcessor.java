@@ -120,6 +120,11 @@ public class SocketProcessor implements Runnable {
         }
     }
 
+    /**
+     * 从通道中读
+     * @param key
+     * @throws IOException
+     */
     public void readFromSockets(SelectionKey key) throws IOException {
         Socket socket = (Socket) key.attachment();
         socket.getMessageReader().read(socket, this.readByteBuffer);
