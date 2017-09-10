@@ -1,5 +1,7 @@
 package client;
 
+import com.sun.org.apache.bcel.internal.classfile.Code;
+import filestore.code.CodeUtils;
 import support.CharsetHelper;
 
 import java.io.IOException;
@@ -49,9 +51,10 @@ public class CheetahClient implements Runnable{
                             if (channel.finishConnect()) {
                                 //成功连接
                                 key.interestOps(SelectionKey.OP_READ);
-
-                                 channel.write(CharsetHelper.encode(CharBuffer.wrap(getWord())));
-                                 sleep();
+                                ByteBuffer byteBuffer = ByteBuffer.allocate(128);
+                                CodeUtils.encode(getWord(), byteBuffer);
+                                channel.write(byteBuffer);
+                                sleep();
                             } else {
                                 key.cancel();
                             }
@@ -99,11 +102,11 @@ public class CheetahClient implements Runnable{
     private void init() {
         words = new ArrayBlockingQueue<String>(5);
         try {
-            words.put("hi");
-            words.put("who");
-            words.put("what");
-            words.put("where");
-            words.put("bye");
+            words.put("SELECT * FROM TABLE_A;");
+//            words.put("who");
+//            words.put("what");
+//            words.put("where");
+//            words.put("bye");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
