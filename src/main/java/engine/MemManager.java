@@ -41,6 +41,7 @@ public class MemManager<T> {
      * 每个表对应的管理器
      */
     private static Map<String, MemManager> tableMemManager = new HashMap<String, MemManager>();
+
     static {
         ConfigUtils.getConfig().loadPropertiesFromSrc();
         PAGE_SIZE = Integer.parseInt(ConfigUtils.getConfig().getPageSize());
