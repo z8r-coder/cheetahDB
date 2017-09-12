@@ -45,6 +45,10 @@ public class BplustreeImpl<T> implements Bplustree<T,Node>, Serializable {
         this.head = head;
     }
 
+    public Node getHeadId() {
+        return null;
+    }
+
     public Node getHead() {
         return head;
     }

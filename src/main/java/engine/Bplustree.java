@@ -68,6 +68,12 @@ public interface Bplustree<T,E> {
     public void setHead(E head);
 
     /**
+     * 获取头节点
+     * @return
+     */
+    public E getHeadId();
+
+    /**
      * 访问输出叶子结点
      * @param root
      */

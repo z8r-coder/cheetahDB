@@ -63,7 +63,7 @@ public class MemManager<T> {
     /**
      * 磁盘空间目前的最大值
      */
-    private long MAX_SIZE;
+    private int MAX_SIZE;
 
     /**
      * 磁盘空间逻辑页数
@@ -405,11 +405,11 @@ public class MemManager<T> {
         return diskNode;
     }
 
-    public void setMAX_SIZE(long MAX_SIZE) {
+    public void setMAX_SIZE(int MAX_SIZE) {
         this.MAX_SIZE = MAX_SIZE;
     }
 
-    public long getMAX_SIZE() {
+    public int getMAX_SIZE() {
         return MAX_SIZE;
     }
 
@@ -417,7 +417,7 @@ public class MemManager<T> {
         this.MAX_ID = MAX_ID;
     }
 
-    public long getMAX_ID() {
+    public int getMAX_ID() {
         return MAX_ID;
     }
 
@@ -461,6 +461,14 @@ public class MemManager<T> {
      */
     public int freePageSize () {
         return freePage.size();
+    }
+
+    /**
+     * 获取空闲页列表
+     * @return
+     */
+    public List<Integer> getFreePage() {
+        return freePage;
     }
 
     public static void main(String arg[]) {

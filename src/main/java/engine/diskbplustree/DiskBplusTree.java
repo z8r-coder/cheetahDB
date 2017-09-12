@@ -34,6 +34,7 @@ public class DiskBplusTree<T> implements Bplustree<T,Integer>{
      */
     private String tableName;
 
+
     /**
      * 该表的内存管理器
      */
@@ -51,10 +52,12 @@ public class DiskBplusTree<T> implements Bplustree<T,Integer>{
         this.memManager = MemManager.getTableMemManager(tableName);
     }
     public T search(Comparable key) {
-        return null;
+        DiskNode<T> rootNode = memManager.getPageById(rootId);
+        return rootNode.search(key, this);
     }
 
     public List<T> searchForList(Comparable key, String rp) throws SelectException {
+
         return null;
     }
 
@@ -66,10 +69,13 @@ public class DiskBplusTree<T> implements Bplustree<T,Integer>{
     public void insert(Comparable key, T obj) {
         DiskNode<T> rootNode = memManager.getPageById(rootId);
         rootNode.insert(key, obj, this, memManager);
+        PersistInfo persistInfo = new PersistInfo();
+        persistInfoInit(persistInfo);
     }
 
     public void update(Comparable key, T obj) {
-
+        DiskNode<T> rootNode = memManager.getPageById(rootId);
+        rootNode.update(key, obj, this);
     }
 
     public int getOrder() {
@@ -88,6 +94,10 @@ public class DiskBplusTree<T> implements Bplustree<T,Integer>{
         this.headId = head;
     }
 
+    public Integer getHeadId() {
+        return headId;
+    }
+
     public void setMemManager(MemManager<T> memManager) {
         this.memManager = memManager;
     }
@@ -104,13 +114,6 @@ public class DiskBplusTree<T> implements Bplustree<T,Integer>{
         return changeDiskNodeCache;
     }
 
-    public int getHeadId() {
-        return headId;
-    }
-
-    public void setHeadId(int headId) {
-        this.headId = headId;
-    }
 
     /**
      * 添加改变后的diskNode
@@ -165,6 +168,15 @@ public class DiskBplusTree<T> implements Bplustree<T,Integer>{
      */
     public void visitorLeaf(Integer root) {
 
+    }
+
+    private void persistInfoInit(PersistInfo persistInfo) {
+        persistInfo.setFreePage(memManager.getFreePage());
+        persistInfo.setHeadId(headId);
+        persistInfo.setMAX_ID(memManager.getMAX_ID());
+        persistInfo.setMAX_SIZE(memManager.getMAX_SIZE());
+        persistInfo.setOrder(order);
+        persistInfo.setRootId(rootId);
     }
 
     public static void main(String arg[]) {
