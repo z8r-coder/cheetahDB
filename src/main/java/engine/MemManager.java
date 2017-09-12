@@ -261,21 +261,49 @@ public class MemManager<T> {
      * 用于批量写入磁盘，减少IO次数
      * @param cacheMap
      */
-    public void batchWriteToDisk(Map<Long, DiskNode<T>> cacheMap) {
-        int writeCount = cacheMap.size();
-        ByteBuffer batchWriteBuf = ByteBuffer.allocate(PAGE_SIZE * writeCount);
+    public void batchWriteToDisk(Map<Integer, DiskNode<T>> cacheMap) throws Exception {
+        ByteBuffer batchWriteBuf = ByteBuffer.allocate(PAGE_SIZE);
         FileChannel outChannel = null;
-        for (Long nodeId : cacheMap.keySet()) {
-            //将cacheMap中的缓存放入缓冲区
-//            CodeUtils.encode();
-        }
+
         try {
             RandomAccessFile afile = new RandomAccessFile(FILE_PATH
                     + tableName + "_indexFile.db", "rw");
             outChannel = afile.getChannel();
+            for (Integer id : cacheMap.keySet()) {
+                DiskNode<T> diskNode = cacheMap.get(id);
+                //检查每页大小
+                int diskNodeBytesLen = CodeUtils.getBytesArrLength(diskNode);
+                CheckUtils.state(diskNodeBytesLen > 4000,
+                        "the page is too big!", diskNode);
 
+                //编码
+                CodeUtils.encode(diskNode, batchWriteBuf);
+                int pos = 1025 + PAGE_SIZE * id;
+
+                // TODO: 2017/9/12 测试的时候看看该行能否去掉
+                batchWriteBuf.flip();
+                batchWriteBuf.position(0);
+                batchWriteBuf.limit(PAGE_SIZE - 1);
+
+                outChannel.position(pos);
+                while (batchWriteBuf.hasRemaining()) {
+                    outChannel.write(batchWriteBuf);
+                }
+
+                batchWriteBuf.clear();
+            }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new Exception(e);
+        } catch (IOException e) {
+            throw new Exception(e);
+        } finally {
+            if (outChannel != null) {
+                try {
+                    outChannel.close();
+                } catch (IOException e) {
+                    throw new Exception(e);
+                }
+            }
         }
     }
 
@@ -288,8 +316,7 @@ public class MemManager<T> {
      */
     public boolean writeToDisk(int id, DiskNode<T> diskNode) throws Exception {
         int position = 1025 + id * PAGE_SIZE;
-        //终止位置，不足0补齐
-        int end = 1024 + (id + 1) * PAGE_SIZE;
+
         ByteBuffer writeBuf = ByteBuffer.allocate(PAGE_SIZE);
 
         //检查页大小
@@ -304,26 +331,14 @@ public class MemManager<T> {
             RandomAccessFile afile = new RandomAccessFile(FILE_PATH
                     + tableName + "_indexFile.db", "rw");
             outChannel = afile.getChannel();
+            outChannel.position(position);
 
             writeBuf.flip();
-            writeBuf.position(position);
-            writeBuf.limit(end);
+            writeBuf.position(0);
+            //不足之处0补齐
+            writeBuf.limit(PAGE_SIZE - 1);
             while(writeBuf.hasRemaining()) {
                 outChannel.write(writeBuf);
-            }
-
-            //不足的0补齐
-            if (outChannel.position() < end) {
-                int startPos = (int) (end - outChannel.position());
-                ByteBuffer zeroBuffer = ByteBuffer.allocate(startPos);
-                outChannel.position(startPos + 1);
-                for (int i = 0; i <= zeroBuffer.capacity();i++) {
-                    zeroBuffer.put((byte) 0);
-                }
-                //将补齐的零写入磁盘
-                while (zeroBuffer.hasRemaining()) {
-                    outChannel.write(zeroBuffer);
-                }
             }
             //缓存该结点
             putNodeToCache(id, diskNode);
@@ -368,7 +383,6 @@ public class MemManager<T> {
                     + tableName + "_indexFile.db", "rw");
             inchannel = afile.getChannel();
             inchannel.position(positon);
-            inchannel.truncate(positon + PAGE_SIZE - 1);
 
             int bytesRead = inchannel.read(readBuf);
 
