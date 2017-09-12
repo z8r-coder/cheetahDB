@@ -36,45 +36,45 @@ public class DiskNode<T> {
      * 父节点在磁盘中的位置
      * 若该节点即为根节点，则parentId = -1
      */
-    private long parentId;
+    private int parentId;
 
     /**
      * 前驱节点在磁盘中的位置
      * 若前驱节点不存在，则为-1
      */
-    private long prevId;
+    private int prevId;
 
     /**
      * 后继节点在磁盘中的位置
      * 若后继节点不存在，则为-1
      */
-    private long nextId;
+    private int nextId;
 
     /**
      * 自身在磁盘中的位置
      */
-    private long id;
+    private int id;
     /**
      * 儿子结点在磁盘中的位置
      */
-    private List<Long> childrenId;
+    private List<Integer> childrenId;
 
     private transient Log log = LogFactory.getLog(DiskNode.class);
 
-    public DiskNode(boolean leaf, long id) {
+    public DiskNode(boolean leaf, int id) {
         this.id = id;
         this.leaf = leaf;
         if (!leaf) {
-            childrenId = new ArrayList<Long>();
+            childrenId = new ArrayList<Integer>();
         }
     }
 
-    public DiskNode(boolean leaf, boolean root,long id) {
+    public DiskNode(boolean leaf, boolean root,int id) {
         this.id = id;
         this.leaf = leaf;
         this.root = root;
         if (!leaf) {
-            childrenId = new ArrayList<Long>();
+            childrenId = new ArrayList<Integer>();
         }
     }
 
@@ -102,43 +102,43 @@ public class DiskNode<T> {
         this.entries = entries;
     }
 
-    public long getParentId() {
+    public int getParentId() {
         return parentId;
     }
 
-    public void setParentId(long parentId) {
+    public void setParentId(int parentId) {
         this.parentId = parentId;
     }
 
-    public long getPrevId() {
+    public int getPrevId() {
         return prevId;
     }
 
-    public void setPrevId(long prevId) {
+    public void setPrevId(int prevId) {
         this.prevId = prevId;
     }
 
-    public long getNextId() {
+    public int getNextId() {
         return nextId;
     }
 
-    public void setNextId(long nextId) {
+    public void setNextId(int nextId) {
         this.nextId = nextId;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public List<Long> getChildrenId() {
+    public List<Integer> getChildrenId() {
         return childrenId;
     }
 
-    public void setChildrenId(List<Long> childrenId) {
+    public void setChildrenId(List<Integer> childrenId) {
         this.childrenId = childrenId;
     }
 
@@ -158,18 +158,18 @@ public class DiskNode<T> {
             return null;
         } else {
             if (key.compareTo(entries.get(0).getKey()) <= 0) {
-                long childId = childrenId.get(0);
+                int childId = childrenId.get(0);
                 DiskNode<T> diskChildNode = bpt.getChangeNode(childId);
                 return diskChildNode.search(key, bpt);
             } else if (key.compareTo(entries.get(entries.size() - 1).getKey()) >= 0) {
-                long childId = childrenId.get(0);
+                int childId = childrenId.get(0);
                 DiskNode<T> diskChildNode = bpt.getChangeNode(childId);
                 return diskChildNode.search(key, bpt);
             } else {
                 for (int i = 0; i < entries.size();i++) {
                     if (entries.get(i).getKey().compareTo(key) <= 0 &&
                             entries.get(i + 1).getKey().compareTo(key) >0) {
-                        long childId = childrenId.get(i);
+                        int childId = childrenId.get(i);
                         DiskNode<T> diskChildNode = bpt.getChangeNode(childId);
                         return diskChildNode.search(key, bpt);
                     }
@@ -188,18 +188,18 @@ public class DiskNode<T> {
         if (!leaf) {
             //非叶子节点
             if (key.compareTo(entries.get(0).getKey()) <= 0) {
-                long childId = childrenId.get(0);
+                int childId = childrenId.get(0);
                 DiskNode<T> childDiskNode = bpt.getChangeNode(childId);
                 childDiskNode.update(key, obj, bpt);
             } else if (key.compareTo(entries.get(entries.size() - 1).getKey()) >= 0) {
-                long childId = childrenId.get(entries.size() - 1);
+                int childId = childrenId.get(entries.size() - 1);
                 DiskNode<T> childDiskNode = bpt.getChangeNode(childId);
                 childDiskNode.update(key, obj, bpt);
             } else {
                 for (int i = 0; i < entries.size();i++) {
                     if (entries.get(i).getKey().compareTo(key) <= 0 &&
                             entries.get(i + 1).getKey().compareTo(key) > 0) {
-                        long childId = childrenId.get(i);
+                        int childId = childrenId.get(i);
                         DiskNode<T> childDiskNode = bpt.getChangeNode(childId);
                         childDiskNode.update(key, obj, bpt);
                         break;
@@ -303,7 +303,7 @@ public class DiskNode<T> {
 
                             //更新链表
                             if (prevDiskNode.getPrevId() != -1) {
-                                long prepreid = prevDiskNode.getPrevId();
+                                int prepreid = prevDiskNode.getPrevId();
                                 DiskNode<T> prepreNode = bpt.getChangeNode(prepreid);
                                 prepreNode.setNextId(id);
                                 prevId = prepreid;
@@ -332,7 +332,7 @@ public class DiskNode<T> {
 
                             //更新链表
                             if (nextDiskNode.getNextId() != -1) {
-                                long nextnextId = nextDiskNode.getNextId();
+                                int nextnextId = nextDiskNode.getNextId();
                                 DiskNode<T> nextnextNode = bpt.getChangeNode(nextnextId);
                                 nextnextNode.setPrevId(id);
                                 nextId = nextnextId;
@@ -349,18 +349,18 @@ public class DiskNode<T> {
             }
         } else {
             if (key.compareTo(entries.get(0).getKey()) <= 0) {
-                long childId = childrenId.get(0);
+                int childId = childrenId.get(0);
                 DiskNode<T> diskChildNode = bpt.getChangeNode(childId);
                 diskChildNode.remove(key,bpt, memManager);
             } else if (key.compareTo(entries.get(entries.size() - 1).getKey()) >= 0) {
-                long childId = childrenId.get(childrenId.size() - 1);
+                int childId = childrenId.get(childrenId.size() - 1);
                 DiskNode<T> diskChildNode = bpt.getChangeNode(childId);
                 diskChildNode.remove(key, bpt, memManager);
             } else {
                 for (int i = 0; i < entries.size();i++) {
                     if (entries.get(i).getKey().compareTo(key) <= 0 &&
                             entries.get(i + 1).getKey().compareTo(key) > 0) {
-                        long childId = childrenId.get(i);
+                        int childId = childrenId.get(i);
                         DiskNode<T> diskChildNode = bpt.getChangeNode(childId);
                         diskChildNode.remove(key, bpt, memManager);
                         break;
@@ -386,7 +386,7 @@ public class DiskNode<T> {
                     return;
                 } else {
                     //合并,只有一个子节点
-                    long rootId = childrenId.get(0);
+                    int rootId = childrenId.get(0);
                     DiskNode<T> diskRoot = bpt.getChangeNode(rootId);
                     bpt.setRoot(rootId);
                     diskRoot.setParentId(-1);
@@ -411,12 +411,12 @@ public class DiskNode<T> {
                 DiskNode<T> previous = null, next = null;
 
                 if (prevIndex >= 0) {
-                    long prevId = diskParent.getChildrenId().get(prevIndex);
+                    int prevId = diskParent.getChildrenId().get(prevIndex);
                     previous = bpt.getChangeNode(prevId);
                 }
 
                 if (nextIndex < diskParent.getChildrenId().size()) {
-                    long nextId = diskParent.getChildrenId().get(nextIndex);
+                    int nextId = diskParent.getChildrenId().get(nextIndex);
                     next = bpt.getChangeNode(nextId);
                 }
 
@@ -426,7 +426,7 @@ public class DiskNode<T> {
                     //若前置结点的子节点数大于二分之阶数，则旋转结点
                     //获取借来的结点
                     int idx = previous.getChildrenId().size() - 1;
-                    long borrowId = previous.getChildrenId().get(idx);
+                    int borrowId = previous.getChildrenId().get(idx);
                     DiskNode<T> borrowNode = bpt.getChangeNode(borrowId);
                     previous.getChildrenId().remove(borrowId);
                     borrowNode.setParentId(id);
@@ -444,7 +444,7 @@ public class DiskNode<T> {
                         && next.getChildrenId().size() > bpt.getOrder() / 2
                         && next.getChildrenId().size() > 2) {
                     //向后置结点借
-                    long borrowId = next.getChildrenId().get(0);
+                    int borrowId = next.getChildrenId().get(0);
                     DiskNode<T> borrowNode = bpt.getChangeNode(borrowId);
                     next.getChildrenId().remove(borrowId);
                     borrowNode.setParentId(id);
@@ -464,7 +464,7 @@ public class DiskNode<T> {
                             && previous.getChildrenId().size() <= 2)) {
                         //同前面的结点合并
                         for (int i = previous.getChildrenId().size() - 1;i >= 0;i--) {
-                            long childId = previous.getChildrenId().get(i);
+                            int childId = previous.getChildrenId().get(i);
                             childrenId.add(0, childId);
                             DiskNode<T> diskChildNode = bpt.getChangeNode(childId);
                             diskChildNode.setParentId(id);
@@ -488,7 +488,7 @@ public class DiskNode<T> {
                             next.getChildrenId().size() <= 2)) {
                         //与后继结点合并
                         for (int i = 0; i < next.getChildrenId().size();i++) {
-                            long childId = next.getChildrenId().get(i);
+                            int childId = next.getChildrenId().get(i);
                             DiskNode<T> diskchildNode = bpt.getChangeNode(childId);
                             childrenId.add(childId);
                             diskchildNode.setParentId(id);
@@ -554,7 +554,7 @@ public class DiskNode<T> {
                 }
             } else {
                 //分裂
-                Long rightId = memManager.getNewOrFreeId();
+                int rightId = memManager.getNewOrFreeId();
                 //左结点的id用本node的id
                 DiskNode<T> left = new DiskNode<T>(true,id);
                 DiskNode<T> right = new DiskNode<T>(true, rightId);
@@ -619,7 +619,7 @@ public class DiskNode<T> {
                     //根节点
                     root = false;
 
-                    long newParentId = memManager.getNewOrFreeId();
+                    int newParentId = memManager.getNewOrFreeId();
 
                     DiskNode<T> diskParentNode = new DiskNode<T>(false, true, newParentId);
                     left.setParentId(newParentId);
@@ -645,18 +645,18 @@ public class DiskNode<T> {
         } else {
             //非叶结点
             if (key.compareTo(entries.get(0).getKey()) <= 0) {
-                long childId = childrenId.get(0);
+                int childId = childrenId.get(0);
                 DiskNode<T> childNode = bpt.getChangeNode(childId);
                 childNode.insert(key, obj, bpt, memManager);
             } else if (key.compareTo(entries.get(entries.size() - 1).getKey()) >= 0) {
-                long childId = childrenId.get(0);
+                int childId = childrenId.get(0);
                 DiskNode<T> childNode = bpt.getChangeNode(childId);
                 childNode.insert(key, obj, bpt, memManager);
             } else {
                 for (int i = 0; i < entries.size();i++) {
                     if (entries.get(i).getKey().compareTo(key) <= 0
                             && entries.get(i + 1).getKey().compareTo(key) > 0) {
-                        long childId = childrenId.get(i);
+                        int childId = childrenId.get(i);
                         DiskNode<T> childNode = bpt.getChangeNode(childId);
                         childNode.insert(key, obj, bpt, memManager);
                         break;
@@ -701,7 +701,7 @@ public class DiskNode<T> {
             //分裂，将本身节点在磁盘中的位置给左节点，右节点看空闲页中是否有数据，若没有在添加尾后
             DiskNode<T> left = new DiskNode<T>(false,this.id);
             //获取新的id
-            long newId = memManager.getNewOrFreeId();
+            int newId = memManager.getNewOrFreeId();
 
             DiskNode<T> right = new DiskNode<T>(false, newId);
 
@@ -710,7 +710,7 @@ public class DiskNode<T> {
             //将以前一半的子节点放入左节点
             for (int i = 0; i < leftSize; i++) {
                 left.getChildrenId().add(childrenId.get(i));
-                long childId = childrenId.get(i);
+                int childId = childrenId.get(i);
                 DiskNode<T> childDiskNode = bpt.getChangeNode(childId);
                 Comparable key = childDiskNode.getEntries().get(0).getKey();
                 left.getEntries().add(new SimpleEntry<Comparable, T>(key, null));
@@ -722,7 +722,7 @@ public class DiskNode<T> {
             //后一半的子节点放入右节点
             for (int i = 0; i < rightSize;i++) {
                 right.getChildrenId().add(childrenId.get(leftSize + i));
-                long childId = childrenId.get(leftSize + i);
+                int childId = childrenId.get(leftSize + i);
                 DiskNode<T> childDiskNode = bpt.getChangeNode(childId);
                 Comparable key = childDiskNode.getEntries().get(0).getKey();
                 right.getEntries().add(new SimpleEntry<Comparable, T>(key, null));
@@ -754,7 +754,7 @@ public class DiskNode<T> {
                 //根节点
                 root = false;
 
-                long newParentId = memManager.getNewOrFreeId();
+                int newParentId = memManager.getNewOrFreeId();
 
                 DiskNode<T> diskParentNode = new DiskNode<T>(false, true, newParentId);
                 left.setParentId(newParentId);
@@ -788,7 +788,7 @@ public class DiskNode<T> {
             //关键字节点和节点数目相同
             List<Map.Entry<Comparable, T>> entries = diskNode.getEntries();
             for (int i = 0; i < entries.size();i++) {
-                long childrenId = diskNode.getChildrenId().get(i);
+                int childrenId = diskNode.getChildrenId().get(i);
                 //获取磁盘上的子节点
                 DiskNode<T> dnode = bpt.getChangeNode(childrenId);
                 Comparable key = dnode.getEntries().get(0).getKey();
@@ -800,7 +800,7 @@ public class DiskNode<T> {
             bpt.putChangeNode(diskNode.getId(), diskNode);
 
             if (!diskNode.root){
-                long parentId = diskNode.getParentId();
+                int parentId = diskNode.getParentId();
                 DiskNode<T> parentNode = bpt.getChangeNode(parentId);
                 validate(parentNode, bpt, memManager);
             }
@@ -811,7 +811,7 @@ public class DiskNode<T> {
                 //若子节点数不等于关键字个数但仍大于M/2并且小于M，并且大于2
             diskNode.entries.clear();
             for (int i = 0; i < diskNode.getChildrenId().size();i++) {
-                long childrenId = diskNode.getChildrenId().get(i);
+                int childrenId = diskNode.getChildrenId().get(i);
                 //获取磁盘上的子节点
                 DiskNode<T> dnode = memManager.getPageById(childrenId);
                 Comparable key = dnode.getEntries().get(0).getKey();
@@ -821,7 +821,7 @@ public class DiskNode<T> {
             //缓存
             bpt.putChangeNode(diskNode.getId(), diskNode);
             if (!diskNode.root) {
-                long parentId = diskNode.getParentId();
+                int parentId = diskNode.getParentId();
                 DiskNode<T> parentNode = bpt.getChangeNode(parentId);
                 validate(parentNode, bpt, memManager);
             }

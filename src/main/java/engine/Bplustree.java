@@ -84,24 +84,24 @@ public interface Bplustree<T,E> {
      * @param id
      * @return
      */
-    public DiskNode<T> getChangeNode(Long id);
+    public DiskNode<T> getChangeNode(E id);
 
     /**
      * 从缓存中移除，防止无用插入和非法访问
      * @param id
      * @return
      */
-    public DiskNode<T> removeChangeNode(Long id);
+    public DiskNode<T> removeChangeNode(E id);
 
     /**
      * 封装内存管理器的空闲页管理
      * @return
      */
-    public Long getFreeId();
+    public E getFreeId();
 
     /**
      * 内存管理器增加空闲页
      * @param id
      */
-    public void addFreeId(long id);
+    public void addFreeId(E id);
 }

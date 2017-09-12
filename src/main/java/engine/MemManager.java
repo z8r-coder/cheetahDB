@@ -68,12 +68,12 @@ public class MemManager<T> {
     /**
      * 磁盘空间逻辑页数
      */
-    private long MAX_ID;
+    private int MAX_ID;
 
     /**
      * 空闲页管理
      */
-    private List<Long> freePage = new LinkedList<Long>();
+    private List<Integer> freePage = new LinkedList<Integer>();
 
     private Log log = LogFactory.getLog(MemManager.class);
 
@@ -86,7 +86,7 @@ public class MemManager<T> {
      * 添加一个空闲页
      * @param freeId
      */
-    public void addFreePage(Long freeId) {
+    public void addFreePage(Integer freeId) {
         freePage.add(freeId);
     }
 
@@ -95,12 +95,12 @@ public class MemManager<T> {
      * 若为空，返回-1
      * @return
      */
-    public long removeAndRetFreePage() {
+    public int removeAndRetFreePage() {
         int freePageSize = freePage.size();
         if (freePageSize == 0) {
             return -1;
         }
-        Long retId = freePage.get(freePageSize - 1);
+        Integer retId = freePage.get(freePageSize - 1);
         freePage.remove(freePageSize - 1);
         return retId;
     }
@@ -163,6 +163,7 @@ public class MemManager<T> {
         } else {
             //如果缓存满了，扔掉时间戳最小的那个
             // TODO: 2017/9/6 待优化，可加个负载因子
+            // TODO: 2017/9/12 可维护个最小堆
             long min_tm = Long.parseLong(DateUtils.MAX_TIME_STAMP);
             long min_id = -1;
             for (long removeid : cacheMap.keySet()) {
@@ -182,8 +183,8 @@ public class MemManager<T> {
     }
 
     public void writeBptToDisk(Bplustree<T,Long> bpt) throws Exception {
-        long position = 1;
-        long end = 1024;
+        int position = 1;
+        int end = 1024;
         ByteBuffer writeBuf = ByteBuffer.allocate(1024);
         FileChannel outchannel = null;
 
@@ -191,25 +192,14 @@ public class MemManager<T> {
             RandomAccessFile afile = new RandomAccessFile(FILE_PATH
                     + tableName + "_indexFile.db", "rw");
             outchannel = afile.getChannel();
-            outchannel.position(position);
 
             writeBuf.flip();
+            //设置可读区间，不足0补齐
+            writeBuf.position(position);
+            writeBuf.limit(end);
+
             while(writeBuf.hasRemaining()) {
                 outchannel.write(writeBuf);
-            }
-
-            //不足的0补齐
-            if (outchannel.position() < end) {
-                int startPos = (int) (end - outchannel.position());
-                ByteBuffer zeroBuffer = ByteBuffer.allocate(startPos);
-                outchannel.position(startPos + 1);
-                for (int i = 0; i <= zeroBuffer.capacity();i++) {
-                    zeroBuffer.put((byte) 0);
-                }
-                //将补齐的零写入磁盘
-                while (zeroBuffer.hasRemaining()) {
-                    outchannel.write(zeroBuffer);
-                }
             }
         } catch (FileNotFoundException e) {
             throw new Exception(e);
@@ -230,9 +220,9 @@ public class MemManager<T> {
      * @return
      * @throws Exception
      */
-    public Bplustree<T, Long> readBptFromDisk() throws Exception {
-        long positon = 1;
-        long end = 1024;
+    public Bplustree<T, Integer> readBptFromDisk() throws Exception {
+        int positon = 1;
+        int end = 1024;
         ByteBuffer readBuf = ByteBuffer.allocate(1024);
         FileChannel inchannel = null;
 
@@ -240,8 +230,9 @@ public class MemManager<T> {
             RandomAccessFile afile = new RandomAccessFile(FILE_PATH
                     + tableName + "_indexFile.db", "rw");
             inchannel = afile.getChannel();
-            inchannel.position(positon);
-            inchannel.truncate(end);
+            //设置写区间，不足0补齐
+            readBuf.position(positon);
+            readBuf.limit(end);
             int bytesRead = inchannel.read(readBuf);
 
             if (bytesRead < 0) {
@@ -262,7 +253,7 @@ public class MemManager<T> {
                 }
             }
         }
-        Bplustree<T, Long> diskBpt = (DiskBplusTree<T>)CodeUtils.decode(readBuf);
+        Bplustree<T, Integer> diskBpt = (DiskBplusTree<T>)CodeUtils.decode(readBuf);
         return diskBpt;
     }
 
@@ -289,28 +280,16 @@ public class MemManager<T> {
     }
 
     /**
-     * 将一页中不足的用0补齐
-     * @param buf
-     * @param end
-     */
-    public void fillWithZero(ByteBuffer buf, int end) {
-        buf.limit(end);
-        byte zero = 0;
-        for (int i = buf.position();i <= end;i++) {
-            buf.put(zero);
-        }
-    }
-    /**
      * 将diskNode写入磁盘
      * @param id
      * @param diskNode
      * @return
      * @throws Exception
      */
-    public boolean writeToDisk(long id, DiskNode<T> diskNode) throws Exception {
-        long position = 1025 + id * PAGE_SIZE;
+    public boolean writeToDisk(int id, DiskNode<T> diskNode) throws Exception {
+        int position = 1025 + id * PAGE_SIZE;
         //终止位置，不足0补齐
-        long end = 1024 + (id + 1) * PAGE_SIZE;
+        int end = 1024 + (id + 1) * PAGE_SIZE;
         ByteBuffer writeBuf = ByteBuffer.allocate(PAGE_SIZE);
 
         //检查页大小
@@ -325,9 +304,10 @@ public class MemManager<T> {
             RandomAccessFile afile = new RandomAccessFile(FILE_PATH
                     + tableName + "_indexFile.db", "rw");
             outChannel = afile.getChannel();
-            outChannel.position(position);
 
             writeBuf.flip();
+            writeBuf.position(position);
+            writeBuf.limit(end);
             while(writeBuf.hasRemaining()) {
                 outChannel.write(writeBuf);
             }
@@ -419,7 +399,7 @@ public class MemManager<T> {
         return MAX_SIZE;
     }
 
-    public void setMAX_ID(long MAX_ID) {
+    public void setMAX_ID(int MAX_ID) {
         this.MAX_ID = MAX_ID;
     }
 
@@ -443,7 +423,7 @@ public class MemManager<T> {
      * 分裂后磁盘逻辑页数增加1,并返回添加后的逻辑页
      * 该值不会减少
      */
-    public long addAndRetMaxId() {
+    public int addAndRetMaxId() {
         addMaxSize();
         return ++MAX_ID;
     }
@@ -452,7 +432,7 @@ public class MemManager<T> {
      * 获取一个新或空间的叶
      * @return
      */
-    public long getNewOrFreeId() {
+    public Integer getNewOrFreeId() {
         if (freePageSize() > 0) {
             //还有空间页
             return removeAndRetFreePage();
