@@ -33,8 +33,10 @@ public class DiskBplusTree<T> implements Bplustree<T,Integer>{
      * 所属表名
      */
     private String tableName;
-
-
+    /**
+     * 持久信息
+     */
+    private PersistInfo persistInfo;
     /**
      * 该表的内存管理器
      */
@@ -69,7 +71,6 @@ public class DiskBplusTree<T> implements Bplustree<T,Integer>{
     public void insert(Comparable key, T obj) {
         DiskNode<T> rootNode = memManager.getPageById(rootId);
         rootNode.insert(key, obj, this, memManager);
-        PersistInfo persistInfo = new PersistInfo();
         persistInfoInit(persistInfo);
     }
 
