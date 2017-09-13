@@ -45,6 +45,10 @@ public class BplustreeImpl<T> implements Bplustree<T,Node>, Serializable {
         this.head = head;
     }
 
+    public Node getHeadId() {
+        return null;
+    }
+
     public Node getHead() {
         return head;
     }
@@ -101,6 +105,14 @@ public class BplustreeImpl<T> implements Bplustree<T,Node>, Serializable {
 
     }
 
+    public DiskNode<T> getChangeNode(Node id) {
+        return null;
+    }
+
+    public DiskNode<T> removeChangeNode(Node id) {
+        return null;
+    }
+
     public DiskNode<T> getChangeNode(Long id) {
         return null;
     }
@@ -109,8 +121,12 @@ public class BplustreeImpl<T> implements Bplustree<T,Node>, Serializable {
         return null;
     }
 
-    public Long getFreeId() {
+    public Node getFreeId() {
         return null;
+    }
+
+    public void addFreeId(Node id) {
+
     }
 
     public void addFreeId(long id) {

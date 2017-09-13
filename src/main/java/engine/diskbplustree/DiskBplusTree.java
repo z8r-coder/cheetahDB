@@ -14,11 +14,11 @@ import java.util.Map;
  *
  * Created by rx on 2017/9/4.
  */
-public class DiskBplusTree<T> implements Bplustree<T,Long>{
+public class DiskBplusTree<T> implements Bplustree<T,Integer>{
     /**
      * 根节点所在位置
      */
-    private long rootId;
+    private int rootId;
 
     /**
      * 阶数
@@ -28,12 +28,15 @@ public class DiskBplusTree<T> implements Bplustree<T,Long>{
     /**
      * 叶节点链表头结点所在位置
      */
-    private long headId;
+    private int headId;
     /**
      * 所属表名
      */
     private String tableName;
-
+    /**
+     * 持久信息
+     */
+    private PersistInfo persistInfo;
     /**
      * 该表的内存管理器
      */
@@ -42,19 +45,21 @@ public class DiskBplusTree<T> implements Bplustree<T,Long>{
     /**
      * 缓存修改过的页
      */
-    private transient Map<Long, DiskNode<T>> changeDiskNodeCache = new HashMap<Long, DiskNode<T>>();
+    private transient Map<Integer, DiskNode<T>> changeDiskNodeCache = new HashMap<Integer, DiskNode<T>>();
 
-    public DiskBplusTree(int order, long rootId, String tableName) {
+    public DiskBplusTree(int order, int rootId, String tableName) {
         this.order = order;
         this.rootId = rootId;
         this.tableName = tableName;
         this.memManager = MemManager.getTableMemManager(tableName);
     }
     public T search(Comparable key) {
-        return null;
+        DiskNode<T> rootNode = memManager.getPageById(rootId);
+        return rootNode.search(key, this);
     }
 
     public List<T> searchForList(Comparable key, String rp) throws SelectException {
+
         return null;
     }
 
@@ -66,26 +71,32 @@ public class DiskBplusTree<T> implements Bplustree<T,Long>{
     public void insert(Comparable key, T obj) {
         DiskNode<T> rootNode = memManager.getPageById(rootId);
         rootNode.insert(key, obj, this, memManager);
+        persistInfoInit(persistInfo);
     }
 
     public void update(Comparable key, T obj) {
-
+        DiskNode<T> rootNode = memManager.getPageById(rootId);
+        rootNode.update(key, obj, this);
     }
 
     public int getOrder() {
         return order;
     }
 
-    public void setRoot(Long root) {
+    public void setRoot(Integer root) {
         this.rootId = root;
     }
 
-    public Long getRoot() {
+    public Integer getRoot() {
         return rootId;
     }
 
-    public void setHead(Long head) {
+    public void setHead(Integer head) {
         this.headId = head;
+    }
+
+    public Integer getHeadId() {
+        return headId;
     }
 
     public void setMemManager(MemManager<T> memManager) {
@@ -96,19 +107,20 @@ public class DiskBplusTree<T> implements Bplustree<T,Long>{
         return memManager;
     }
 
-    public void setChangeDiskNodeCache(Map<Long, DiskNode<T>> changeDiskNodeCache) {
+    public void setChangeDiskNodeCache(Map<Integer, DiskNode<T>> changeDiskNodeCache) {
         this.changeDiskNodeCache = changeDiskNodeCache;
     }
 
-    public Map<Long, DiskNode<T>> getChangeDiskNodeCache() {
+    public Map<Integer, DiskNode<T>> getChangeDiskNodeCache() {
         return changeDiskNodeCache;
     }
+
 
     /**
      * 添加改变后的diskNode
      * @param diskNode
      */
-    public void putChangeNode (Long id, DiskNode<T> diskNode) {
+    public void putChangeNode (Integer id, DiskNode<T> diskNode) {
         changeDiskNodeCache.put(id, diskNode);
     }
 
@@ -117,7 +129,7 @@ public class DiskBplusTree<T> implements Bplustree<T,Long>{
      * @param id
      * @return
      */
-    public DiskNode<T> getChangeNode(Long id) {
+    public DiskNode<T> getChangeNode(Integer id) {
         if (changeDiskNodeCache.get(id) == null) {
             //若修改节点缓存中没有，去磁盘读
             DiskNode diskNode = memManager.getPageById(id);
@@ -132,7 +144,7 @@ public class DiskBplusTree<T> implements Bplustree<T,Long>{
      * @param id
      * @return
      */
-    public DiskNode<T> removeChangeNode(Long id) {
+    public DiskNode<T> removeChangeNode(Integer id) {
         return changeDiskNodeCache.remove(id);
     }
 
@@ -140,7 +152,7 @@ public class DiskBplusTree<T> implements Bplustree<T,Long>{
      * 封装内存管理器的空闲页管理
      * @return
      */
-    public Long getFreeId() {
+    public Integer getFreeId() {
         return memManager.getNewOrFreeId();
     }
 
@@ -148,15 +160,24 @@ public class DiskBplusTree<T> implements Bplustree<T,Long>{
      * 增添空闲页
      * @param id
      */
-    public void addFreeId(long id) {
+    public void addFreeId(Integer id) {
         memManager.addFreePage(id);
     }
     /**
      * 遍历叶节点
      * @param root
      */
-    public void visitorLeaf(Long root) {
+    public void visitorLeaf(Integer root) {
 
+    }
+
+    private void persistInfoInit(PersistInfo persistInfo) {
+        persistInfo.setFreePage(memManager.getFreePage());
+        persistInfo.setHeadId(headId);
+        persistInfo.setMAX_ID(memManager.getMAX_ID());
+        persistInfo.setMAX_SIZE(memManager.getMAX_SIZE());
+        persistInfo.setOrder(order);
+        persistInfo.setRootId(rootId);
     }
 
     public static void main(String arg[]) {
