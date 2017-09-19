@@ -70,6 +70,7 @@ public class MemManager<T> {
      */
     private int MAX_ID;
 
+    private CachePage<T>[] cachePageHeap = null;
     /**
      * 空闲页管理
      */
@@ -156,28 +157,37 @@ public class MemManager<T> {
      * @param diskNode
      */
     public void putNodeToCache(long id, DiskNode<T> diskNode) {
+        Long dateTime = Long.parseLong(DateUtils.convertDate2Str(new Date(), DateUtils.TIME_CACHE_FORMAT));
+        CachePage cachePage = new CachePage(dateTime, diskNode);
         if (cacheMap.size() < CACHE_SIZE) {
             //缓存未满
-            Long dateTime = Long.parseLong(DateUtils.convertDate2Str(new Date(), DateUtils.TIME_CACHE_FORMAT));
-            cacheMap.put(id, new CachePage(dateTime, diskNode));
+            cacheMap.put(id, cachePage);
         } else {
             //如果缓存满了，扔掉时间戳最小的那个
             // TODO: 2017/9/6 待优化，可加个负载因子
-            // TODO: 2017/9/12 可维护个最小堆
-            long min_tm = Long.parseLong(DateUtils.MAX_TIME_STAMP);
-            long min_id = -1;
-            for (long removeid : cacheMap.keySet()) {
-                CachePage cachePage = cacheMap.get(removeid);
-                if (cachePage.timestamp < min_tm) {
-                    min_id = cachePage.cacheNode.getId();
-                    min_tm = removeid;
+
+            CachePage<T> replacePage = null;
+            if (cachePageHeap == null) {
+                //还未建堆
+                cachePageHeap = new CachePage[cacheMap.size()];
+                int count = 0;
+                for (long Id : cacheMap.keySet()) {
+                    CachePage cachePagetmp = cacheMap.get(Id);
+                    cachePageHeap[count] = cachePagetmp;
+                    count++;
                 }
+                cachePageHeap = buildHeap(cachePageHeap, cacheMap.size());
+                replacePage = replaceFirst(cachePageHeap, cacheMap.size() - 1);
+                addNewElement(cachePageHeap, cachePage, cacheMap.size() - 1);
+            } else {
+                //已经存在堆
+                replacePage = replaceFirst(cachePageHeap, cacheMap.size() - 1);
+                addNewElement(cachePageHeap, cachePage, cacheMap.size() - 1);
             }
+
             //移除掉最少的
-            cacheMap.remove(min_id);
+            cacheMap.remove(replacePage.cacheNode.getId());
             //将新的放进去
-            Long dateTime = Long.parseLong(DateUtils.convertDate2Str(new Date(), DateUtils.TIME_CACHE_FORMAT));
-            CachePage cachePage = new CachePage(dateTime, diskNode);
             cacheMap.put(id, cachePage);
         }
     }
@@ -499,6 +509,22 @@ public class MemManager<T> {
         }
     }
 
+    private CachePage<T> replaceFirst(CachePage<T>[] cachePageHeap, int n) {
+        swap(cachePageHeap, 0, n);
+        CachePage<T> cachePage = cachePageHeap[n];
+        cachePageHeap[n] = null;
+        siftDown(cachePageHeap, 0, n);
+        return cachePage;
+    }
+
+    private void addNewElement(CachePage<T>[] cachePageHeap, CachePage<T> cachePage, int n) {
+        if (cachePageHeap.length == CACHE_SIZE) {
+            return;
+        }
+        //新加进来的一定是时间戳最大的
+        cachePageHeap[n] = cachePage;
+    }
+
     /**
      * 是否是叶结点
      * @param pos
@@ -521,10 +547,18 @@ public class MemManager<T> {
         return 2*pos + 2;
     }
 
-    public void buildHeap(CachePage<T>[] cachePageHeap, int n) {
+    // TODO: 2017/9/19 优化，可单独写成一个类，并提供方法
+    /**
+     * 建立最小堆，用于快速LRU缓存
+     * @param cachePageHeap
+     * @param n
+     * @return
+     */
+    public CachePage<T>[] buildHeap(CachePage<T>[] cachePageHeap, int n) {
         for (int i = n / 2 - 1; i >= 0; i--) {
             siftDown(cachePageHeap, i, n);
         }
+        return cachePageHeap;
     }
     public static void main(String arg[]) {
         //System.out.println(System.currentTimeMillis());
