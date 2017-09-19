@@ -471,8 +471,60 @@ public class MemManager<T> {
         return freePage;
     }
 
+    /**
+     * 交换位置
+     * @param cachePages
+     * @param firstPos
+     * @param secondPos
+     */
     private void swap(CachePage<T>[] cachePages, int firstPos, int secondPos) {
-        
+        CachePage<T> cachePagetmp = cachePages[firstPos];
+        cachePages[secondPos] = cachePages[secondPos];
+        cachePages[secondPos] = cachePagetmp;
+    }
+
+    public void siftDown(CachePage<T>[] cachePageHeap, int pos , int n) {
+        while (!isLeaf(pos, n)) {
+            int j = leftChild(pos);
+            int rc = rightChild(pos);
+
+            if ((rc < n) && (cachePageHeap[j].timestamp < cachePageHeap[rc].timestamp)) {
+                j = rc;
+            }
+            if (cachePageHeap[pos].timestamp > cachePageHeap[j].timestamp) {
+                return;
+            }
+            swap(cachePageHeap, j, pos);
+            pos = j;
+        }
+    }
+
+    /**
+     * 是否是叶结点
+     * @param pos
+     * @param n
+     * @return
+     */
+    private boolean isLeaf(int pos, int n) {
+        return (pos >= n / 2) && (pos < n);
+    }
+
+    private int parent(int pos) {
+        return (pos - 1) / 2;
+    }
+
+    private int leftChild(int pos) {
+        return 2*pos + 1;
+    }
+
+    private int rightChild(int pos) {
+        return 2*pos + 2;
+    }
+
+    public void buildHeap(CachePage<T>[] cachePageHeap, int n) {
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            siftDown(cachePageHeap, i, n);
+        }
     }
     public static void main(String arg[]) {
         //System.out.println(System.currentTimeMillis());
