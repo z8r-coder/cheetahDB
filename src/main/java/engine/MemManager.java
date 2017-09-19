@@ -471,6 +471,9 @@ public class MemManager<T> {
         return freePage;
     }
 
+    private void swap(CachePage<T>[] cachePages, int firstPos, int secondPos) {
+        
+    }
     public static void main(String arg[]) {
         //System.out.println(System.currentTimeMillis());
         String teststr = null;
