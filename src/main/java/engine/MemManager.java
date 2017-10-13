@@ -378,9 +378,6 @@ public class MemManager<T> {
 //    }
     /**
      * 从磁盘中读取节点
-     * @param id
-     * @return
-     * @throws Exception
      */
     private DiskNode<T> readFromDisk(long id) throws Exception {
         //该结点的起始位置,1开始
